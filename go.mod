@@ -10,6 +10,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	go.uber.org/zap v1.16.0
 	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4
-	google.golang.org/grpc v1.33.2
+	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 )
