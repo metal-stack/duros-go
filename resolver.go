@@ -52,7 +52,7 @@ func newLbResolver(log *zap.SugaredLogger, scheme string, targets EPs) *lbResolv
 		log:    log,
 		tgts:   targets.String(),
 	}
-	r.log.Infow("initializing...", "targets", r.tgts)
+	r.log.Debugw("initializing...", "targets", r.tgts)
 	return r
 }
 
@@ -64,7 +64,7 @@ func (r *lbResolver) Build(
 	target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions,
 ) (resolver.Resolver, error) {
 	r.cc = cc
-	r.log.Infow("building...", "targets", r.tgts)
+	r.log.Debugw("building...", "targets", r.tgts)
 	r.updateCCState()
 	return r, nil
 }
@@ -90,7 +90,7 @@ func (r *lbResolver) ResolveNow(o resolver.ResolveNowOptions) {
 	}
 	r.tgts = r.eps.String()
 	r.mu.Unlock()
-	r.log.Infow("resolving...", "targets", r.tgts)
+	r.log.Debugw("resolving...", "targets", r.tgts)
 
 	r.updateCCState()
 }
