@@ -29,10 +29,13 @@ var (
 	prng = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
+// GRPCScheme the scheme to talk to the duros api endpoint, can be plaintext or https
 type GRPCScheme string
 
 const (
-	GRPC  GRPCScheme = "grpc"
+	// GRPC defines a plaitext communication
+	GRPC GRPCScheme = "grpc"
+	// GRPCS defines https protocol for the communication
 	GRPCS GRPCScheme = "grpcs"
 )
 

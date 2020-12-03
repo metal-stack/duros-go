@@ -74,10 +74,17 @@ func main() {
 	}
 	fmt.Printf("Cluster:%v\n", info)
 
-	projectID := "project-a"
-	lpr, err := durosClient.ListProjects(ctx, &v2.ListProjectsRequest{})
+	err = createProjectWithCredentials(ctx, durosClient)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func createProjectWithCredentials(ctx context.Context, client v2.DurosAPIClient) error {
+	projectID := "project-a"
+	lpr, err := client.ListProjects(ctx, &v2.ListProjectsRequest{})
+	if err != nil {
+		return err
 	}
 	projectExists := false
 	for _, p := range lpr.Projects {
@@ -87,33 +94,34 @@ func main() {
 		}
 	}
 	if !projectExists {
-		project, err := durosClient.CreateProject(ctx, &v2.CreateProjectRequest{Name: projectID})
+		project, err := client.CreateProject(ctx, &v2.CreateProjectRequest{Name: projectID})
 		if err != nil {
-			panic(err)
+			return err
 		}
 		fmt.Printf("Project created:%q\n", project)
 	}
 
-	creds, err := durosClient.ListCredentials(ctx, &v2.ListCredentialsRequest{ProjectName: projectID})
+	creds, err := client.ListCredentials(ctx, &v2.ListCredentialsRequest{ProjectName: projectID})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	for _, cred := range creds.Credentials {
 		fmt.Printf("Credential: ID:%s Project:%s Type:%s\n", cred.ID, cred.ProjectName, cred.Type)
-		_, err := durosClient.DeleteCredential(ctx, &v2.DeleteCredentialRequest{ID: cred.ID, ProjectName: cred.ProjectName})
+		_, err := client.DeleteCredential(ctx, &v2.DeleteCredentialRequest{ID: cred.ID, ProjectName: cred.ProjectName})
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
 	id := uuid.New()
-	credential, err := durosClient.CreateCredential(ctx, &v2.CreateCredentialRequest{
+	credential, err := client.CreateCredential(ctx, &v2.CreateCredentialRequest{
 		ProjectName: projectID,
 		ID:          id.String(),
 		Type:        v2.CredsType_RS256PubKey,
 		Payload:     []byte(adminPub),
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	fmt.Printf("Credentials created:%s type:%s\n", credential.ID, credential.Type)
+	return nil
 }

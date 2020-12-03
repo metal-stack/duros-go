@@ -101,7 +101,7 @@ func (eps EPs) Clone() EPs {
 }
 
 // for sort.Interface:
-// Len returns the lenght of the EPs
+// Len returns the length of the EPs
 func (eps EPs) Len() int { return len(eps) }
 
 // Swap the content of the EPs
