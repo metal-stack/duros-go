@@ -7,3 +7,5 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/metal-stack/duros-go/blob/master/LICENSE)
 
 A lightbits duros api go client library.
+
+A usage example can be found [here](https://github.com/metal-stack/duros-go/blob/master/cmd/cli/cli.go).
