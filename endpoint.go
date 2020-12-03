@@ -66,8 +66,8 @@ func parseStricter(endpoint string) (EP, error) {
 	return EP{Host: host, Port: uint16(portNum)}, nil
 }
 
-// IsValid returns true for a valid EP
-func (ep EP) IsValid() bool {
+// isValid returns true for a valid EP
+func (ep EP) isValid() bool {
 	return ep != EP{}
 }
 
@@ -83,18 +83,18 @@ func (eps EPs) String() string {
 	return strings.Join(tgts, ",")
 }
 
-// IsValid returns true for a valid EPs
-func (eps EPs) IsValid() bool {
+// isValid returns true for a valid EPs
+func (eps EPs) isValid() bool {
 	for _, ep := range eps {
-		if !ep.IsValid() {
+		if !ep.isValid() {
 			return false
 		}
 	}
 	return len(eps) >= 1
 }
 
-// Clone create a copy of the given EPs
-func (eps EPs) Clone() EPs {
+// clone create a copy of the given EPs
+func (eps EPs) clone() EPs {
 	res := make([]EP, len(eps))
 	copy(res, eps)
 	return res
@@ -135,6 +135,15 @@ func canonicalize(targets []string, parser func(string) (EP, error)) (EPs, error
 // ParseEndpoints parse a slice of strings in the form of <host>:<port> into a slice of EP.
 func ParseEndpoints(endpoints []string) (EPs, error) {
 	return canonicalize(endpoints, ParseEndpoint)
+}
+
+// MustParseEndpoints is equal to ParseEndpoints but panics on error
+func MustParseEndpoints(endpoints []string) EPs {
+	eps, err := ParseEndpoints(endpoints)
+	if err != nil {
+		panic(fmt.Sprintf("endpoint: ParseEndpoints(%s): %s", endpoints, err.Error()))
+	}
+	return eps
 }
 
 // ParseCSV parses a string containing comma-separated list of target

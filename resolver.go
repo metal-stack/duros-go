@@ -48,7 +48,7 @@ type lbResolver struct {
 func newLbResolver(log *zap.SugaredLogger, scheme string, targets EPs) *lbResolver {
 	r := &lbResolver{
 		scheme: scheme,
-		eps:    targets.Clone(),
+		eps:    targets.clone(),
 		log:    log,
 		tgts:   targets.String(),
 	}

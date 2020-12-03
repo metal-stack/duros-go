@@ -69,7 +69,7 @@ type client struct {
 // passed here) - `DeadlineExceeded` will be returned as usual, and the caller
 // can retry the operation.
 func Dial(ctx context.Context, targets EPs, grpcScheme GRPCScheme, token string, log *zap.SugaredLogger) (durosv2.DurosAPIClient, error) {
-	if !targets.IsValid() {
+	if !targets.isValid() {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"invalid target endpoints specified: [%s]", targets)
 	}
@@ -82,7 +82,7 @@ func Dial(ctx context.Context, targets EPs, grpcScheme GRPCScheme, token string,
 	)
 
 	res := &client{
-		eps:  targets.Clone(),
+		eps:  targets.clone(),
 		id:   id,
 		tgts: targets.String(),
 		log:  log,
