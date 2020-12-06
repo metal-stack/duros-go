@@ -7,6 +7,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	v2 "github.com/metal-stack/duros-go/api/duros/v2"
 )
 
 type lbJWTClaims struct {
@@ -16,6 +17,11 @@ type lbJWTClaims struct {
 	jwt.StandardClaims
 
 	Roles []string `json:"roles,omitempty"` // mandatory custom claim
+}
+
+// NewJWTTokenForCredential create a new JWTToken where subject and kid is taken from the credential
+func NewJWTTokenForCredential(credential *v2.Credential, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
+	return NewJWTToken(credential.ProjectName, credential.ID, roles, expires, keyPair)
 }
 
 // NewJWTToken create a JWT Token to use to authenticate against a duros API endpoint
