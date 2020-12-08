@@ -20,8 +20,8 @@ type lbJWTClaims struct {
 }
 
 // NewJWTTokenForCredential create a new JWTToken where subject and kid is taken from the credential
-func NewJWTTokenForCredential(credential *v2.Credential, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
-	return NewJWTToken(credential.ProjectName, credential.ID, roles, expires, keyPair)
+func NewJWTTokenForCredential(subject string, credential *v2.Credential, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
+	return NewJWTToken(subject, credential.ProjectName+":"+credential.ID, roles, expires, keyPair)
 }
 
 // NewJWTToken create a JWT Token to use to authenticate against a duros API endpoint
