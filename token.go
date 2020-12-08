@@ -20,8 +20,8 @@ type lbJWTClaims struct {
 }
 
 // NewJWTTokenForCredential create a new JWTToken where subject and kid is taken from the credential
-func NewJWTTokenForCredential(subject string, credential *v2.Credential, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
-	return NewJWTToken(subject, credential.ProjectName+":"+credential.ID, roles, expires, keyPair)
+func NewJWTTokenForCredential(subject, issuer string, credential *v2.Credential, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
+	return NewJWTToken(subject, issuer, credential.ProjectName+":"+credential.ID, roles, expires, keyPair)
 }
 
 // NewJWTToken create a JWT Token to use to authenticate against a duros API endpoint
@@ -37,7 +37,7 @@ func NewJWTTokenForCredential(subject string, credential *v2.Credential, roles [
 //   foo:admin which gives this user  (subject) admin rights to the foo resource
 // expires: Duration after which this token will expire.
 // keyPair: RSA public and private key which should be used to sign this token
-func NewJWTToken(subject string, kid string, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
+func NewJWTToken(subject, issuer string, kid string, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
 	now := time.Now().UTC()
 	claims := &lbJWTClaims{
 		// see overview of "standard" JWT claims as used by jwt-go here:
@@ -53,6 +53,7 @@ func NewJWTToken(subject string, kid string, roles []string, expires time.Durati
 
 			// put name/title/ID of whoever will be using this JWT here:
 			Subject: subject,
+			Issuer:  issuer,
 		},
 		Roles: roles,
 	}

@@ -15,6 +15,7 @@ func TestSimple(t *testing.T) {
 	}
 	token, err := NewJWTToken(
 		"tenant-foo",          // 'sub' claim, who'll be using this JWT
+		"duros-go",            // 'iss' who issued this token
 		"foo:cred-1",          // matches LightOS cred 'cred-1' in proj 'foo'
 		[]string{"foo:admin"}, // user of JWT can act as 'admin' of 'foo'
 		30*24*time.Hour,       // Expire after 30Days
