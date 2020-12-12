@@ -3,7 +3,9 @@ package duros
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"strconv"
 	"sync"
@@ -55,6 +57,23 @@ type client struct {
 	switched bool // a matter of aesthetics: 1st conn shouldn't warn
 }
 
+// DialConfig is the configuration to create a duros-api connection
+type DialConfig struct {
+	Endpoints   EPs
+	Scheme      GRPCScheme
+	Token       string
+	Credentials *Credentials
+	Log         *zap.SugaredLogger
+}
+
+// Credentials specify the TLS Certificate based authentication for the grpc connection
+type Credentials struct {
+	ServerName string
+	Certfile   string
+	KeyFile    string
+	CAFile     string
+}
+
 // Dial creates a LightOS cluster client. it is a blocking call and will only
 // return once the connection to [at least one of the] `targets` has been
 // actually established - subject to `ctx` limitations. if `ctx` specified
@@ -68,23 +87,27 @@ type client struct {
 // longer than the actual operation context timeout (as opposed to the `ctx`
 // passed here) - `DeadlineExceeded` will be returned as usual, and the caller
 // can retry the operation.
-func Dial(ctx context.Context, targets EPs, grpcScheme GRPCScheme, token string, log *zap.SugaredLogger) (durosv2.DurosAPIClient, error) {
-	if !targets.isValid() {
+func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error) {
+	if !config.Endpoints.isValid() {
 		return nil, status.Errorf(codes.InvalidArgument,
-			"invalid target endpoints specified: [%s]", targets)
+			"invalid target endpoints specified: [%s]", config.Endpoints)
 	}
 	id := fmt.Sprintf("%07s", strconv.FormatUint(uint64(prng.Uint32()), 36))
+	if config.Log == nil {
+		return nil, fmt.Errorf("logger is nil")
+	}
+	log := config.Log
 
 	log.Infow("connecting...",
 		"client", "duros-go",
-		"targets", targets,
+		"targets", config.Endpoints,
 		"client-id", id,
 	)
 
 	res := &client{
-		eps:  targets.clone(),
+		eps:  config.Endpoints.clone(),
 		id:   id,
-		tgts: targets.String(),
+		tgts: config.Endpoints.String(),
 		log:  log,
 	}
 
@@ -137,11 +160,19 @@ func Dial(ctx context.Context, targets EPs, grpcScheme GRPCScheme, token string,
 		grpc.WithConnectParams(cp),
 		grpc.WithResolvers(lbr),
 		grpc.WithPerRPCCredentials(tokenAuth{
-			token: token,
+			token: config.Token,
 		}),
 	}
+	// Configure tls ca certificate based auth if credentials are given
+	if config.Credentials != nil {
+		creds, err := getCredentials(*config.Credentials)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, grpc.WithTransportCredentials(creds))
+	}
 
-	switch grpcScheme {
+	switch config.Scheme {
 	case GRPC:
 		log.Infof("connecting insecurely")
 		opts = append(opts, grpc.WithInsecure())
@@ -255,4 +286,35 @@ func grpcToZapLevel(code codes.Code) zapcore.Level {
 	default:
 		return zapcore.ErrorLevel
 	}
+}
+
+func getCredentials(c Credentials) (credentials.TransportCredentials, error) {
+	certPool, err := x509.SystemCertPool()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load system credentials: %w", err)
+	}
+	if c.CAFile == "" || c.Certfile == "" || c.KeyFile == "" || c.ServerName == "" {
+		return nil, fmt.Errorf("all credentials properties must be configured")
+	}
+	ca, err := ioutil.ReadFile(c.CAFile)
+	if err != nil {
+		return nil, fmt.Errorf("could not read ca certificate: %w", err)
+	}
+
+	ok := certPool.AppendCertsFromPEM(ca)
+	if !ok {
+		return nil, fmt.Errorf("failed to append ca certs: %s", c.CAFile)
+	}
+
+	clientCertificate, err := tls.LoadX509KeyPair(c.Certfile, c.KeyFile)
+	if err != nil {
+		return nil, fmt.Errorf("could not load client key pair: %w", err)
+	}
+
+	creds := credentials.NewTLS(&tls.Config{
+		ServerName:   c.ServerName,
+		Certificates: []tls.Certificate{clientCertificate},
+		RootCAs:      certPool,
+	})
+	return creds, nil
 }

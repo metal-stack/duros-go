@@ -37,13 +37,21 @@ htcrucZWyL4=
 
 func main() {
 	var (
-		endpoints string
-		token     string
-		scheme    string
+		endpoints  string
+		token      string
+		scheme     string
+		caFile     string
+		certFile   string
+		keyFile    string
+		serverName string
 	)
 	flag.StringVar(&token, "token", "", "The token to authenticate against the lightbits api.")
 	flag.StringVar(&scheme, "scheme", "grpcs", "The scheme to connect to the lightbits api, can be grpc|grpcs")
 	flag.StringVar(&endpoints, "endpoints", "localhost:443", "The endpoints, in the form host:port,host:port of the lightbits api.")
+	flag.StringVar(&caFile, "ca-file", "", "the filename of the ca for certificate based authentication")
+	flag.StringVar(&certFile, "cert-file", "", "the filename of the ca certificate for certificate based authentication")
+	flag.StringVar(&keyFile, "key-file", "", "the filename of the key  for certificate based authentication")
+	flag.StringVar(&serverName, "server-name", "", "the servername to validate against for certificate based authentication")
 
 	flag.Parse()
 
@@ -62,8 +70,23 @@ func main() {
 	}
 
 	ctx := context.Background()
-	durosEPs := duros.MustParseCSV(endpoints)
-	durosClient, err := duros.Dial(ctx, durosEPs, grpcScheme, token, zlog.Sugar())
+	dialConfig := duros.DialConfig{
+		Endpoints: duros.MustParseCSV(endpoints),
+		Scheme:    grpcScheme,
+		Token:     token,
+		Log:       zlog.Sugar(),
+	}
+	if caFile != "" && certFile != "" && keyFile != "" && serverName != "" {
+		creds := &duros.Credentials{
+			CAFile:     caFile,
+			Certfile:   certFile,
+			KeyFile:    keyFile,
+			ServerName: serverName,
+		}
+		dialConfig.Credentials = creds
+	}
+
+	durosClient, err := duros.Dial(ctx, dialConfig)
 	if err != nil {
 		panic(err)
 	}
