@@ -41,3 +41,8 @@ protoc: third-party
 protoc-ci: third-party
 	protoc -I api --go_out=plugins=grpc:api api/lightbits/api/duros/v1/*.proto
 	protoc -I api --go_out=plugins=grpc:api api/lightbits/api/duros/v2/*.proto
+
+.PHONY: mocks
+mocks:
+	@if ! which mockery > /dev/null; then echo "mockery needs to be installed (https://github.com/vektra/mockery)"; exit 1; fi
+	cd api/duros/v2 && mockery --name DurosAPIClient cd -
