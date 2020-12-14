@@ -70,7 +70,7 @@ type DialConfig struct {
 type Credentials struct {
 	ServerName string
 	Certfile   string
-	KeyFile    string
+	Keyfile    string
 	CAFile     string
 }
 
@@ -293,7 +293,7 @@ func getCredentials(c Credentials) (credentials.TransportCredentials, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load system credentials: %w", err)
 	}
-	if c.CAFile == "" || c.Certfile == "" || c.KeyFile == "" || c.ServerName == "" {
+	if c.CAFile == "" || c.Certfile == "" || c.Keyfile == "" || c.ServerName == "" {
 		return nil, fmt.Errorf("all credentials properties must be configured")
 	}
 	ca, err := ioutil.ReadFile(c.CAFile)
@@ -306,7 +306,7 @@ func getCredentials(c Credentials) (credentials.TransportCredentials, error) {
 		return nil, fmt.Errorf("failed to append ca certs: %s", c.CAFile)
 	}
 
-	clientCertificate, err := tls.LoadX509KeyPair(c.Certfile, c.KeyFile)
+	clientCertificate, err := tls.LoadX509KeyPair(c.Certfile, c.Keyfile)
 	if err != nil {
 		return nil, fmt.Errorf("could not load client key pair: %w", err)
 	}
