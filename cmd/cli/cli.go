@@ -80,7 +80,7 @@ func main() {
 		creds := &duros.Credentials{
 			CAFile:     caFile,
 			Certfile:   certFile,
-			KeyFile:    keyFile,
+			Keyfile:    keyFile,
 			ServerName: serverName,
 		}
 		dialConfig.Credentials = creds
