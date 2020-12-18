@@ -164,21 +164,21 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		}),
 	}
 	// Configure tls ca certificate based auth if credentials are given
-	if config.Credentials != nil {
-		creds, err := getCredentials(*config.Credentials)
-		if err != nil {
-			return nil, err
-		}
-		opts = append(opts, grpc.WithTransportCredentials(creds))
-	}
-
 	switch config.Scheme {
 	case GRPC:
 		log.Infof("connecting insecurely")
 		opts = append(opts, grpc.WithInsecure())
 	case GRPCS:
 		log.Infof("connecting securely")
-		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
+		if config.Credentials != nil {
+			creds, err := getCredentials(*config.Credentials)
+			if err != nil {
+				return nil, err
+			}
+			opts = append(opts, grpc.WithTransportCredentials(creds))
+		} else {
+			opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
+		}
 	default:
 		return nil, fmt.Errorf("unsupported scheme:%v", scheme)
 	}
