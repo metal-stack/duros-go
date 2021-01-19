@@ -62,7 +62,7 @@ func NewJWTToken(subject, issuer string, kid string, roles []string, expires tim
 	token.Header["kid"] = kid
 	res, err := token.SignedString(keyPair)
 	if err != nil {
-		return "", fmt.Errorf("unable to sign RS256 JWT: %v", err)
+		return "", fmt.Errorf("unable to sign RS256 JWT: %w", err)
 	}
 	return res, nil
 }

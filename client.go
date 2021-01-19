@@ -195,12 +195,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	}
 
 	c := durosv2.NewDurosAPIClient(res.conn)
-	v, err := c.GetVersion(ctx, &durosv2.GetVersionRequest{})
-	if err != nil {
-		return nil, err
-	}
-	log.Info("connected!", "version", v.ApiVersion)
-
 	return c, nil
 }
 
@@ -315,6 +309,7 @@ func getCredentials(c Credentials) (credentials.TransportCredentials, error) {
 		ServerName:   c.ServerName,
 		Certificates: []tls.Certificate{clientCertificate},
 		RootCAs:      certPool,
+		MinVersion:   tls.VersionTLS12,
 	})
 	return creds, nil
 }
