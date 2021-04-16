@@ -47,6 +47,7 @@ func parseStricter(endpoint string) (EP, error) {
 	}
 	host, port, err := net.SplitHostPort(endpoint)
 	if err != nil {
+		//nolint dunno howto convert this to errors.As
 		if addrErr, ok := err.(*net.AddrError); ok {
 			return EP{}, mkErr("%s", addrErr.Err)
 		}
