@@ -137,6 +137,36 @@ func (_m *DurosAPIClient) CreateProject(ctx context.Context, in *v2.CreateProjec
 	return r0, r1
 }
 
+// CreateResourcePolicy provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) CreateResourcePolicy(ctx context.Context, in *v2.CreateResourcePolicyRequest, opts ...grpc.CallOption) (*v2.ResourcePolicy, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ResourcePolicy
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.CreateResourcePolicyRequest, ...grpc.CallOption) *v2.ResourcePolicy); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ResourcePolicy)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.CreateResourcePolicyRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateServer provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) CreateServer(ctx context.Context, in *v2.CreateServerRequest, opts ...grpc.CallOption) (*v2.Server, error) {
 	_va := make([]interface{}, len(opts))
@@ -159,6 +189,36 @@ func (_m *DurosAPIClient) CreateServer(ctx context.Context, in *v2.CreateServerR
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.CreateServerRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// CreateSnapshot provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) CreateSnapshot(ctx context.Context, in *v2.CreateSnapshotRequest, opts ...grpc.CallOption) (*v2.Snapshot, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.Snapshot
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.CreateSnapshotRequest, ...grpc.CallOption) *v2.Snapshot); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.Snapshot)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.CreateSnapshotRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -287,6 +347,36 @@ func (_m *DurosAPIClient) DeleteProject(ctx context.Context, in *v2.DeleteProjec
 	return r0, r1
 }
 
+// DeleteResourcePolicy provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) DeleteResourcePolicy(ctx context.Context, in *v2.DeleteResourcePolicyRequest, opts ...grpc.CallOption) (*v2.DeleteResourcePolicyResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.DeleteResourcePolicyResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.DeleteResourcePolicyRequest, ...grpc.CallOption) *v2.DeleteResourcePolicyResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.DeleteResourcePolicyResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.DeleteResourcePolicyRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DeleteServer provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) DeleteServer(ctx context.Context, in *v2.DeleteServerRequest, opts ...grpc.CallOption) (*v2.DeleteServerResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -309,6 +399,36 @@ func (_m *DurosAPIClient) DeleteServer(ctx context.Context, in *v2.DeleteServerR
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.DeleteServerRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DeleteSnapshot provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) DeleteSnapshot(ctx context.Context, in *v2.DeleteSnapshotRequest, opts ...grpc.CallOption) (*v2.DeleteSnapshotResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.DeleteSnapshotResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.DeleteSnapshotRequest, ...grpc.CallOption) *v2.DeleteSnapshotResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.DeleteSnapshotResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.DeleteSnapshotRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -347,6 +467,36 @@ func (_m *DurosAPIClient) DeleteVolume(ctx context.Context, in *v2.DeleteVolumeR
 	return r0, r1
 }
 
+// DisableFeatureFlag provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) DisableFeatureFlag(ctx context.Context, in *v2.DisableFeatureFlagRequest, opts ...grpc.CallOption) (*v2.SetFeatureFlagResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.SetFeatureFlagResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.DisableFeatureFlagRequest, ...grpc.CallOption) *v2.SetFeatureFlagResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.SetFeatureFlagResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.DisableFeatureFlagRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // DisableServer provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) DisableServer(ctx context.Context, in *v2.DisableServerRequest, opts ...grpc.CallOption) (*v2.DisableServerResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -369,6 +519,36 @@ func (_m *DurosAPIClient) DisableServer(ctx context.Context, in *v2.DisableServe
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.DisableServerRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// EnableFeatureFlag provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) EnableFeatureFlag(ctx context.Context, in *v2.EnableFeatureFlagRequest, opts ...grpc.CallOption) (*v2.SetFeatureFlagResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.SetFeatureFlagResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.EnableFeatureFlagRequest, ...grpc.CallOption) *v2.SetFeatureFlagResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.SetFeatureFlagResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.EnableFeatureFlagRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -467,6 +647,36 @@ func (_m *DurosAPIClient) GetCluster(ctx context.Context, in *v2.GetClusterReque
 	return r0, r1
 }
 
+// GetClusterConfigParam provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) GetClusterConfigParam(ctx context.Context, in *v2.GetClusterConfigParamRequest, opts ...grpc.CallOption) (*v2.ClusterConfigParam, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ClusterConfigParam
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.GetClusterConfigParamRequest, ...grpc.CallOption) *v2.ClusterConfigParam); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ClusterConfigParam)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.GetClusterConfigParamRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetClusterInfo provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) GetClusterInfo(ctx context.Context, in *v2.GetClusterRequest, opts ...grpc.CallOption) (*v2.ClusterInfoV2, error) {
 	_va := make([]interface{}, len(opts))
@@ -519,6 +729,36 @@ func (_m *DurosAPIClient) GetCredential(ctx context.Context, in *v2.GetCredentia
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.GetCredentialRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetFeatureFlag provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) GetFeatureFlag(ctx context.Context, in *v2.GetFeatureFlagRequest, opts ...grpc.CallOption) (*v2.FeatureFlagStatus, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.FeatureFlagStatus
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.GetFeatureFlagRequest, ...grpc.CallOption) *v2.FeatureFlagStatus); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.FeatureFlagStatus)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.GetFeatureFlagRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -647,6 +887,36 @@ func (_m *DurosAPIClient) GetProject(ctx context.Context, in *v2.GetProjectReque
 	return r0, r1
 }
 
+// GetResourcePolicy provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) GetResourcePolicy(ctx context.Context, in *v2.GetResourcePolicyRequest, opts ...grpc.CallOption) (*v2.ResourcePolicy, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ResourcePolicy
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.GetResourcePolicyRequest, ...grpc.CallOption) *v2.ResourcePolicy); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ResourcePolicy)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.GetResourcePolicyRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetRole provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) GetRole(ctx context.Context, in *v2.GetRoleRequest, opts ...grpc.CallOption) (*v2.GetRoleResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -699,6 +969,36 @@ func (_m *DurosAPIClient) GetServer(ctx context.Context, in *v2.GetServerRequest
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.GetServerRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetSnapshot provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) GetSnapshot(ctx context.Context, in *v2.GetSnapshotRequest, opts ...grpc.CallOption) (*v2.Snapshot, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.Snapshot
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.GetSnapshotRequest, ...grpc.CallOption) *v2.Snapshot); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.Snapshot)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.GetSnapshotRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -797,6 +1097,36 @@ func (_m *DurosAPIClient) ListAdminEndpoints(ctx context.Context, in *v2.ListAdm
 	return r0, r1
 }
 
+// ListClusterConfigParams provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) ListClusterConfigParams(ctx context.Context, in *v2.ListClusterConfigParamsRequest, opts ...grpc.CallOption) (*v2.ListClusterConfigParamsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ListClusterConfigParamsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.ListClusterConfigParamsRequest, ...grpc.CallOption) *v2.ListClusterConfigParamsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ListClusterConfigParamsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.ListClusterConfigParamsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListCredentials provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) ListCredentials(ctx context.Context, in *v2.ListCredentialsRequest, opts ...grpc.CallOption) (*v2.ListCredentialsResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -819,6 +1149,36 @@ func (_m *DurosAPIClient) ListCredentials(ctx context.Context, in *v2.ListCreden
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.ListCredentialsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListFeatureFlags provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) ListFeatureFlags(ctx context.Context, in *v2.ListFeatureFlagsRequest, opts ...grpc.CallOption) (*v2.ListFeatureFlagsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ListFeatureFlagsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.ListFeatureFlagsRequest, ...grpc.CallOption) *v2.ListFeatureFlagsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ListFeatureFlagsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.ListFeatureFlagsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -947,6 +1307,36 @@ func (_m *DurosAPIClient) ListProjects(ctx context.Context, in *v2.ListProjectsR
 	return r0, r1
 }
 
+// ListResourcePolicies provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) ListResourcePolicies(ctx context.Context, in *v2.ListResourcePoliciesRequest, opts ...grpc.CallOption) (*v2.ListResourcePoliciesResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ListResourcePoliciesResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.ListResourcePoliciesRequest, ...grpc.CallOption) *v2.ListResourcePoliciesResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ListResourcePoliciesResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.ListResourcePoliciesRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListRoles provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) ListRoles(ctx context.Context, in *v2.ListRolesRequest, opts ...grpc.CallOption) (*v2.ListRolesResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -999,6 +1389,36 @@ func (_m *DurosAPIClient) ListServers(ctx context.Context, in *v2.ListServersReq
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.ListServersRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListSnapshots provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) ListSnapshots(ctx context.Context, in *v2.ListSnapshotsRequest, opts ...grpc.CallOption) (*v2.ListSnapshotsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.ListSnapshotsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.ListSnapshotsRequest, ...grpc.CallOption) *v2.ListSnapshotsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.ListSnapshotsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.ListSnapshotsRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -1067,6 +1487,36 @@ func (_m *DurosAPIClient) ReplaceNode(ctx context.Context, in *v2.ReplaceNodeReq
 	return r0, r1
 }
 
+// RollbackVolume provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) RollbackVolume(ctx context.Context, in *v2.RollbackVolumeRequest, opts ...grpc.CallOption) (*v2.RollbackVolumeResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.RollbackVolumeResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.RollbackVolumeRequest, ...grpc.CallOption) *v2.RollbackVolumeResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.RollbackVolumeResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.RollbackVolumeRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateAdminEndpoint provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) UpdateAdminEndpoint(ctx context.Context, in *v2.UpdateAdminEndpointRequest, opts ...grpc.CallOption) (*v2.AdminEndpoint, error) {
 	_va := make([]interface{}, len(opts))
@@ -1097,6 +1547,36 @@ func (_m *DurosAPIClient) UpdateAdminEndpoint(ctx context.Context, in *v2.Update
 	return r0, r1
 }
 
+// UpdateClusterConfigParam provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) UpdateClusterConfigParam(ctx context.Context, in *v2.UpdateClusterConfigParamRequest, opts ...grpc.CallOption) (*v2.UpdateClusterConfigParamResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.UpdateClusterConfigParamResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.UpdateClusterConfigParamRequest, ...grpc.CallOption) *v2.UpdateClusterConfigParamResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.UpdateClusterConfigParamResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.UpdateClusterConfigParamRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateNvmeDevice provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) UpdateNvmeDevice(ctx context.Context, in *v2.UpdateNvmeDeviceRequest, opts ...grpc.CallOption) (*v2.UpdateNvmeDeviceResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -1119,6 +1599,36 @@ func (_m *DurosAPIClient) UpdateNvmeDevice(ctx context.Context, in *v2.UpdateNvm
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.UpdateNvmeDeviceRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateResourcePolicy provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) UpdateResourcePolicy(ctx context.Context, in *v2.UpdateResourcePolicyRequest, opts ...grpc.CallOption) (*v2.UpdateResourcePolicyResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v2.UpdateResourcePolicyResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.UpdateResourcePolicyRequest, ...grpc.CallOption) *v2.UpdateResourcePolicyResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.UpdateResourcePolicyResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.UpdateResourcePolicyRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
