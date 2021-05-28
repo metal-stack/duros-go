@@ -28,6 +28,7 @@ import (
 )
 
 var (
+	//nolint
 	prng = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
@@ -199,6 +200,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 			}
 			opts = append(opts, grpc.WithTransportCredentials(creds))
 		} else {
+			//nolint
 			opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
 		}
 	default:

@@ -110,6 +110,44 @@ message VolumeStatisticsApi {
     uint64 physicalUsedStorage = 2;
     // commpression ratio
     //
-    // compression ratio logicalUsedStorage/physicalUsedStorage
+    // compression ratio userWritten/physicalCapacity
     double compressionRatio = 3;
+    // total commpression ratio
+    //
+    // compression ratio sum(userWritten) / sum(physical capacity)
+    double totalCompressionRatio = 4; //need to decide on a name
+    // PhysicalCapacity
+    //
+    // The physical capacity that exists in this volume layer
+    uint64 physicalCapacity = 5;
+    // Physical Owned storage Capacity
+    //
+    // The capacity that would be freed when volume is deleted
+    uint64 physicalOwnedCapacity = 6;
+    uint64 physicalOwnedMemory = 7;
+    uint64 physicalMemory = 8;
+    uint64 userWritten = 9;
+}
+
+message SnapshotStatisticsApi {
+    // PhysicalCapacity
+    //
+    // The physical capacity that exists in this volume layer
+    uint64 physicalCapacity = 1;
+    // Physical Owned storage Capacity
+    //
+    // The capacity that would be freed when snapshot would be deleted
+    uint64 physicalOwnedCapacity = 2;
+    // Physical Owned Memory
+    //
+    // The number, in bytes, of md ranges multiplied by the size of md range
+    uint64 physicalOwnedMemory = 3;
+    // Physical Memory
+    //
+    // Memory used by this MSVV (how many chunks)
+    uint64 physicalMemory = 4;
+    // User Written
+    //
+    // Amount, in bytes of data requested to be written by the user
+    uint64 userWritten = 5;
 }

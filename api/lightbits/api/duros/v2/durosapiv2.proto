@@ -5,9 +5,11 @@ package lightbits.api.duros.v2;
 option go_package = "duros/v2;v2";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 import "lightbits/api/duros/v2/statisticsapiv2.proto";
+import "lightbits/api/duros/v2/schedule_policy.proto";
 
 service DurosAPI {
     rpc GetVersion(GetVersionRequest) returns (Version) {
@@ -23,11 +25,11 @@ service DurosAPI {
     rpc CreateVolume(CreateVolumeRequest) returns (Volume) {
         option (google.api.http) = {
             post: "/api/v2/projects/{projectName}/volumes"
+            body: "*"
             additional_bindings {
                 post: "/api/v2/volumes"
                 body: "*"
             }
-            body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create volume.";
@@ -150,7 +152,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List volumes.";
-            description: "List can be filtered by failure domain. List can be partially returned by given offset UUID and size of the list. If offset is not provided, list is returned from the start. If offset UUID is provided, list starts from the next volume after the provided offset UUID. If limit is provided, length of the returned list is bounded by the limit. If limit is not provided, list is returned until the end. projectName is mandatory unless you are the admin.";
+            description: "List can be filtered by failure domain. List can be partially returned by given offset UUID and size of the list. If offset is not provided, list is returned from the start. If offset UUID is provided, list starts from the next volume after the provided offset UUID. If limit is provided, length of the returned list is bounded by the limit. If limit is not provided, list is returned until the end. projectName is mandatory unless you are the admin. List can also be filtered by a specific source snapshot.";
             tags: "list volume";
             responses: {
                 key: "400";
@@ -530,50 +532,50 @@ service DurosAPI {
         };
     }
 
-   rpc UpdateNvmeDevice(UpdateNvmeDeviceRequest) returns (UpdateNvmeDeviceResponse) {
-       option (google.api.http) = {
-           post: "/api/v2/nvmeDevices/{serialNumber}"
-           body: "*"
-       };
-       option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-           summary: "Update NVMe device on a node.";
-           description: "Update NVMe device defined by serial number on a node defined by node UUID.";
-           tags: "node";
-           responses: {
-               key: "500";
-               value: {
-                   description: "Internal error of LightOS.";
-                   schema: { json_schema: { type: INTEGER;	} }
-               }
-           }
-           responses: {
-               key: "400";
-               value: {
-                   description: "Empty serial or empty node uuid is provided or device is already attached to another node or number of node's managed devices reached maximum or node is not listed as server's node for the server that device belongs to or node isn't active.";
-                   schema: { json_schema: { type: INTEGER;	} }
-               }
-           }
-           responses: {
-               key: "404";
-               value: {
-                   description: "Serial or node uuid not found.";
-                   schema: { json_schema: { type: INTEGER;	} }
-               }
-           }
-           responses: {
-               key: "412";
-               value: {
-                   description: "Etag mismatch.";
-                   schema: { json_schema: { type: INTEGER;	} }
-               }
-           }
-           responses: {
-               key: "409";
-               value: {
-                   description: "There is a user operation in progress on the device";
-                   schema: { json_schema: { type: INTEGER;	} }
-               }
-           }
+    rpc UpdateNvmeDevice(UpdateNvmeDeviceRequest) returns (UpdateNvmeDeviceResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/nvmeDevices/{serialNumber}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update NVMe device on a node.";
+            description: "Update NVMe device defined by serial number on a node defined by node UUID.";
+            tags: "node";
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "400";
+                value: {
+                    description: "Empty serial or empty node uuid is provided or device is already attached to another node or number of node's managed devices reached maximum or node is not listed as server's node for the server that device belongs to or node isn't active.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Serial or node uuid not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "412";
+                value: {
+                    description: "Etag mismatch.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "409";
+                value: {
+                    description: "There is a user operation in progress on the device";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
             responses: {
                 key: "401";
                 value: {
@@ -588,8 +590,8 @@ service DurosAPI {
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
-       };
-   }
+        };
+    }
 
     rpc AddNvmeDevice(AddNvmeDeviceRequest) returns (AddNvmeDeviceResponse) {
         option (google.api.http) = {
@@ -655,10 +657,11 @@ service DurosAPI {
     rpc UpdateVolume(UpdateVolumeRequest) returns (UpdateVolumeResponse) {
         option (google.api.http) = {
             put: "/api/v2/projects/{projectName}/volumes/{UUID}"
+            body: "*"
             additional_bindings {
                 put: "/api/v2/volumes/{UUID}"
+                body: "*"
             }
-            body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             description: "update volume enable the change of the following attributes:\nACL list\nIPACL list";
@@ -1931,19 +1934,704 @@ service DurosAPI {
         };
     }
 
+    rpc CreateResourcePolicy(CreateResourcePolicyRequest) returns (ResourcePolicy) {
+        option (google.api.http) = {
+            post: "/api/v2/projects/{projectName}/resourcePolicies"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Create a resource policy.";
+            description: "A resource policy";
+            tags: "create resource policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \nname contains illegal characters.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the resource policy with given resource UUID is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "409";
+                value: {
+                    description: "Resource with the provided name already exists.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateResourcePolicy(UpdateResourcePolicyRequest) returns (UpdateResourcePolicyResponse) {
+        option (google.api.http) = {
+            put: "/api/v2/projects/{projectName}/resourcePolicies/{UUID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update a resource policy.";
+            description: "update resource policy enable the change of the following attributes:\nretentionTime \nschedulePolicy \ndescription";
+            tags: "update resource policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \nname contains illegal characters, \ninvalid argument value.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the resource policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListResourcePolicies(ListResourcePoliciesRequest) returns (ListResourcePoliciesResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/resourcePolicies"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List resource policies.";
+            description: "A request to list resource policies. The result can be filtered by either name or UUID";
+            tags: "list resource policies";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the resource policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetResourcePolicy(GetResourcePolicyRequest) returns (ResourcePolicy) {
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/resourcePolicies/{UUID}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get resource policy.";
+            description: "Get resource policy information by provided UUID/name";
+            tags: "get resource policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the resource policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DeleteResourcePolicy(DeleteResourcePolicyRequest) returns (DeleteResourcePolicyResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/resourcePolicies/{UUID}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete resource policy.";
+            description: "Delete resource policy information by provided UUID/name";
+            tags: "delete resource policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the resource policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc CreateSnapshot(CreateSnapshotRequest) returns (Snapshot) {
+        option (google.api.http) = {
+            post: "/api/v2/projects/{projectName}/snapshots"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Create snapshot.";
+            description: "A snapshot created from a volume";
+            tags: "create snapshot";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \nname contains illegal characters.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the snapshot with given source-volume UUID is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "409";
+                value: {
+                    description: "Resource with the provided name already exists.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "501";
+                value: {
+                    description: "Unimplemented capability (updating capacity).";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetSnapshot(GetSnapshotRequest) returns (Snapshot) {
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/snapshots/{UUID}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get snapshot.";
+            description: "Get snapshot by UUID/Name.";
+            tags: "get snapshot";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Snapshot with UUID/Name not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListSnapshots(ListSnapshotsRequest) returns (ListSnapshotsResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/snapshots"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List snapshots.";
+            description: "List can be filtered by UUID/Name.";
+            tags: "list snapshot";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DeleteSnapshot(DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {
+        option (google.api.http) = {
+            delete: "/api/v2/projects/{projectName}/snapshots/{UUID}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete snapshot.";
+            description: "Deletes snapshot with provided UUID.\nDeletion of a snapshot is a long operation. The status of deletion can be queried by GET operation on the snapshot. As long as the operation runs snapshot state is Deleting. When operation completed GET snapshot returns NotFound error response";
+            tags: "delete snapshot";
+            responses: {
+                key: "404";
+                value: {
+                    description: "Snapshot with provided UUID is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "400";
+                value: {
+                    description: "Provided invalid UUID or a snapshot state does not allow deletion (Deleting/Failed).";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "503";
+                value: {
+                    description: "Snapshot is in a temporal state that does not allow deletion currently (Creating/Updating and volume Updating).";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "412";
+                value: {
+                    description: "Etag mismatch.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "409";
+                value: {
+                    description: "There is a user operation in progress on the snapshot";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetFeatureFlag(GetFeatureFlagRequest) returns (FeatureFlagStatus) {
+        option (google.api.http) = {
+            get: "/api/v2/featureFlags/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get feature flag status";
+            description: "Get feature flag status enable / disable corresponding to given feature flag name";
+            tags: "feature flag";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc EnableFeatureFlag(EnableFeatureFlagRequest) returns (SetFeatureFlagResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/featureFlags/{name}/enable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Enable feature flag";
+            description: "Enable feature flag status corresponding to given feature flag name";
+            tags: "feature flag";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DisableFeatureFlag(DisableFeatureFlagRequest) returns (SetFeatureFlagResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/featureFlags/{name}/disable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Disable feature flag";
+            description: "Disable feature flag status corresponding to given feature flag name";
+            tags: "feature flag";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListFeatureFlags(ListFeatureFlagsRequest) returns (ListFeatureFlagsResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/featureFlags"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List feature flags";
+            description: "List feature flags";
+            tags: "feature flag";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetClusterConfigParam(GetClusterConfigParamRequest) returns (ClusterConfigParam) {
+        option (google.api.http) = {
+            get: "/api/v2/clusterConfig/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get cluster config value according to a given parameter.";
+            description: "Get cluster config value according to a given parameter.";
+            tags: "get cluster config";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Cluster config parameter wasn't not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateClusterConfigParam(UpdateClusterConfigParamRequest) returns (UpdateClusterConfigParamResponse) {
+        option (google.api.http) = {
+            put: "/api/v2/clusterConfig/{configParam.name}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update Cluster Config value.";
+            description: "Update Cluster Config value.";
+            tags: "update cluster config";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Cluster config parameter wasn't not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListClusterConfigParams(ListClusterConfigParamsRequest) returns (ListClusterConfigParamsResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/clusterConfig"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List all cluster config values.";
+            description: "List all cluster config values.";
+            tags: "list cluster config";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Cluster config parameter wasn't found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc RollbackVolume(RollbackVolumeRequest) returns (RollbackVolumeResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/projects/{projectName}/volumes/{UUID}/rollback"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Roll back a volume to a previous snapshot";
+            description: "Roll back a volume to a previous snapshot";
+            tags: "rollback volume";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Volume or snapshot UUID not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "503";
+                value: {
+                    description: "Cannot roll volume back. Volume is deleting.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
 }
 
 message AdminEndpoint {
-    enum StateEnum {
-        Unknown   = 0;
-        Creating  = 1;
-        Updating  = 2;
-        Deleting  = 3;
-        Ok        = 4;
-    }
-
     uint32 port = 1;
     repeated string ips = 2;
+    // Etag
+    //
+    // identifier for a specific version of a resource
+    string ETag = 3;
 }
 
 
@@ -2089,6 +2777,9 @@ message CreateVolumeRequest {
     //
     // project name
     string projectName = 9;
+
+    string sourceSnapshotUUID = 10;
+    string sourceSnapshotName = 11;
 }
 
 message DeleteVolumeRequest {
@@ -2233,6 +2924,10 @@ message ListVolumeRequest {
     int64 limit = 5;
     //
     string projectName = 6;
+    // source snapshot UUID
+    //
+    // Optional. Return only volumes created from this source snapshot.
+    string snapshotUUID = 7;
 }
 
 message ListNvmeDevicesRequest {
@@ -2359,6 +3054,7 @@ message DurosNodeInfo {
     string ETag = 17;
     bool readOnly = 18;
     uint32 powerupProgress = 19;
+    bool permanentFailure = 20;
 }
 
 message ListNodesResponse {
@@ -2497,6 +3193,8 @@ message Volume {
         Deleted = 4;
         Failed = 7;
         Updating = 8;
+        Rollback = 9;
+        Migrating = 10;
     }
     enum ProtocolEnum {
         ProtocolTCP = 0;
@@ -2522,6 +3220,8 @@ message Volume {
     repeated string connectedHosts = 15;
     uint32 sectorSize = 16;
     string projectName = 17;
+    string sourceSnapshotUUID = 18;
+    string sourceSnapshotName = 19;
 }
 
 message Server {
@@ -2593,4 +3293,190 @@ message ListRolesRequest {
 
 message ListRolesResponse {
     repeated Role roles = 1;
+}
+
+message Snapshot {
+    enum StateEnum {
+        Unknown = 0;
+        Creating = 1;
+        Available = 2;
+        Deleting = 3;
+        Deleted = 4;
+        Failed = 7;
+    }
+
+    StateEnum state = 1;
+    string UUID = 2;
+    string name = 3;
+    string description = 4;
+    google.protobuf.Timestamp creationTime = 5;
+    google.protobuf.Duration retentionTime = 6;
+    string sourceVolumeUUID = 7;
+    string sourceVolumeName = 8;
+    uint32 replicaCount = 9;
+    repeated string nodeList = 10;
+    uint32 nsid = 11;
+    StringList acl = 12;
+    bool compression = 13;
+    uint64 size = 14;
+    StringList IPAcl = 15;
+    uint32 sectorSize = 16;
+    SnapshotStatisticsApi statistics = 18;
+    string ETag = 19;
+    string projectName = 20;
+}
+
+message DeleteSnapshotRequest {
+    string UUID = 1;
+    string name = 2;
+    string projectName = 3;
+}
+
+message CreateSnapshotRequest {
+    string name = 1;
+    string sourceVolumeUUID = 2;
+    string sourceVolumeName = 3;
+    google.protobuf.Duration retentionTime = 4;
+    string description = 5;
+    string projectName = 6;
+}
+message ListSnapshotsRequest {
+    string UUID = 1;
+    string Name = 2;
+    string projectName = 3;
+    // offsetUUID
+    //
+    // Optional. When provided, returned list starts with next to offsetUUID volume.
+    string offsetUUID = 4;
+    // limit
+    //
+    // Optional. Limits the number of volumes in the response.
+    int64 limit = 5;
+}
+
+message GetSnapshotRequest {
+    string UUID = 1;
+    string Name = 2;
+    string projectName = 3;
+}
+
+message ListSnapshotsResponse {
+    repeated Snapshot snapshots = 1;
+}
+message DeleteSnapshotResponse {
+}
+
+message FeatureFlagStatus {
+    string name = 1;
+    bool enabled = 2;
+}
+
+message GetFeatureFlagRequest{
+    string name = 1;
+}
+
+message EnableFeatureFlagRequest {
+    string name = 1;
+}
+
+message DisableFeatureFlagRequest {
+    string name = 1;
+}
+
+message SetFeatureFlagResponse {}
+
+message ListFeatureFlagsRequest {}
+
+message ListFeatureFlagsResponse {
+    map<string, FeatureFlagStatus> featureFlags = 1;
+}
+
+message CreateResourcePolicyRequest {
+    string name = 1;
+    string resourceUUID = 2;
+    string resourceName = 3;
+    string projectName = 4;
+    SchedulePolicy schedulePolicy = 5;
+    string description = 6;
+}
+
+message ResourcePolicy {
+    enum State {
+        UnknownState = 0;
+        Creating     = 1;
+        Active       = 2;
+        Deleting     = 3;
+        Failed       = 4;
+    }
+
+    string UUID = 1;
+    string name = 2;
+    string resourceUUID = 3;
+    string resourceName = 4;
+    string projectName = 5;
+    SchedulePolicy schedulePolicy = 6;
+    string description = 7;
+    State state = 8;
+}
+
+message UpdateResourcePolicyRequest {
+    string UUID = 1;
+    string projectName = 2;
+    SchedulePolicy schedulePolicy = 3;
+    string description = 4;
+}
+
+message UpdateResourcePolicyResponse {}
+
+message ListResourcePoliciesRequest {
+    string UUID = 1;
+    string projectName = 2;
+    string volumeUUID  = 3;
+}
+
+message ListResourcePoliciesResponse {
+    repeated ResourcePolicy resourcePolicies = 1;
+}
+
+message GetResourcePolicyRequest {
+    string UUID = 1;
+    string projectName = 2;
+}
+
+message DeleteResourcePolicyRequest {
+    string UUID = 1;
+    string projectName = 3;
+}
+
+message DeleteResourcePolicyResponse {}
+
+message GetClusterConfigParamRequest {
+    string name = 1;
+}
+
+message ClusterConfigParam {
+    string name = 1;
+    string value = 2;
+}
+
+message UpdateClusterConfigParamRequest {
+    ClusterConfigParam configParam = 1;
+}
+
+message RollbackVolumeRequest {
+    string UUID = 1;
+    string srcSnapshotUUID = 2;
+    //
+    // project name
+    string projectName = 3;
+}
+
+message RollbackVolumeResponse {}
+
+message UpdateClusterConfigParamResponse {}
+
+message ListClusterConfigParamsRequest {}
+
+message ListClusterConfigParamsResponse {
+    repeated ClusterConfigParam values = 1;
 }
