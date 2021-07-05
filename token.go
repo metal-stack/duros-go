@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	v2 "github.com/metal-stack/duros-go/api/duros/v2"
 )
@@ -41,7 +41,7 @@ func NewJWTToken(subject, issuer string, kid string, roles []string, expires tim
 	now := time.Now().UTC()
 	claims := &lbJWTClaims{
 		// see overview of "standard" JWT claims as used by jwt-go here:
-		//   https://godoc.org/github.com/dgrijalva/jwt-go#StandardClaims
+		//   https://godoc.org/github.com/golang-jwt/jwt#StandardClaims
 		// see the semantics of the registered claims here:
 		//   https://en.wikipedia.org/wiki/JSON_Web_Token#Standard_fields
 		StandardClaims: jwt.StandardClaims{
