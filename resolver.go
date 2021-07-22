@@ -65,7 +65,10 @@ func (r *lbResolver) Build(
 ) (resolver.Resolver, error) {
 	r.cc = cc
 	r.log.Debugw("building...", "targets", r.tgts)
-	r.updateCCState()
+	err := r.updateCCState()
+	if err != nil {
+		return nil, err
+	}
 	return r, nil
 }
 
@@ -92,7 +95,10 @@ func (r *lbResolver) ResolveNow(o resolver.ResolveNowOptions) {
 	r.mu.Unlock()
 	r.log.Debugw("resolving...", "targets", r.tgts)
 
-	r.updateCCState()
+	err := r.updateCCState()
+	if err != nil {
+		r.log.Errorw("updateCCState", "error", err)
+	}
 }
 
 func (r *lbResolver) Close() {
@@ -101,12 +107,12 @@ func (r *lbResolver) Close() {
 
 // updateCCState() updates the underlying ClientConn with the currently
 // known list of LightOS cluster nodes.
-func (r *lbResolver) updateCCState() {
+func (r *lbResolver) updateCCState() error {
 	r.mu.Lock()
 	addrs := make([]resolver.Address, len(r.eps))
 	for i, ep := range r.eps {
 		addrs[i].Addr = ep.String()
 	}
 	r.mu.Unlock()
-	r.cc.UpdateState(resolver.State{Addresses: addrs})
+	return r.cc.UpdateState(resolver.State{Addresses: addrs})
 }
