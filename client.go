@@ -19,6 +19,7 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
+	"google.golang.org/grpc/balancer/roundrobin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
@@ -46,10 +47,8 @@ const (
 type client struct {
 	eps         EPs
 	conn        *grpc.ClientConn
-	DurosClient durosv2.DurosAPIClient
 
 	id   string
-	tgts string // cached string repr of `eps`
 	log  *zap.SugaredLogger
 
 	// peerMu protects all peer-related fields:
@@ -124,7 +123,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	res := &client{
 		eps:  config.Endpoints.clone(),
 		id:   id,
-		tgts: config.Endpoints.String(),
 		log:  log,
 	}
 
@@ -132,7 +130,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		grpc_zap.WithLevels(grpcToZapLevel),
 	}
 	interceptors := []grpc.UnaryClientInterceptor{
-		mkUnaryClientInterceptor(res),
+		res.peerReviewUnaryInterceptor,
 		grpc_zap.UnaryClientInterceptor(log.Desugar(), zapOpts...),
 		grpc_zap.PayloadUnaryClientInterceptor(log.Desugar(),
 			func(context.Context, string) bool { return true },
@@ -176,6 +174,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		grpc.WithKeepaliveParams(kal),
 		grpc.WithConnectParams(cp),
 		grpc.WithResolvers(lbr),
+		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, roundrobin.Name)),
 		grpc.WithPerRPCCredentials(tokenAuth{
 			token: config.Token,
 		}),
@@ -234,15 +233,6 @@ func (t tokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[st
 
 func (tokenAuth) RequireTransportSecurity() bool {
 	return true
-}
-
-// TODO: add stream interceptor *IF* LB API adds streaming entrypoints...
-func mkUnaryClientInterceptor(c *client) grpc.UnaryClientInterceptor {
-	return func(ctx context.Context, method string, req, rep interface{}, cc *grpc.ClientConn,
-		invoker grpc.UnaryInvoker, opts ...grpc.CallOption,
-	) error {
-		return c.peerReviewUnaryInterceptor(ctx, method, req, rep, cc, invoker, opts...)
-	}
 }
 
 func (c *client) peerReviewUnaryInterceptor( // sic!
