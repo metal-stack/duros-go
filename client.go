@@ -54,7 +54,6 @@ type client struct {
 	// peerMu protects all peer-related fields:
 	peerMu   sync.Mutex
 	lastPeer peer.Peer
-	switched bool // a matter of aesthetics: 1st conn shouldn't warn
 }
 
 // DialConfig is the configuration to create a duros-api connection
@@ -232,8 +231,13 @@ func (tokenAuth) RequireTransportSecurity() bool {
 }
 
 func (c *client) peerReviewUnaryInterceptor( // sic!
-	ctx context.Context, method string, req, rep interface{}, cc *grpc.ClientConn,
-	invoker grpc.UnaryInvoker, opts ...grpc.CallOption,
+	ctx context.Context,
+	method string,
+	req interface{},
+	rep interface{},
+	cc *grpc.ClientConn,
+	invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption,
 ) error {
 	var currPeer peer.Peer
 	opts = append(opts, grpc.Peer(&currPeer))
@@ -252,13 +256,7 @@ func (c *client) peerReviewUnaryInterceptor( // sic!
 		if lastPeer.Addr != nil {
 			last = lastPeer.Addr.String()
 		}
-		// don't want to warn on healthy flow...
-		if c.switched {
-			c.log.Warnf("switched target: %s -> %s", last, curr)
-		} else {
-			c.switched = true
-			c.log.Infof("switched target: %s -> %s", last, curr)
-		}
+		c.log.Infof("targets: last:%s  curr:%s", last, curr)
 	}
 	return err
 }
