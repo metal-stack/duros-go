@@ -239,11 +239,11 @@ func (c *client) peerReviewUnaryInterceptor( // sic!
 	opts = append(opts, grpc.Peer(&currPeer))
 	err := invoker(ctx, method, req, rep, cc, opts...)
 	c.peerMu.Lock()
+	defer c.peerMu.Unlock()
 	if currPeer.Addr != c.lastPeer.Addr {
 		// TODO: introduce rate-limiter to spare logs and perf!
 		lastPeer := c.lastPeer
 		c.lastPeer = currPeer
-		c.peerMu.Unlock()
 		curr := "<NONE>"
 		if currPeer.Addr != nil {
 			curr = currPeer.Addr.String()
@@ -259,8 +259,6 @@ func (c *client) peerReviewUnaryInterceptor( // sic!
 			c.switched = true
 			c.log.Infof("switched target: %s -> %s", last, curr)
 		}
-	} else {
-		c.peerMu.Unlock()
 	}
 	return err
 }
