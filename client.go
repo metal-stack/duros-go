@@ -45,11 +45,11 @@ const (
 
 // client for the duros grpc endpoint
 type client struct {
-	eps         EPs
-	conn        *grpc.ClientConn
+	eps  EPs
+	conn *grpc.ClientConn
 
-	id   string
-	log  *zap.SugaredLogger
+	id  string
+	log *zap.SugaredLogger
 
 	// peerMu protects all peer-related fields:
 	peerMu   sync.Mutex
@@ -121,9 +121,9 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	)
 
 	res := &client{
-		eps:  config.Endpoints.clone(),
-		id:   id,
-		log:  log,
+		eps: config.Endpoints.clone(),
+		id:  id,
+		log: log,
 	}
 
 	zapOpts := []grpc_zap.Option{
@@ -162,9 +162,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		MinConnectTimeout: 6 * time.Second,
 	}
 
-	scheme := "lightos-" + id
-	lbr := newLbResolver(log, scheme, res.eps)
-
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
 		grpc.WithDisableRetry(),
@@ -173,7 +170,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(interceptors...)),
 		grpc.WithKeepaliveParams(kal),
 		grpc.WithConnectParams(cp),
-		grpc.WithResolvers(lbr),
 		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, roundrobin.Name)),
 		grpc.WithPerRPCCredentials(tokenAuth{
 			token: config.Token,
@@ -203,13 +199,13 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 			opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
 		}
 	default:
-		return nil, fmt.Errorf("unsupported scheme:%v", scheme)
+		return nil, fmt.Errorf("unsupported scheme:%v", config.Scheme)
 	}
 
 	var err error
 	res.conn, err = grpc.DialContext(
 		ctx,
-		scheme+":///lb-resolver", // use our resolver instead of explicit target
+		"ipv4:"+config.Endpoints.String(),
 		opts...,
 	)
 	if err != nil {
