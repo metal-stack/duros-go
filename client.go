@@ -58,8 +58,8 @@ type DialConfig struct {
 	Credentials     *Credentials
 	ByteCredentials *ByteCredentials
 	Log             *zap.SugaredLogger
-	// UserAgent to use, if nil or empty duros-go is used
-	UserAgent *string
+	// UserAgent to use, if empty duros-go is used
+	UserAgent string
 }
 
 // Credentials specify the TLS Certificate based authentication for the grpc connection
@@ -110,8 +110,8 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	log := config.Log
 
 	ua := defaultUserAgent
-	if config.UserAgent != nil && *config.UserAgent != "" {
-		ua = *config.UserAgent
+	if config.UserAgent != "" {
+		ua = config.UserAgent
 	}
 
 	log.Infow("connecting...",
