@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"strconv"
-	"sync"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -22,7 +21,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
-	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 
 	durosv2 "github.com/metal-stack/duros-go/api/duros/v2"
@@ -49,13 +47,7 @@ const (
 type client struct {
 	eps  EPs
 	conn *grpc.ClientConn
-
-	id  string
-	log *zap.SugaredLogger
-
-	// peerMu protects all peer-related fields:
-	peerMu   sync.Mutex
-	lastPeer peer.Peer
+	log  *zap.SugaredLogger
 }
 
 // DialConfig is the configuration to create a duros-api connection
@@ -130,7 +122,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 
 	res := &client{
 		eps: config.Endpoints.clone(),
-		id:  id,
 		log: log,
 	}
 
@@ -138,7 +129,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		grpc_zap.WithLevels(grpcToZapLevel),
 	}
 	interceptors := []grpc.UnaryClientInterceptor{
-		res.peerReviewUnaryInterceptor,
 		grpc_zap.UnaryClientInterceptor(log.Desugar(), zapOpts...),
 		grpc_zap.PayloadUnaryClientInterceptor(log.Desugar(),
 			func(context.Context, string) bool { return true },
@@ -237,37 +227,6 @@ func (t tokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[st
 
 func (tokenAuth) RequireTransportSecurity() bool {
 	return true
-}
-
-func (c *client) peerReviewUnaryInterceptor( // sic!
-	ctx context.Context,
-	method string,
-	req interface{},
-	rep interface{},
-	cc *grpc.ClientConn,
-	invoker grpc.UnaryInvoker,
-	opts ...grpc.CallOption,
-) error {
-	var currPeer peer.Peer
-	opts = append(opts, grpc.Peer(&currPeer))
-	err := invoker(ctx, method, req, rep, cc, opts...)
-	c.peerMu.Lock()
-	defer c.peerMu.Unlock()
-	if currPeer.Addr != c.lastPeer.Addr {
-		// TODO: introduce rate-limiter to spare logs and perf!
-		lastPeer := c.lastPeer
-		c.lastPeer = currPeer
-		curr := "<NONE>"
-		if currPeer.Addr != nil {
-			curr = currPeer.Addr.String()
-		}
-		last := "<NONE>"
-		if lastPeer.Addr != nil {
-			last = lastPeer.Addr.String()
-		}
-		c.log.Infof("targets: last:%s  curr:%s", last, curr)
-	}
-	return err
 }
 
 func grpcToZapLevel(code codes.Code) zapcore.Level {
