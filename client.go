@@ -41,6 +41,8 @@ const (
 	GRPC GRPCScheme = "grpc"
 	// GRPCS defines https protocol for the communication
 	GRPCS GRPCScheme = "grpcs"
+
+	defaultUserAgent = "duros-go"
 )
 
 // client for the duros grpc endpoint
@@ -64,6 +66,8 @@ type DialConfig struct {
 	Credentials     *Credentials
 	ByteCredentials *ByteCredentials
 	Log             *zap.SugaredLogger
+	// UserAgent to use, if nil or empty duros-go is used
+	UserAgent *string
 }
 
 // Credentials specify the TLS Certificate based authentication for the grpc connection
@@ -113,8 +117,13 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	}
 	log := config.Log
 
+	ua := defaultUserAgent
+	if config.UserAgent != nil && *config.UserAgent != "" {
+		ua = *config.UserAgent
+	}
+
 	log.Infow("connecting...",
-		"client", "duros-go",
+		"client", ua,
 		"targets", config.Endpoints,
 		"client-id", id,
 	)
@@ -164,7 +173,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
 		grpc.WithDisableRetry(),
-		grpc.WithUserAgent("duros-go"), // TODO enable setting this by client
+		grpc.WithUserAgent(ua),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(interceptors...)),
 		grpc.WithKeepaliveParams(kal),

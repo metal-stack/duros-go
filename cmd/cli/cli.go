@@ -69,12 +69,14 @@ func main() {
 		panic(fmt.Errorf("unsupported scheme:%s", scheme))
 	}
 
+	ua := "duros-go-cli"
 	ctx := context.Background()
 	dialConfig := duros.DialConfig{
 		Endpoints: duros.MustParseCSV(endpoints),
 		Scheme:    grpcScheme,
 		Token:     token,
 		Log:       zlog.Sugar(),
+		UserAgent: &ua,
 	}
 	if caFile != "" && certFile != "" && keyFile != "" && serverName != "" {
 		creds := &duros.Credentials{
