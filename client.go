@@ -204,11 +204,11 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	var err error
 	res.conn, err = grpc.DialContext(
 		ctx,
-		"ipv4:"+config.Endpoints.String(),
+		config.Endpoints.String(),
 		opts...,
 	)
 	if err != nil {
-		log.Errorw("failed to connect", "error", err.Error())
+		log.Errorw("failed to connect", "endpoints", config.Endpoints.String(), "error", err.Error())
 		return nil, err
 	}
 
