@@ -8,10 +8,8 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"strconv"
-	"sync"
 	"time"
 
-	"github.com/gogo/status"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -19,10 +17,11 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
+	"google.golang.org/grpc/balancer/roundrobin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
-	"google.golang.org/grpc/peer"
+	"google.golang.org/grpc/status"
 
 	durosv2 "github.com/metal-stack/duros-go/api/duros/v2"
 )
@@ -40,22 +39,15 @@ const (
 	GRPC GRPCScheme = "grpc"
 	// GRPCS defines https protocol for the communication
 	GRPCS GRPCScheme = "grpcs"
+
+	defaultUserAgent = "duros-go"
 )
 
 // client for the duros grpc endpoint
 type client struct {
-	eps         EPs
-	conn        *grpc.ClientConn
-	DurosClient durosv2.DurosAPIClient
-
-	id   string
-	tgts string // cached string repr of `eps`
+	eps  EPs
+	conn *grpc.ClientConn
 	log  *zap.SugaredLogger
-
-	// peerMu protects all peer-related fields:
-	peerMu   sync.Mutex
-	lastPeer peer.Peer
-	switched bool // a matter of aesthetics: 1st conn shouldn't warn
 }
 
 // DialConfig is the configuration to create a duros-api connection
@@ -66,6 +58,8 @@ type DialConfig struct {
 	Credentials     *Credentials
 	ByteCredentials *ByteCredentials
 	Log             *zap.SugaredLogger
+	// UserAgent to use, if empty duros-go is used
+	UserAgent string
 }
 
 // Credentials specify the TLS Certificate based authentication for the grpc connection
@@ -115,24 +109,26 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	}
 	log := config.Log
 
+	ua := defaultUserAgent
+	if config.UserAgent != "" {
+		ua = config.UserAgent
+	}
+
 	log.Infow("connecting...",
-		"client", "duros-go",
+		"client", ua,
 		"targets", config.Endpoints,
 		"client-id", id,
 	)
 
 	res := &client{
-		eps:  config.Endpoints.clone(),
-		id:   id,
-		tgts: config.Endpoints.String(),
-		log:  log,
+		eps: config.Endpoints.clone(),
+		log: log,
 	}
 
 	zapOpts := []grpc_zap.Option{
 		grpc_zap.WithLevels(grpcToZapLevel),
 	}
 	interceptors := []grpc.UnaryClientInterceptor{
-		mkUnaryClientInterceptor(res),
 		grpc_zap.UnaryClientInterceptor(log.Desugar(), zapOpts...),
 		grpc_zap.PayloadUnaryClientInterceptor(log.Desugar(),
 			func(context.Context, string) bool { return true },
@@ -164,18 +160,15 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		MinConnectTimeout: 6 * time.Second,
 	}
 
-	scheme := "lightos-" + id
-	lbr := newLbResolver(log, scheme, res.eps)
-
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
 		grpc.WithDisableRetry(),
-		grpc.WithUserAgent("duros-go"), // TODO enable setting this by client
+		grpc.WithUserAgent(ua),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(interceptors...)),
 		grpc.WithKeepaliveParams(kal),
 		grpc.WithConnectParams(cp),
-		grpc.WithResolvers(lbr),
+		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, roundrobin.Name)),
 		grpc.WithPerRPCCredentials(tokenAuth{
 			token: config.Token,
 		}),
@@ -204,17 +197,17 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 			opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
 		}
 	default:
-		return nil, fmt.Errorf("unsupported scheme:%v", scheme)
+		return nil, fmt.Errorf("unsupported scheme:%v", config.Scheme)
 	}
 
 	var err error
 	res.conn, err = grpc.DialContext(
 		ctx,
-		scheme+":///lb-resolver", // use our resolver instead of explicit target
+		config.Endpoints.String(),
 		opts...,
 	)
 	if err != nil {
-		log.Errorw("failed to connect", "error", err.Error())
+		log.Errorw("failed to connect", "endpoints", config.Endpoints.String(), "error", err.Error())
 		return nil, err
 	}
 
@@ -234,49 +227,6 @@ func (t tokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[st
 
 func (tokenAuth) RequireTransportSecurity() bool {
 	return true
-}
-
-// TODO: add stream interceptor *IF* LB API adds streaming entrypoints...
-func mkUnaryClientInterceptor(c *client) grpc.UnaryClientInterceptor {
-	return func(ctx context.Context, method string, req, rep interface{}, cc *grpc.ClientConn,
-		invoker grpc.UnaryInvoker, opts ...grpc.CallOption,
-	) error {
-		return c.peerReviewUnaryInterceptor(ctx, method, req, rep, cc, invoker, opts...)
-	}
-}
-
-func (c *client) peerReviewUnaryInterceptor( // sic!
-	ctx context.Context, method string, req, rep interface{}, cc *grpc.ClientConn,
-	invoker grpc.UnaryInvoker, opts ...grpc.CallOption,
-) error {
-	var currPeer peer.Peer
-	opts = append(opts, grpc.Peer(&currPeer))
-	err := invoker(ctx, method, req, rep, cc, opts...)
-	c.peerMu.Lock()
-	if currPeer.Addr != c.lastPeer.Addr {
-		// TODO: introduce rate-limiter to spare logs and perf!
-		lastPeer := c.lastPeer
-		c.lastPeer = currPeer
-		c.peerMu.Unlock()
-		curr := "<NONE>"
-		if currPeer.Addr != nil {
-			curr = currPeer.Addr.String()
-		}
-		last := "<NONE>"
-		if lastPeer.Addr != nil {
-			last = lastPeer.Addr.String()
-		}
-		// don't want to warn on healthy flow...
-		if c.switched {
-			c.log.Warnf("switched target: %s -> %s", last, curr)
-		} else {
-			c.switched = true
-			c.log.Infof("switched target: %s -> %s", last, curr)
-		}
-	} else {
-		c.peerMu.Unlock()
-	}
-	return err
 }
 
 func grpcToZapLevel(code codes.Code) zapcore.Level {

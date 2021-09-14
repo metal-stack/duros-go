@@ -75,6 +75,7 @@ func main() {
 		Scheme:    grpcScheme,
 		Token:     token,
 		Log:       zlog.Sugar(),
+		UserAgent: "duros-go-cli",
 	}
 	if caFile != "" && certFile != "" && keyFile != "" && serverName != "" {
 		creds := &duros.Credentials{
