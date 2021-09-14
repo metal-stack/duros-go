@@ -11,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gogo/status"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -24,6 +23,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/grpc/status"
 
 	durosv2 "github.com/metal-stack/duros-go/api/duros/v2"
 )

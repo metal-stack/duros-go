@@ -3,7 +3,6 @@ module github.com/metal-stack/duros-go
 go 1.16
 
 require (
-	github.com/gogo/status v1.1.0
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
