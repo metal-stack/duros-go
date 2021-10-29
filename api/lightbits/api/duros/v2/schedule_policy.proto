@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package lightbits.api.duros.v2;
+package lightbits.api.schedule;
 
-option go_package = "duros/v2;v2";
+option go_package = "durosv2;durospb";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
