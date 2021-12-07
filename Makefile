@@ -31,6 +31,7 @@ third-party:
 	wget https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1/protoc-gen-swagger/options/openapiv2.proto -O api/protoc-gen-swagger/options/openapiv2.proto
 	wget https://raw.githubusercontent.com/googleapis/api-common-protos/master/google/api/annotations.proto -O api/google/api/annotations.proto
 	wget https://raw.githubusercontent.com/googleapis/api-common-protos/master/google/api/http.proto -O api/google/api/http.proto
+	wget https://raw.githubusercontent.com/googleapis/api-common-protos/master/google/api/httpbody.proto -O api/google/api/httpbody.proto
 
 .PHONY: protoc
 protoc: third-party
