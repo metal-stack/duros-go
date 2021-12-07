@@ -14,7 +14,7 @@ type lbJWTClaims struct {
 	// "standard" (aka "registered") claims:
 	//   mandatory: sub, exp
 	//   optional (validated and logged if present): nbf, iss, jti
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 
 	Roles []string `json:"roles,omitempty"` // mandatory custom claim
 }
@@ -44,12 +44,12 @@ func NewJWTToken(subject, issuer string, kid string, roles []string, expires tim
 		//   https://godoc.org/github.com/golang-jwt/jwt/v4#StandardClaims
 		// see the semantics of the registered claims here:
 		//   https://en.wikipedia.org/wiki/JSON_Web_Token#Standard_fields
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: now.Add(expires).UTC().Unix(),
-			IssuedAt:  now.Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(now.Add(expires)),
+			IssuedAt:  jwt.NewNumericDate(now),
 
 			// ID is for your traceability, doesn't have to be UUID:
-			Id: uuid.New().String(),
+			ID: uuid.New().String(),
 
 			// put name/title/ID of whoever will be using this JWT here:
 			Subject: subject,
