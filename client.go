@@ -5,8 +5,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"strconv"
 	"time"
 
@@ -264,7 +264,7 @@ func (c Credentials) getTransportCredentials() (credentials.TransportCredentials
 	if c.CAFile == "" || c.Certfile == "" || c.Keyfile == "" || c.ServerName == "" {
 		return nil, fmt.Errorf("all credentials properties must be configured")
 	}
-	ca, err := ioutil.ReadFile(c.CAFile)
+	ca, err := os.ReadFile(c.CAFile)
 	if err != nil {
 		return nil, fmt.Errorf("could not read ca certificate: %w", err)
 	}
