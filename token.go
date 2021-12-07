@@ -11,7 +11,6 @@ import (
 )
 
 type lbJWTClaims struct {
-	// "standard" (aka "registered") claims:
 	//   mandatory: sub, exp
 	//   optional (validated and logged if present): nbf, iss, jti
 	jwt.RegisteredClaims
@@ -40,8 +39,8 @@ func NewJWTTokenForCredential(subject, issuer string, credential *v2.Credential,
 func NewJWTToken(subject, issuer string, kid string, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
 	now := time.Now().UTC()
 	claims := &lbJWTClaims{
-		// see overview of "standard" JWT claims as used by jwt-go here:
-		//   https://godoc.org/github.com/golang-jwt/jwt/v4#StandardClaims
+		// see overview of "registered" JWT claims as used by jwt-go here:
+		//   https://pkg.go.dev/github.com/golang-jwt/jwt/v4?utm_source=godoc#RegisteredClaims
 		// see the semantics of the registered claims here:
 		//   https://en.wikipedia.org/wiki/JSON_Web_Token#Standard_fields
 		RegisteredClaims: jwt.RegisteredClaims{
