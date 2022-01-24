@@ -226,9 +226,16 @@ service DurosAPI {
                 }
             }
             responses: {
+                key: "501";
+                value: {
+                    description: "Unimplemented capability.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
                 key: "404";
                 value: {
-                    description: "Returned when event UUID is not found.";
+                    description: "project not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2930,6 +2937,21 @@ message UpdateVolumeRequest {
     string projectName = 6;
 }
 
+message ProxyInfo {
+    // URL
+    //
+    // URL of the proxy server. Pattern: "http://<server-ip>:<port>"
+    string URL = 1;
+    // Username
+    //
+    // Username for the proxy server
+    string Username = 2;
+    // Password
+    //
+    // Password for the proxy server
+    string Password = 3;
+}
+
 message UpgradeServerRequest {
     string UUID = 1;
     // InstallPkgUri
@@ -2940,6 +2962,10 @@ message UpgradeServerRequest {
     //
     // Optional. When true, bypasses the upgradrability (loss of service) check.
     bool ForceUpgrade = 3;
+    // ProxyInfo
+    //
+    // Optional. Proxy server information for upgrade behind proxy.
+    ProxyInfo ProxyInfo = 4;
 }
 
 message UpgradeClusterRequest {
@@ -2951,6 +2977,10 @@ message UpgradeClusterRequest {
     //
     // Optional. Servers with given UUIDs are upgraded. If not given, all servers in the cluster are upgraded according to upgradeablity (loss of service) check.
     repeated string UUIDs = 2;
+    // ProxyInfo
+    //
+    // Optional. Proxy server information for upgrade behind proxy.
+    ProxyInfo ProxyInfo = 3;
 }
 
 message GetClusterRequest {
@@ -3221,18 +3251,45 @@ message Version {
 }
 
 message ClusterInfo {
+    // cluster UUID
+    //
+    // UUID of cluster
     string UUID = 1;
+    // subsystemNQN
+    //
+    // Subsystem NQN that shall be used by the hosts to connect to volumes on this cluster.
     string subsystemNQN = 2;
+    // Current maximum number of replicas per volume
+    //
+    // A maximal number of replicas that a new volume can have, given current state of the nodes. This value depends on the healthiness of the nodes.
     uint32 currentMaxReplicas = 3;
+    // Maximum number of replicas per volume supported by cluster.
+    //
+    // A maximal number of replicas that volume can have, given cluster installation parameters (Number of Servers, Failure Domains...).
     uint32 supportedMaxReplicas = 4;
+    // cluster statistics
+    //
+    // cluster statistics (storage capacity, used storage, compression ration...)
     ClusterStatisticsApi statistics = 5;
     // Etag
     //
-    // identifier for a specific version of a resource
+    // identifier for a specific version of a resource.
     string ETag = 6;
+    // Cluster Health
+    //
+    // Cluster health: OK- cluster healthy, Warning - Inactive node(s) and/or degraded volumes in cluster, Error - ReadOnly/Unavailable volumes in cluster.
     ClusterHealth health = 7;
+    // Minimal LightOS version
+    //
+    // Lowest version of LightOS running on one of the servers in cluster.
     string MinVersionInCluster = 8;
+    // Minimal allowed LightOS version
+    //
+    // For LightOS internal use.
     string MinAllowedVersion = 9;
+    // Maximal allowed LightOS version
+    //
+    // LightOS version this cluster may be upgraded to.
     string MaxAllowedVersion = 10;
     // Addresses of the API Service
     //
@@ -3243,22 +3300,37 @@ message ClusterInfo {
     repeated string apiEndpoints = 11;
     // Addresses of the Discovery Service
     //
-    // A list of TCP endpoints - <ip>:<port> pairs that the Discovery Service listen on
+    // A list of TCP endpoints - <ip>:<port> pairs that the Discovery Service listen on.
     // Example entries:
     // - 192.168.16.16:8009
     // - 192.168.16.17:8009
     repeated string discoveryEndpoints = 12;
+    // cluster name
+    //
+    // cluster name.
     string clusterName = 13;
 }
 
 message ClusterInfoV2 {
+    // cluster UUID
+    //
+    // UUID of cluster
     string UUID = 1;
+    // subsystemNQN
+    //
+    // Subsystem NQN that shall be used by the hosts to connect to volumes on this server.
     string subsystemNQN = 2;
+    // Current maximum number of replicas per volume
+    //
+    // A maximal number of replicas that a new volume can have, given current state of the nodes. This value depends on the healthiness of the nodes.
     uint32 currentMaxReplicas = 3;
+    // Maximum number of replicas per volume supported by cluster
+    //
+    // A maximal number of replicas that volume can have, given cluster installation parameters.
     uint32 supportedMaxReplicas = 4;
     // Etag
     //
-    // identifier for a specific version of a resource
+    // identifier for a specific version of a resource.
     string ETag = 6;
     // Addresses of the API Service
     //
@@ -3269,18 +3341,21 @@ message ClusterInfoV2 {
     repeated string apiEndpoints = 11;
     // Addresses of the Discovery Service
     //
-    // A list of TCP endpoints - <ip>:<port> pairs that the Discovery Service listen on
+    // A list of TCP endpoints - <ip>:<port> pairs that the Discovery Service listen on.
     // Example entries:
     // - 192.168.16.16:8009
     // - 192.168.16.17:8009
     repeated string discoveryEndpoints = 12;
     // Addresses of the NVMe endpoints
     //
-    // A list of TCP endpoints - <ip>:<port> pairs that the NVMe targets listen on
+    // A list of TCP endpoints - <ip>:<port> pairs that the NVMe targets listen on.
     // Example entries:
     // - 192.168.16.16:8009
     // - 192.168.16.17:8009
     repeated string nvmeEndpoints = 13;
+    // cluster name
+    //
+    // cluster name.
     string clusterName = 14;
 }
 
@@ -3520,7 +3595,7 @@ message CreateResourcePolicyRequest {
     string resourceUUID = 2;
     string resourceName = 3;
     string projectName = 4;
-    SchedulePolicy schedulePolicy = 5;
+    lightbits.api.schedule.SchedulePolicy schedulePolicy = 5;
     string description = 6;
 }
 
@@ -3538,7 +3613,7 @@ message ResourcePolicy {
     string resourceUUID = 3;
     string resourceName = 4;
     string projectName = 5;
-    SchedulePolicy schedulePolicy = 6;
+    lightbits.api.schedule.SchedulePolicy schedulePolicy = 6;
     string description = 7;
     State state = 8;
 }
@@ -3546,7 +3621,7 @@ message ResourcePolicy {
 message UpdateResourcePolicyRequest {
     string UUID = 1;
     string projectName = 2;
-    SchedulePolicy schedulePolicy = 3;
+    lightbits.api.schedule.SchedulePolicy schedulePolicy = 3;
     string description = 4;
 }
 
