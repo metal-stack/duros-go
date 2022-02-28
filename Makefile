@@ -45,5 +45,4 @@ protoc-ci: third-party
 
 .PHONY: mocks
 mocks:
-	@if ! which mockery > /dev/null; then echo "mockery needs to be installed (https://github.com/vektra/mockery)"; exit 1; fi
-	cd api/duros/v2 && mockery --name DurosAPIClient && cd -
+	docker run --user $$(id -u):$$(id -g) --rm -w /work -v ${PWD}:/work vektra/mockery:v2.7.4 -r --keeptree --inpackage --dir api/duros/v2 --output test/mocks --name DurosAPIClient

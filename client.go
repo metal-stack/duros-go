@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc/balancer/roundrobin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/status"
 
@@ -177,7 +178,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	switch config.Scheme {
 	case GRPC:
 		log.Infof("connecting insecurely")
-		opts = append(opts, grpc.WithInsecure())
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	case GRPCS:
 		log.Infof("connecting securely")
 		if config.Credentials != nil {
