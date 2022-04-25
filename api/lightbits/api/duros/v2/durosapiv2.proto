@@ -1306,7 +1306,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create project.";
-            description: "A project has a name and description.";
+            description: "A project has a name, a description, and a default qos rate limit policy.";
             tags: "create project";
             responses: {
                 key: "409";
@@ -1318,7 +1318,7 @@ service DurosAPI {
             responses: {
                 key: "400";
                 value: {
-                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \nname contains illegal characters, \nsize is not a positive integer, \nreplica count is outside of a valid range, \nACL or IP-ACL is invalid.";
+                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \nname contains illegal characters.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1340,6 +1340,46 @@ service DurosAPI {
                 key: "403";
                 value: {
                     description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse) {
+        option (google.api.http) = {
+            put: "/api/v2/projects/{projectName}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update Project Default Policy.";
+            description: "Update project's default resource policy.";
+            tags: "update project default policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Mandatory argument is missing.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2063,6 +2103,80 @@ service DurosAPI {
         };
     }
 
+    rpc CreatePolicy(CreatePolicyRequest) returns (Policy) {
+        option (google.api.http) = {
+            post: "/api/v2/policies"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Create a policy.";
+            description: "A policy is a set of user-defined rules that should be applied to one or more objects in the system.";
+            tags: "create policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \n invalid argument is provided \nname contains illegal characters.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "One of the given projects wasn't found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            // TODO: currently we don't enforce name uniqueness, but we may want to.
+            responses: {
+                key: "409";
+                value: {
+                    description: "Policy with the provided name already exists.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdatePolicy(UpdatePolicyRequest) returns (UpdatePolicyResponse) {
+        option (google.api.http) = {
+            put: "/api/v2/policies/{UUID}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update a policy.";
+            description: "Updates user pre-defined policy by overriding the existing properties with the given arguments.";
+            tags: "update policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Provided invalid argument(s) with one of the following reasons: \nmandatory argument is missing, \nmutually exclusive arguments were provided \ninvalid argument is provided \nthe system is not in the right state to fullfill the update.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "The given policy wasn't found or the request is not supported.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
     rpc UpdateResourcePolicy(UpdateResourcePolicyRequest) returns (UpdateResourcePolicyResponse) {
         option (google.api.http) = {
             put: "/api/v2/projects/{projectName}/resourcePolicies/{UUID}"
@@ -2083,6 +2197,70 @@ service DurosAPI {
                 key: "404";
                 value: {
                     description: "Returned when the resource policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetPolicy(GetPolicyRequest) returns (Policy) {
+        option (google.api.http) = {
+            get: "/api/v2/policies/{UUID}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get policy.";
+            description: "A request to get polic by either name or UUID";
+            tags: "get policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/policies"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List policies.";
+            description: "A request to list policies. The result can be filtered by either name or UUID";
+            tags: "list policies";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Returned when the policy UUID/name is not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2179,6 +2357,38 @@ service DurosAPI {
                 key: "404";
                 value: {
                     description: "Returned when the resource policy UUID/name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DeletePolicy(DeletePolicyRequest) returns (DeletePolicyResponse) {
+        option (google.api.http) = {
+            delete: "/api/v2/policies/{UUID}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete policy.";
+            description: "Delete policy information by provided policy UUID";
+            tags: "delete policy";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "The given policy to delete wasn't found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2798,16 +3008,22 @@ message GetCredentialRequest {
     string projectName = 2;
 }
 
+message DefaultPolicy {
+    PolicyType policyType = 1;
+    string policyUUID = 2;
+}
 
 message CreateProjectRequest {
     string name = 1;
     string description = 2;
+    repeated DefaultPolicy defaultPolicies = 3;
 }
 
 message Project {
     string UUID = 1;
     string name = 2;
     string description = 3;
+    repeated DefaultPolicy defaultPolicies = 4;
 }
 
 message DeleteProjectRequest {
@@ -2873,6 +3089,7 @@ message CreateVolumeRequest {
     string sourceSnapshotUUID = 10;
     string sourceSnapshotName = 11;
     repeated LabelMatchExpression placementRestrictions = 12;
+    string qosPolicyUUID = 13;
 }
 
 message DeleteVolumeRequest {
@@ -2935,6 +3152,9 @@ message UpdateVolumeRequest {
     // project name
     //
     string projectName = 6;
+    // qos policy uuid
+    //
+    string qosPolicyUUID = 7;
 }
 
 message ProxyInfo {
@@ -3112,48 +3332,52 @@ message UserNvmeDevicesResponse {
         Failed = 4;
     }
 
-        // Total capacity of the device in bytes
-        uint64 size = 1;
-        // The numa node ID this device is associated with
-        uint64 numaNodeID = 2;
-        // model
-        //
-        // Model string of the device, if exists
-        string model = 3;
-        // serial
-        //
-        // Serial of the block device, if exists
-        string serial = 4;
-        // server uuid
-        //
-        // The UUID of the server to which the block device is installed
-        string serverUUID = 5;
-        // device state
-        //
-        // Describes the state of the device, unmanaged device state will be None
-        StateEnum state = 6;
-            // device time of failure
-        //
-        // Timestamp that will be updated in case the device have failed
-        google.protobuf.Timestamp failureTime = 7;
-        // device rebuild completion time
-        //
-        // Timestamp that will be updated once gftl have completed
-        // to rebuild all the data that the device had, and we are safe
-        // for second failure
-        google.protobuf.Timestamp rebuildCompletionTime = 8;
-        // name
-        //
-        // Device name or address
-        string name = 9;
-        // node uuid that manages the device
-        //
-        // The UUID of the node that manages the device, empty string if the device is not managed
-        string nodeUUID = 12;
-        // Etag
-        //
-        // identifier for a specific version of a resource
-        string ETag = 13;
+    // Total capacity of the device in bytes
+    uint64 size = 1;
+    // The numa node ID this device is associated with
+    uint64 numaNodeID = 2;
+    // model
+    //
+    // Model string of the device, if exists
+    string model = 3;
+    // serial
+    //
+    // Serial of the block device, if exists
+    string serial = 4;
+    // server uuid
+    //
+    // The UUID of the server to which the block device is installed
+    string serverUUID = 5;
+    // device state
+    //
+    // Describes the state of the device, unmanaged device state will be None
+    StateEnum state = 6;
+        // device time of failure
+    //
+    // Timestamp that will be updated in case the device have failed
+    google.protobuf.Timestamp failureTime = 7;
+    // device rebuild completion time
+    //
+    // Timestamp that will be updated once gftl have completed
+    // to rebuild all the data that the device had, and we are safe
+    // for second failure
+    google.protobuf.Timestamp rebuildCompletionTime = 8;
+    // name
+    //
+    // Device name or address
+    string name = 9;
+    // node uuid that manages the device
+    //
+    // The UUID of the node that manages the device, empty string if the device is not managed
+    string nodeUUID = 12;
+    // Etag
+    //
+    // identifier for a specific version of a resource
+    string ETag = 13;
+    // Statistics
+    //
+    // Various nvme-device related statistics
+    NvmeDeviceStatisticsApi statistics = 14;
 }
 
 message DurosNodeInfo {
@@ -3295,8 +3519,8 @@ message ClusterInfo {
     //
     // A list of REST/gRPC endpoints - <ip>:<port> pairs that the API listen on.
     // Example entries:
-    // - 192.168.16.16:80
-    // - 192.168.16.17:80
+    // - 192.168.16.16:443
+    // - 192.168.16.17:443
     repeated string apiEndpoints = 11;
     // Addresses of the Discovery Service
     //
@@ -3336,8 +3560,8 @@ message ClusterInfoV2 {
     //
     // A list of REST/gRPC endpoints - <ip>:<port> pairs that the API listen on.
     // Example entries:
-    // - 192.168.16.16:80
-    // - 192.168.16.17:80
+    // - 192.168.16.16:443
+    // - 192.168.16.17:443
     repeated string apiEndpoints = 11;
     // Addresses of the Discovery Service
     //
@@ -3350,8 +3574,8 @@ message ClusterInfoV2 {
     //
     // A list of TCP endpoints - <ip>:<port> pairs that the NVMe targets listen on.
     // Example entries:
-    // - 192.168.16.16:8009
-    // - 192.168.16.17:8009
+    // - 192.168.16.16:4420
+    // - 192.168.16.17:4420
     repeated string nvmeEndpoints = 13;
     // cluster name
     //
@@ -3420,6 +3644,8 @@ message Volume {
     string sourceSnapshotUUID = 18;
     string sourceSnapshotName = 19;
     repeated LabelMatchExpression placementRestrictions = 20;
+    string qosPolicyUUID = 21;
+    string qosPolicyName = 22;
 }
 
 message Server {
@@ -3599,6 +3825,29 @@ message CreateResourcePolicyRequest {
     string description = 6;
 }
 
+message CreatePolicyRequest {
+    string name = 1;
+    string description = 2;
+
+    oneof policy {
+        QoSRateLimitPolicy qoSRateLimitPolicy = 3;
+        // in the future we will move here schedule policy as well as other policies.
+    }
+}
+
+message UpdatePolicyRequest {
+    string UUID = 1;
+    string name = 2;
+    string description = 3;
+
+    oneof policy {
+        QoSRateLimitPolicy qoSRateLimitPolicy = 4;
+        // in the future we will move here schedule policy as well as other policies.
+    }
+}
+
+message UpdatePolicyResponse {}
+
 message ResourcePolicy {
     enum State {
         UnknownState = 0;
@@ -3618,6 +3867,25 @@ message ResourcePolicy {
     State state = 8;
 }
 
+message Policy {
+    enum State {
+        Unknown    = 0;
+        Creating   = 1;
+        Active     = 2;
+        Updating   = 3;
+        Deprecated = 4;
+        Failed     = 5;
+    }
+
+    string UUID = 1;
+    string name = 2;
+    string description = 3;
+    State state = 4;
+    oneof info {
+        QoSRateLimitPolicy QoSRateLimitPolicy = 5;
+    }
+}
+
 message UpdateResourcePolicyRequest {
     string UUID = 1;
     string projectName = 2;
@@ -3627,6 +3895,16 @@ message UpdateResourcePolicyRequest {
 
 message UpdateResourcePolicyResponse {}
 
+message ListPoliciesRequest {
+    string UUID = 1;
+    string name = 2;
+    string projectName = 3;
+}
+
+message ListPoliciesResponse {
+    repeated Policy policies = 1;
+}
+
 message ListResourcePoliciesRequest {
     string UUID = 1;
     string projectName = 2;
@@ -3635,6 +3913,13 @@ message ListResourcePoliciesRequest {
 
 message ListResourcePoliciesResponse {
     repeated ResourcePolicy resourcePolicies = 1;
+    repeated DefaultGlobalResourcePolicy defaultResourcePolicies = 2;
+}
+
+message GetPolicyRequest {
+    string UUID = 1;
+    string name = 2;
+    string projectName = 3;
 }
 
 message GetResourcePolicyRequest {
@@ -3648,6 +3933,13 @@ message DeleteResourcePolicyRequest {
 }
 
 message DeleteResourcePolicyResponse {}
+
+message DeletePolicyRequest {
+    string UUID = 1;
+    string name = 2;
+}
+
+message DeletePolicyResponse {}
 
 message GetClusterConfigParamRequest {
     string name = 1;
@@ -3744,6 +4036,12 @@ message ComponentServerInfo {
     string Name = 2;
 }
 
+message ComponentDataIntegrityInfo {
+    string NodeUUID = 1;
+    string ServerUUID = 2;
+    repeated string SSDs = 3;
+}
+
 // Event that will be returned to user
 message Event {
     enum EventType {
@@ -3753,6 +4051,10 @@ message Event {
         Volume = 3;
         NVMeSSD = 4;
         Server = 5;
+
+        // XXX: do we really need a new type for data-integrity events or we can use NVMESSD?
+        // in some cases, the corruption is not due to malfunctioning ssds in the node that reported such event.
+        DataIntegrity = 6;
     }
 
     enum EventReportingService {
@@ -3801,5 +4103,58 @@ message Event {
         ComponentNodeInfo ComponentNodeInfo = 203;
         ComponentServerInfo ComponentServerInfo = 204;
         ComponentClusterInfo ComponentClusterInfo = 205;
+        ComponentDataIntegrityInfo ComponentDataIntegrityInfo = 206;
     }
 }
+
+enum PolicyVisibility {
+    Unavailable = 0;
+    Scoped = 1;
+    Global = 2;
+}
+
+message QoSRateLimitPolicy {
+    // TODO: i think we can omit the prefix QoSLimit from the messages below
+    // They will inherit the name of the outer message as prefix
+    
+    // A limit of 0 means no rate limit.
+    // Bandwidth limit is in units of MB/s.
+    message QoSLimitIOPS {
+        uint32 writeIOPSLimit = 1;
+        uint32 readIOPSLimit = 2;
+    }
+    message QoSLimitBW{
+        uint32 writeBWLimit = 1;
+        uint32 readBWLimit = 2;
+    }
+    message QoSLimitIOPSPerGB {
+        uint32 writeIOPSPerGBLimit = 1;
+        uint32 readIOPSPerGBLimit = 2;
+    }
+
+    repeated string projectsNamesScope = 3;
+    PolicyVisibility policyVisibility = 4;
+    oneof QoSLimit {
+        QoSLimitIOPS limitIOPS = 6;
+        QoSLimitBW limitBw = 7;
+        QoSLimitIOPSPerGB limitIOPSPerGB = 8;
+    }
+}
+
+enum PolicyType {
+    unknown = 0;
+    snapshot = 1;
+    qosRateLimit = 2;
+}
+
+message DefaultGlobalResourcePolicy {
+    PolicyType policyType = 1;
+    string policyUUID = 2;
+}
+
+message UpdateProjectRequest {
+    string projectName = 1;
+    repeated DefaultPolicy defaultPolicies = 2;
+}
+
+message UpdateProjectResponse {}
