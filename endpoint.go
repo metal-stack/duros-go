@@ -41,28 +41,24 @@ func MustParseEndpoint(endpoint string) EP {
 }
 
 func parseStricter(endpoint string) (EP, error) {
-	mkErr := func(format string, args ...interface{}) error {
-		return fmt.Errorf("bad endpoint '%s': "+format,
-			append([]interface{}{endpoint}, args...)...)
-	}
 	host, port, err := net.SplitHostPort(endpoint)
 	if err != nil {
 		//nolint dunno howto convert this to errors.As
 		if addrErr, ok := err.(*net.AddrError); ok {
-			return EP{}, mkErr("%s", addrErr.Err)
+			return EP{}, fmt.Errorf("%s", addrErr.Err)
 		}
 		// shouldn't happen, but...
-		return EP{}, mkErr("%s", err)
+		return EP{}, fmt.Errorf("%w", err)
 	}
 	if host == "" {
-		return EP{}, mkErr("invalid empty host")
+		return EP{}, fmt.Errorf("invalid empty host")
 	}
 	if !hostRegex.MatchString(host) {
-		return EP{}, mkErr("invalid host '%s'", host)
+		return EP{}, fmt.Errorf("invalid host %q", host)
 	}
 	portNum, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
-		return EP{}, mkErr("invalid port number '%s'", port)
+		return EP{}, fmt.Errorf("invalid port number %q", port)
 	}
 	return EP{Host: host, Port: uint16(portNum)}, nil
 }
