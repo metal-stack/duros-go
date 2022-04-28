@@ -1,6 +1,6 @@
 
 
-all: cli
+all: protoc mocks cli
 
 .PHONY:
 cli: 
@@ -45,4 +45,4 @@ protoc-ci: third-party
 
 .PHONY: mocks
 mocks:
-	docker run --user $$(id -u):$$(id -g) --rm -w /work -v ${PWD}:/work vektra/mockery:v2.7.4 -r --keeptree --inpackage --dir api/duros/v2 --output test/mocks --name DurosAPIClient
+	docker run --user $$(id -u):$$(id -g) --rm -w /work -v ${PWD}:/work vektra/mockery:v2.12.1 -r --all --keeptree --dir api/duros/v2 --output api/duros/v2/mocks 
