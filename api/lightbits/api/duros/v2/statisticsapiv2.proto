@@ -135,6 +135,14 @@ message VolumeStatisticsApi {
     uint64 physicalOwnedMemory = 7;
     uint64 physicalMemory = 8;
     uint64 userWritten = 9;
+    // Unrecoverable Data Integrity Errors
+    //
+    // Number of data integrity errors that could no be recovered by the system.
+    uint32 unrecoverableDataIntegrityErrors = 10;
+    // Recoverable Data Integrity Errors
+    //
+    // Number of data integrity errors that were recovered by the system.
+    uint32 recoverableDataIntegrityErrors = 11;
 }
 
 message SnapshotStatisticsApi {
