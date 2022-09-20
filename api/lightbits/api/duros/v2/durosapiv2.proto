@@ -2923,6 +2923,53 @@ service DurosAPI {
             }
         };
     }
+
+    rpc EnableNLE(EnableNLERequest) returns (EnableNLEResponse) {
+        option (google.api.http) = {
+            put: "/api/v2/cluster/nle/enable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Enable node level encryption";
+            description: "Enable node level encryption";
+            tags: "node level encryption";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "409";
+                value: {
+                    description: "Cluster configuration or SSDs do not support NLE.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error of LightOS.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "503";
+                value: {
+                    description: "NLE can't be enabled in the current cluster state, try again later.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
 }
 
 message LogRequest {}
@@ -3089,7 +3136,10 @@ message CreateVolumeRequest {
     string sourceSnapshotUUID = 10;
     string sourceSnapshotName = 11;
     repeated LabelMatchExpression placementRestrictions = 12;
-    string qosPolicyUUID = 13;
+    oneof qosPolicyID {
+        string qosPolicyUUID = 13;
+        string qosPolicyName = 14;
+    }
 }
 
 message DeleteVolumeRequest {
@@ -3120,6 +3170,7 @@ message DeleteServerRequest {
 message ReplaceNodeRequest {
     string SrcNodeUUID = 1;
     string TargetNodeUUID = 2;
+    bool   ReplaceWhileActive = 3;
 }
 
 message CreateServerRequest {
@@ -3154,7 +3205,10 @@ message UpdateVolumeRequest {
     string projectName = 6;
     // qos policy uuid
     //
-    string qosPolicyUUID = 7;
+    oneof qosPolicyID {
+        string qosPolicyUUID = 7;
+        string qosPolicyName = 8;
+    }
 }
 
 message ProxyInfo {
@@ -3332,6 +3386,24 @@ message UserNvmeDevicesResponse {
         Failed = 4;
     }
 
+    // whether this block device is a SED, if so - whether it's TCG security
+    // features are managed by LB or not, and if not - why not
+    enum SEDState {
+        Unknown = 0;
+        NotSED = 1;         // device is not recognised as SED
+        UnsupportedSED = 2; // it's a SED, but LB can't manage this device model
+        ForeignSED = 3;     // it's a supported SED already managed by other entity
+        UnmanagedSED = 4;   // it's a SED, not currently managed by anything
+        ManagedSED = 5;     // it's a SED currently managed by LB
+    }
+
+    // current locking state of a SED, possibly managed by LB
+    enum SEDStatus {
+        UnknownLockStatus = 0;
+        Unlocked = 1; // device is currently unlocked by anyone
+        Locked = 2;   // device is currently locked, maybe by LB, maybe not
+    }
+
     // Total capacity of the device in bytes
     uint64 size = 1;
     // The numa node ID this device is associated with
@@ -3366,6 +3438,14 @@ message UserNvmeDevicesResponse {
     //
     // Device name or address
     string name = 9;
+    // SED state
+    //
+    // whether a SED is managed by LB or not, and if not - why not
+    SEDState sedState = 10;
+    // SED status
+    //
+    // current locking state of a SED, possibly managed by LB
+    SEDStatus sedStatus = 11;
     // node uuid that manages the device
     //
     // The UUID of the node that manages the device, empty string if the device is not managed
@@ -3533,6 +3613,10 @@ message ClusterInfo {
     //
     // cluster name.
     string clusterName = 13;
+    // State of Node Level Encryption (NLE)
+    //
+    // State indicates whether NLE in cluster is enabled/enabling/disabled etc.
+    NLEState nleState = 14;
 }
 
 message ClusterInfoV2 {
@@ -3646,6 +3730,14 @@ message Volume {
     repeated LabelMatchExpression placementRestrictions = 20;
     string qosPolicyUUID = 21;
     string qosPolicyName = 22;
+    string primaryNodeUUID = 23;
+}
+
+enum NLEState {
+    UnknownNLEState = 0;
+    DisabledNLE = 1;
+    EnablingNLE = 2;
+    EnabledNLE = 3;
 }
 
 message Server {
@@ -3691,6 +3783,10 @@ message Server {
     // following the upgrade command this field indicates the status of the upgrade operation
     UpgradeStatusEnum UpgradeStatus = 10;
     repeated string ApiEndpoints = 11;
+    // State of Node Level Encryption (NLE)
+    //
+    // State indicates whether NLE in server is enabled/enabling/disabled etc.
+    NLEState nleState = 12;
 }
 
 message GetRoleRequest {
@@ -3749,6 +3845,7 @@ message Snapshot {
     SnapshotStatisticsApi statistics = 18;
     string ETag = 19;
     string projectName = 20;
+    string primaryNodeUUID = 21;
 }
 
 message DeleteSnapshotRequest {
@@ -4158,3 +4255,7 @@ message UpdateProjectRequest {
 }
 
 message UpdateProjectResponse {}
+
+message EnableNLERequest {}
+
+message EnableNLEResponse {}
