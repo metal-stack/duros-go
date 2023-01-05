@@ -23,19 +23,10 @@ fmt:
 vet:
 	go vet ./...
 
-.PHONY: third-party
-third-party:
-	rm -rf api/google/api api/protoc-gen-swagger/options
-	mkdir -p api/google/api api/protoc-gen-swagger/options
-	wget https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1/protoc-gen-swagger/options/annotations.proto -O api/protoc-gen-swagger/options/annotations.proto
-	wget https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v1/protoc-gen-swagger/options/openapiv2.proto -O api/protoc-gen-swagger/options/openapiv2.proto
-	wget https://raw.githubusercontent.com/googleapis/api-common-protos/master/google/api/annotations.proto -O api/google/api/annotations.proto
-	wget https://raw.githubusercontent.com/googleapis/api-common-protos/master/google/api/http.proto -O api/google/api/http.proto
-	wget https://raw.githubusercontent.com/googleapis/api-common-protos/master/google/api/httpbody.proto -O api/google/api/httpbody.proto
-
 .PHONY: protoc
-protoc: third-party
-	docker run --rm --user $$(id -u):$$(id -g) -v ${PWD}:/work metalstack/builder protoc -I api --go_out=plugins=grpc:api api/lightbits/api/duros/v2/*.proto
+protoc: 
+	rm -rf api/*
+	make -C proto protoc
 
 .PHONY: protoc-ci
 protoc-ci: third-party
