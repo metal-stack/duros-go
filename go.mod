@@ -9,8 +9,8 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.24.0
-	google.golang.org/genproto v0.0.0-20230104163317-caabf589fcbf
-	google.golang.org/grpc v1.51.0
+	google.golang.org/genproto v0.0.0-20230131230820-1c016267d619
+	google.golang.org/grpc v1.52.3
 	google.golang.org/protobuf v1.28.1
 )
 
