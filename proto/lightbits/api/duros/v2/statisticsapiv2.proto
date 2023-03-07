@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package lightbits.api.duros.v2;
+
+option go_package = "duros/v2;v2";
+
+///////////////////////////////////////
+//   API structures (external facing)
+///////////////////////////////////////
+message ClusterStatisticsApi {
+  // Installed Physical Storage
+  //
+  // All installed SSDs capacities over all servers in cluster, given in bytes.
+  uint64 installedPhysicalStorage = 1;
+  // Total Attached Physical Storage
+  //
+  // Sum of all managed and healthy SSDs capacities, given in bytes.
+  uint64 managedPhysicalStorage = 2;
+  // Effective Physical Storage
+  //
+  // Effective Physical storage excluding overhead of OVP and Parity, given in bytes.
+  uint64 effectivePhysicalStorage = 3;
+  // Logical Storage
+  //
+  // Sum of capacities of all allocated volumes, given in bytes.
+  uint64 logicalStorage = 4;
+  // Logical Used Storage
+  //
+  // Logical storage space used by all volumes (n of LBAs x 4096), given in bytes.
+  uint64 logicalUsedStorage = 5;
+  // Physical Used Storage Excluding Parity
+  //
+  // Physical storage space occupied by all volumes (data only), given in bytes.
+  uint64 physicalUsedStorage = 6;
+  // Physical Used Storage
+  //
+  // Physical storage space occupied by all data including Parity overhead when EC enabled (physical n*disks/(n*disks -1)), given in bytes.
+  uint64 physicalUsedStorageIncludingParity = 7;
+  // Free Physical Storage
+  //
+  // Free storage before entering to read-only mode , given in bytes.
+  uint64 freePhysicalStorage = 8;
+  // Estimated Free Logical Storage
+  //
+  // Estimated free storage before entering to read-only mode assuming current compression ratio, given in bytes.
+  uint64 estimatedFreeLogicalStorage = 9;
+  // Estimated Total Available Logical Storage
+  //
+  // Estimate of total available logical storage based on current compression ratio (effective * compression)
+  uint64 estimatedLogicalStorage = 10;
+  // commpression ratio
+  //
+  // compression ratio logicalUsedStorage/physicalUsedStorage
+  double compressionRatio = 11;
+}
+
+message NodeStatisticsApi {
+  // Total Attached Physical Total Storage
+  //
+  // Sum of all managed and healthy SSDs capacities, given in bytes.
+  uint64 managedPhysicalStorage = 1;
+  // Effective Physical Storage
+  //
+  // Effective Physical storage excluding overhead of OVP and Parity, given in bytes.
+  uint64 effectivePhysicalStorage = 2;
+  // Logical Storage
+  //
+  // Sum of capacities of all allocated volumes, given in bytes.
+  uint64 logicalStorage = 3;
+  // Logical Used Storage
+  //
+  // Logical storage space used by all volumes (n of LBAs x 4096), given in bytes.
+  uint64 logicalUsedStorage = 4;
+  // Physical Used Storage Excluding Parity
+  //
+  // Physical storage space occupied by all volumes (data only), given in bytes.
+  uint64 physicalUsedStorage = 5;
+  // Physical Used Storage
+  //
+  // Physical storage space occupied by all data including Parity overhead when EC enabled (physical n*disks/(n*disks -1)), given in bytes.
+  uint64 physicalUsedStorageIncludingParity = 6;
+  // Free Physical Storage
+  //
+  // Free storage before entering to read-only mode, given in bytes.
+  uint64 freePhysicalStorage = 7;
+  // Estimated Free Logical Storage
+  //
+  // Estimated free storage before entering to read-only mode assuming current compression ratio, given in bytes.
+  uint64 estimatedFreeLogicalStorage = 8;
+  // Estimated Total Available Logical Storage
+  //
+  // Estimate of total available logical storage based on current compression ratio (effective * compression)
+  uint64 estimatedLogicalStorage = 9;
+  // commpression ratio
+  //
+  // compression ratio logicalUsedStorage/physicalUsedStorage
+  double compressionRatio = 10;
+  // Unrecoverable Data Integrity Errors
+  //
+  // Number of data integrity errors that could no be recovered by the system.
+  uint32 UnrecoverableDataIntegrityErrors = 11;
+  // Recoverable Data Integrity Errors
+  //
+  // Number of data integrity errors that were recovered by the system.
+  uint32 RecoverableDataIntegrityErrors = 12;
+}
+
+message VolumeStatisticsApi {
+  // Logical Used Storage
+  //
+  // Logical storage space used by volume, given in bytes.
+  uint64 logicalUsedStorage = 1;
+  // Physical Used Storage
+  //
+  // Physical storage space used by volume excluding parity, given in bytes.
+  uint64 physicalUsedStorage = 2;
+  // commpression ratio
+  //
+  // compression ratio userWritten/physicalCapacity
+  double compressionRatio = 3;
+  // total commpression ratio
+  //
+  // compression ratio sum(userWritten) / sum(physical capacity)
+  double totalCompressionRatio = 4; //need to decide on a name
+  // PhysicalCapacity
+  //
+  // The physical capacity that exists in this volume layer
+  uint64 physicalCapacity = 5;
+  // Physical Owned storage Capacity
+  //
+  // The capacity that would be freed when volume is deleted
+  uint64 physicalOwnedCapacity = 6;
+  uint64 physicalOwnedMemory = 7;
+  uint64 physicalMemory = 8;
+  uint64 userWritten = 9;
+  // Unrecoverable Data Integrity Errors
+  //
+  // Number of data integrity errors that could no be recovered by the system.
+  uint32 unrecoverableDataIntegrityErrors = 10;
+  // Recoverable Data Integrity Errors
+  //
+  // Number of data integrity errors that were recovered by the system.
+  uint32 recoverableDataIntegrityErrors = 11;
+}
+
+message SnapshotStatisticsApi {
+  // PhysicalCapacity
+  //
+  // The physical capacity that exists in this volume layer
+  uint64 physicalCapacity = 1;
+  // Physical Owned storage Capacity
+  //
+  // The capacity that would be freed when snapshot would be deleted
+  uint64 physicalOwnedCapacity = 2;
+  // Physical Owned Memory
+  //
+  // The number, in bytes, of md ranges multiplied by the size of md range
+  uint64 physicalOwnedMemory = 3;
+  // Physical Memory
+  //
+  // Memory used by this MSVV (how many chunks)
+  uint64 physicalMemory = 4;
+  // User Written
+  //
+  // Amount, in bytes of data requested to be written by the user
+  uint64 userWritten = 5;
+}
+
+message NvmeDeviceStatisticsApi {
+  // Unrecoverable Data Integrity Errors
+  //
+  // Number of data integrity errors that could no be recovered by the system.
+  uint32 UnrecoverableDataIntegrityErrors = 1;
+  // Recoverable Data Integrity Errors
+  //
+  // Number of data integrity errors that were recovered by the system.
+  uint32 RecoverableDataIntegrityErrors = 2;
+}
