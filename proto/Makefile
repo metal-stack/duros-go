@@ -11,7 +11,7 @@ _buf:
 
 .PHONY: protolint
 protolint:
-	@$(MAKE)	_buf	CMD="format -w api"
+	@$(MAKE)	_buf	CMD="format -w lightbits"
 	@$(MAKE)	_buf	CMD="lint -v"
 
 .PHONY: protoc

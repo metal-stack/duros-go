@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package api.duros.v2;
+package lightbits.api.duros.v2;
 
-import "api/duros/v2/schedule_policy.proto";
-import "api/duros/v2/statisticsapiv2.proto";
+import "lightbits/api/duros/v2/schedule_policy.proto";
+import "lightbits/api/duros/v2/statisticsapiv2.proto";
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
 import "google/protobuf/duration.proto";

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package api.duros.v2;
+package lightbits.api.duros.v2;
 
 option go_package = "duros/v2;v2";
 
