@@ -85,7 +85,7 @@ const (
 	DurosAPI_UpdateClusterConfigParam_FullMethodName = "/lightbits.api.duros.v2.DurosAPI/UpdateClusterConfigParam"
 	DurosAPI_ListClusterConfigParams_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/ListClusterConfigParams"
 	DurosAPI_RollbackVolume_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/RollbackVolume"
-	DurosAPI_EnableNLE_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/EnableNLE"
+	DurosAPI_ListChangedBlocks_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/ListChangedBlocks"
 )
 
 // DurosAPIClient is the client API for DurosAPI service.
@@ -157,7 +157,7 @@ type DurosAPIClient interface {
 	UpdateClusterConfigParam(ctx context.Context, in *UpdateClusterConfigParamRequest, opts ...grpc.CallOption) (*UpdateClusterConfigParamResponse, error)
 	ListClusterConfigParams(ctx context.Context, in *ListClusterConfigParamsRequest, opts ...grpc.CallOption) (*ListClusterConfigParamsResponse, error)
 	RollbackVolume(ctx context.Context, in *RollbackVolumeRequest, opts ...grpc.CallOption) (*RollbackVolumeResponse, error)
-	EnableNLE(ctx context.Context, in *EnableNLERequest, opts ...grpc.CallOption) (*EnableNLEResponse, error)
+	ListChangedBlocks(ctx context.Context, in *ListChangedBlocksRequest, opts ...grpc.CallOption) (*ListChangedBlocksResponse, error)
 }
 
 type durosAPIClient struct {
@@ -776,9 +776,9 @@ func (c *durosAPIClient) RollbackVolume(ctx context.Context, in *RollbackVolumeR
 	return out, nil
 }
 
-func (c *durosAPIClient) EnableNLE(ctx context.Context, in *EnableNLERequest, opts ...grpc.CallOption) (*EnableNLEResponse, error) {
-	out := new(EnableNLEResponse)
-	err := c.cc.Invoke(ctx, DurosAPI_EnableNLE_FullMethodName, in, out, opts...)
+func (c *durosAPIClient) ListChangedBlocks(ctx context.Context, in *ListChangedBlocksRequest, opts ...grpc.CallOption) (*ListChangedBlocksResponse, error) {
+	out := new(ListChangedBlocksResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_ListChangedBlocks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -854,7 +854,7 @@ type DurosAPIServer interface {
 	UpdateClusterConfigParam(context.Context, *UpdateClusterConfigParamRequest) (*UpdateClusterConfigParamResponse, error)
 	ListClusterConfigParams(context.Context, *ListClusterConfigParamsRequest) (*ListClusterConfigParamsResponse, error)
 	RollbackVolume(context.Context, *RollbackVolumeRequest) (*RollbackVolumeResponse, error)
-	EnableNLE(context.Context, *EnableNLERequest) (*EnableNLEResponse, error)
+	ListChangedBlocks(context.Context, *ListChangedBlocksRequest) (*ListChangedBlocksResponse, error)
 }
 
 // UnimplementedDurosAPIServer should be embedded to have forward compatible implementations.
@@ -1056,8 +1056,8 @@ func (UnimplementedDurosAPIServer) ListClusterConfigParams(context.Context, *Lis
 func (UnimplementedDurosAPIServer) RollbackVolume(context.Context, *RollbackVolumeRequest) (*RollbackVolumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollbackVolume not implemented")
 }
-func (UnimplementedDurosAPIServer) EnableNLE(context.Context, *EnableNLERequest) (*EnableNLEResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EnableNLE not implemented")
+func (UnimplementedDurosAPIServer) ListChangedBlocks(context.Context, *ListChangedBlocksRequest) (*ListChangedBlocksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListChangedBlocks not implemented")
 }
 
 // UnsafeDurosAPIServer may be embedded to opt out of forward compatibility for this service.
@@ -2244,20 +2244,20 @@ func _DurosAPI_RollbackVolume_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DurosAPI_EnableNLE_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EnableNLERequest)
+func _DurosAPI_ListChangedBlocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListChangedBlocksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DurosAPIServer).EnableNLE(ctx, in)
+		return srv.(DurosAPIServer).ListChangedBlocks(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DurosAPI_EnableNLE_FullMethodName,
+		FullMethod: DurosAPI_ListChangedBlocks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DurosAPIServer).EnableNLE(ctx, req.(*EnableNLERequest))
+		return srv.(DurosAPIServer).ListChangedBlocks(ctx, req.(*ListChangedBlocksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2526,8 +2526,8 @@ var DurosAPI_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DurosAPI_RollbackVolume_Handler,
 		},
 		{
-			MethodName: "EnableNLE",
-			Handler:    _DurosAPI_EnableNLE_Handler,
+			MethodName: "ListChangedBlocks",
+			Handler:    _DurosAPI_ListChangedBlocks_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

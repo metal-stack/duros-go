@@ -8,46 +8,46 @@ import "google/protobuf/timestamp.proto";
 option go_package = "duros/v2;v2";
 
 message HourlySchedule {
-  google.protobuf.Timestamp startTime = 1;
-  uint32 hoursInCycle = 2;
+    google.protobuf.Timestamp startTime = 1;
+    uint32 hoursInCycle = 2;
 }
 
 message DailySchedule {
-  google.protobuf.Timestamp startTime = 1;
-  uint32 daysInCycle = 2;
+    google.protobuf.Timestamp startTime = 1;
+    uint32 daysInCycle = 2;
 }
 
 enum DayOfWeek {
-  DayOfWeekUnspecified = 0;
-  Sunday = 1;
-  Monday = 2;
-  Tuesday = 3;
-  Wednesday = 4;
-  Thursday = 5;
-  Friday = 6;
-  Saturday = 7;
+    DayOfWeekUnspecified = 0;
+    Sunday = 1;
+    Monday = 2;
+    Tuesday = 3;
+    Wednesday = 4;
+    Thursday = 5;
+    Friday = 6;
+    Saturday = 7;
 }
 
 message DayOfWeekEntry {
-  google.protobuf.Timestamp startTime = 1;
-  DayOfWeek day = 2;
+    google.protobuf.Timestamp startTime = 1;
+    DayOfWeek day = 2;
 }
 
 message WeeklySchedule {
-  repeated DayOfWeekEntry daysOfWeek = 1;
+    repeated DayOfWeekEntry daysOfWeek = 1;
 }
 
 message SnapshotSchedulePolicy {
-  oneof schedulePolicies {
-    HourlySchedule hourlySchedule = 1;
-    DailySchedule dailySchedule = 2;
-    WeeklySchedule weeklySchedule = 3;
-  }
+    oneof schedulePolicies {
+        HourlySchedule hourlySchedule = 1;
+        DailySchedule dailySchedule = 2;
+        WeeklySchedule weeklySchedule = 3;
+    }
 }
 
 message SchedulePolicy {
-  oneof schedulePolicies {
-    SnapshotSchedulePolicy snapshotSchedulePolicy = 1;
-  }
-  google.protobuf.Duration retentionTime = 2;
+    oneof schedulePolicies {
+        SnapshotSchedulePolicy snapshotSchedulePolicy = 1;
+    }
+    google.protobuf.Duration retentionTime = 2;
 }

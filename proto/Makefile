@@ -1,5 +1,5 @@
 MAKEFLAGS += --no-print-directory
-BUF_VERSION := 1.15.0
+BUF_VERSION := 1.23.0
 
 _buf:
 	docker run --rm \
@@ -7,7 +7,7 @@ _buf:
 		-v $(PWD)/..:/workspace \
 		-w /workspace/proto \
 		bufbuild/buf:$(BUF_VERSION) \
-		-c "buf $(CMD) && chown -R $(shell id -u):$(shell id -g) /workspace"
+		-c "buf --timeout 5m $(CMD) && chown -R $(shell id -u):$(shell id -g) /workspace"
 
 .PHONY: protolint
 protolint:
