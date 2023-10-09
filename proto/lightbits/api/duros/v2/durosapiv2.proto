@@ -3249,6 +3249,7 @@ message UpdateVolumeRequest {
     //
     // To intentionally shrink volume size, provide updated volume size and set force to true
     bool Force = 9;
+    string name = 10;
 }
 
 message ProxyInfo {
@@ -3568,9 +3569,61 @@ message ListServersResponse {
     repeated Server servers = 1;
 }
 
+message ClusterUpgradeStatusResponse {
+    ClusterInfo cluster = 1;
+}
+
+message ListUpgradeStatusResponse {
+    repeated Server servers = 1;
+}
+
 message Version {
     //latest user API version
     string apiVersion = 4;
+}
+
+message ClusterLastUpgrade {
+    enum UpgradeStatusEnum {
+        Unknown = 0;
+        None = 1;
+        UpgradeFailed = 2;
+        Upgrading = 3;
+    }
+
+    // Status
+    //
+    // The status of the upgrade operation
+    UpgradeStatusEnum Status = 1;
+
+    // StartTime
+    //
+    // The time of the upgrade task start
+    google.protobuf.Timestamp StartTime = 2;
+
+    // EndTime
+    //
+    // The time of closing the upgrade task (completed or failed). Reset when next upgrade starts.
+    google.protobuf.Timestamp EndTime = 3;
+
+    // TargetVersion
+    //
+    // The version that shall be installed by the end of the process.
+    string TargetVersion = 4;
+
+    // ErrorMessage
+    //
+    // Free formatted text, describes the error if such occurred.
+    string ErrorMessage = 5;
+
+    // ProgressStep
+    //
+    // Current upgrade step. You can use ProgressTotal to calculate percentage as ProgressStep/ProgressTotal.
+    uint32 ProgressStep = 6;
+
+    // ProgressTotal
+    //
+    // Total possible upgrade progress steps.
+    uint32 ProgressTotal = 7;
 }
 
 message ClusterInfo {
@@ -3632,6 +3685,11 @@ message ClusterInfo {
     //
     // cluster name.
     string clusterName = 13;
+
+    // lastUpgrade
+    //
+    // Parameters of the last (or active) cluster upgrade process
+    ClusterLastUpgrade lastUpgrade = 14;
 }
 
 message ClusterInfoV2 {
@@ -3680,6 +3738,11 @@ message ClusterInfoV2 {
     //
     // cluster name.
     string clusterName = 14;
+
+    // lastUpgrade
+    //
+    // Parameters of the last (or active) cluster upgrade process
+    ClusterLastUpgrade lastUpgrade = 15;
 }
 
 message ClusterHealth {
@@ -3784,6 +3847,52 @@ message Volume {
     string primaryNodeUUID = 23;
 }
 
+message ServerLastUpgrade {
+    enum UpgradeStatusEnum {
+        Unknown = 0;
+        None = 1;
+        UpgradeFailed = 2;
+        Upgrading = 3;
+        Rebooting = 4;
+        Recovering = 5;
+    }
+
+    // Status
+    //
+    // The status of the upgrade operation
+    UpgradeStatusEnum Status = 1;
+
+    // StartTime
+    //
+    // The time of the upgrade task start
+    google.protobuf.Timestamp StartTime = 2;
+
+    // EndTime
+    //
+    // The time of closing the upgrade task (completed or failed).
+    google.protobuf.Timestamp EndTime = 3;
+
+    // TargetVersion
+    //
+    // The version that shall be installed by the end of the process.
+    string TargetVersion = 4;
+
+    // ErrorMessage
+    //
+    // Last error message. Free text formatted string describes the problem.
+    string ErrorMessage = 5;
+
+    // ProgressStep
+    //
+    // Current upgrade step. You can use ProgressTotal to calculate percentage as ProgressStep/ProgressTotal.
+    uint32 ProgressStep = 6;
+
+    // ProgressTotal
+    //
+    // Total possible upgrade progress steps.
+    uint32 ProgressTotal = 7;
+}
+
 message Server {
     enum UpgradeStatusEnum {
         Unknown = 0;
@@ -3791,6 +3900,7 @@ message Server {
         UpgradeFailed = 2;
         Upgrading = 3;
         Rebooting = 4;
+        Recovering = 5;
     }
     enum RiskOfServiceLossEnum {
         UnknownRiskOfServiceLoss = 0;
@@ -3817,16 +3927,31 @@ message Server {
     repeated string NodesUUIDs = 5;
     ServerStateEnum state = 6;
     repeated string ServerEndpoints = 7;
+
     // Etag
     //
     // identifier for a specific version of a resource
     string ETag = 8;
+
+    // LightOSVersion
+    //
+    // The current LightOS version
     string LightOSVersion = 9;
+
     // UpgradeStatus
     //
-    // following the upgrade command this field indicates the status of the upgrade operation
+    // Deprecated: This field indicates the status of the upgrade operation
     UpgradeStatusEnum UpgradeStatus = 10;
+
+    // ApiEndpoints
+    //
+    // The API endpoints
     repeated string ApiEndpoints = 11;
+
+    // LastUpgrade
+    //
+    // Parameters of the last (or active) server upgrade process
+    ServerLastUpgrade LastUpgrade = 12;
 }
 
 message GetRoleRequest {
@@ -3975,7 +4100,6 @@ message CreatePolicyRequest {
     //
     // Policy description
     string description = 2;
-
     oneof policy {
         QoSRateLimitPolicy qoSRateLimitPolicy = 3;
         // in the future we will move here schedule policy as well as other policies.
@@ -4113,11 +4237,21 @@ message UpdateClusterConfigParamRequest {
 }
 
 message RollbackVolumeRequest {
+    //
+    // volume UUID
     string UUID = 1;
+    //
+    // source snapshot UUID
     string srcSnapshotUUID = 2;
     //
     // project name
     string projectName = 3;
+    //
+    // volume name
+    string Name = 4;
+    //
+    // source snapshot name
+    string srcSnapshotName = 5;
 }
 
 message RollbackVolumeResponse {}
@@ -4215,11 +4349,12 @@ message LBARange {
  message ListChangedBlocksRequest {
     // snapshotUUID
     //
-    // Target snapshot UUID for comparison
+    // Target snapshot UUID for comparison. (specify either snapshotUUID or snapshotName)
     string snapshotUUID = 1;
     // baseSnapshotUUID
     //
-    // Source snapshot UUID for comparison. Optional in case of full comparison
+    // Source snapshot UUID for comparison. Optional in case of full comparison.
+    // (specify either baseSnapshotUUID or baseSnapshotName)
     string baseSnapshotUUID = 2;
     // projectName
     //
@@ -4229,6 +4364,15 @@ message LBARange {
     //
     // The first offset from which the comparison shall start, aligned to 64 and rounded down
     uint64 offsetLBA = 4;
+    // snapshotName
+    //
+    // Target snapshot name for comparison. (specify either snapshotUUID or snapshotName)
+    string snapshotName = 5;
+    // baseSnapshotName
+    //
+    // Source snapshot name for comparison. Optional in case of full comparison
+    // (specify either baseSnapshotUUID or baseSnapshotName)
+    string baseSnapshotName = 6;
 }
 
  message ListChangedBlocksResponse {
