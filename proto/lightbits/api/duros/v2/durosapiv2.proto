@@ -1183,7 +1183,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Enable Server";
-            description: "Enable server that is disabled. Following the operation, the server nodes resynchronize with their peers and storage is rebuilds up-to-date.";
+            description: "Enable a disabled server. Enabling a server causes the server nodes to synchronize with their peers and rebuild the replicas they hold.";
             tags: "server";
             responses: {
                 key: "404";
@@ -1244,7 +1244,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Disable server.";
-            description: "Server is disabled from the cluster. Server nodes become Inactive and do not participate in serving user requests and data protection. Following the operation the server data is not deleted, the server can be enabled and turned back to the cluster, or completely deleted.";
+            description: "Server is disabled from the cluster. Server nodes become Inactive and do not participate in data protection. If the 'evict' parameter is True, all data on the server is evicted from the server before it is disabled. Once a server is disabled it can be enabled and added back to the cluster or removed from the cluster completely.";
             tags: "echo rpc";
             responses: {
                 key: "404";
@@ -1256,7 +1256,7 @@ service DurosAPI {
             responses: {
                 key: "400";
                 value: {
-                    description: "Missing or Invalid UUID is provided.";
+                    description: "Bad request: Missing/Invalid UUID is provided or disable server may lead to risk of service loss.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1264,13 +1264,6 @@ service DurosAPI {
                 key: "500";
                 value: {
                     description: "Internal error of Lightbits.";
-                    schema: { json_schema: { type: INTEGER;	} }
-                }
-            }
-            responses: {
-                key: "412";
-                value: {
-                    description: "Etag mismatch.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3066,7 +3059,7 @@ message CreateProjectRequest {
     string name = 1;
     // Project description
     //
-    // Brief description of project
+    // Brief (up to 256B) description of the project.
     string description = 2;
     // Default policies
     //
@@ -3171,7 +3164,7 @@ message CreateVolumeRequest {
     repeated LabelMatchExpression placementRestrictions = 12;
     // qosPolicyID
     //
-    // Optionally specify QoS policy to be used by volume (either name or UUID) 
+    // Optionally specify QoS policy to be used by volume (either name or UUID)
     oneof qosPolicyID {
         string qosPolicyUUID = 13;
         string qosPolicyName = 14;
@@ -3188,19 +3181,58 @@ message DeleteVolumeResponse {
 }
 
 message EnableServerRequest {
+    // UUID
+    //
+    // The server's UUID for the enable server request.
     string UUID = 1;
+
+    // name
+    //
+    // The server's name for the enable server request.
+    string name = 2;
 }
 
 message DisableServerRequest {
-    string UUID = 1;
-    // ForceRemove
+    // UUID
     //
-    // When 'true' bypasses upgradeability (loss of service) check when disabling server
+    // The server's UUID for the disable server request.
+    string UUID = 1;
+
+    // ForceDisable
+    //
+    // When set to True the disable operation bypasses upgradeability (loss of service) check when disabling
+    // server. If the evict flag is also set to True, will force eviction of all server data, even if it means losing single
+    // replica volumes because they cannot be evicted to another server. Only set both "evict" and "ForceDisable"
+    // to True if you are willing to lose your single-replica volumes.
     bool ForceDisable = 2;
+
+    // name
+    //
+    // The server's name for the disable server request.
+    string name = 3;
+
+    // evictData
+    //
+    // Setting this to True to cause all server data to be evicted from the server.
+    // Setting this to 'False' will disable the server while keeping all data on the server, so it will be there when you
+    // re-enable it.
+    // eviction may fail in some cases, e.g., in case of single replica volume that can’t be
+    // transferred to another server due to network issues between the servers, the eviction is expected to fail.
+    // If you want the data eviction process, even at the risk of potentially losing some data that couldn’t be evicted,
+    // set both evictData and ForceDisable to True.
+    bool evictData = 4;
 }
 
 message DeleteServerRequest {
+    // UUID
+    //
+    // The server's UUID for the delete server request.
     string UUID = 1;
+
+    // name
+    //
+    // The server's name for the delete server request.
+    string name = 2;
 }
 
 message ReplaceNodeRequest {
@@ -3341,11 +3373,11 @@ message ListEventsRequest {
     string nextToken = 2;
     // since
     //
-    // Optional. Return a list of events with a timestamp not earlier than the given timestamp.
+    // Optional. Return a list of events with a timestamp not earlier than the given timestamp. Timstamp format must be given in UTC Time in ISO-8601, e.g: 2000-01-01T12:00:00.000Z.
 	string since = 3;
     // until
     //
-    // Optional. Return a list of events with a timestamp not later than the given timestamp.
+    // Optional. Return a list of events with a timestamp not later than the given timestamp. Timstamp format must be given in UTC Time in ISO-8601, e.g: 2000-01-01T12:00:00.000Z.
 	string until = 4;
     // limit
     //
@@ -3847,6 +3879,40 @@ message Volume {
     string primaryNodeUUID = 23;
 }
 
+message ServerEvictionStatus {
+    enum StatusEnum {
+        None        = 0;
+        Failed      = 1;
+        Evicting    = 2;
+        Aborting    = 3;
+        Completed   = 4;
+    }
+    // status
+    //
+    // The status of the eviction operation
+    StatusEnum status = 1;
+
+    // startTime
+    //
+    // Start time of eviction operation.
+    google.protobuf.Timestamp startTime = 2;
+
+    // endTime
+    //
+    // Completion time of eviction operation (either a successfully completed or ended due to failure).
+    google.protobuf.Timestamp endTime = 3;
+
+    // errorMessage
+    //
+    // Error message from the last eviction operation.
+    string errorMessage = 4;
+
+    // progress
+    //
+    // Current eviction progress given in units of percent
+    uint32 progress = 5;
+}
+
 message ServerLastUpgrade {
     enum UpgradeStatusEnum {
         Unknown = 0;
@@ -3918,6 +3984,7 @@ message Server {
         Enabling  = 6;
         Disabling = 7;
     }
+
     string UUID = 2;
     string name = 3;
     // risk of service loss state
@@ -3952,6 +4019,14 @@ message Server {
     //
     // Parameters of the last (or active) server upgrade process
     ServerLastUpgrade LastUpgrade = 12;
+
+    // IsWitness
+    bool IsWitness = 13;
+
+    // LastEviction
+    // 
+    // Parameters of the last (or active) server eviction process
+    ServerEvictionStatus LastEviction = 14;
 }
 
 message GetRoleRequest {
@@ -4020,13 +4095,36 @@ message DeleteSnapshotRequest {
 }
 
 message CreateSnapshotRequest {
+    // name
+    //
+    // The name of the snapshot
     string name = 1;
+    // sourceVolumeUUID
+    //
+    // The UUID of the volume to create the snapshot from.
+    // You should specify either the UUID or the name.
+    // If both UUID and name as specified, the UUID takes precedence.
     string sourceVolumeUUID = 2;
+    // sourceVolumeName
+    //
+    // The name of the volume to create the snapshot from.
+    // You should specify either the UUID or the name.
+    // If both UUID and name as specified, the UUID takes precedence.
     string sourceVolumeName = 3;
+    // retentionTime
+    //
+    // The length of time in seconds to retain this snapshot for.
     google.protobuf.Duration retentionTime = 4;
+    // description
+    //
+    // A short description (up to 256B) of the snapshot.
     string description = 5;
+    // projectName
+    //
+    // The name of the project this snapshot belongs to
     string projectName = 6;
 }
+
 message ListSnapshotsRequest {
     string UUID = 1;
     string Name = 2;
@@ -4083,11 +4181,31 @@ message ListFeatureFlagsResponse {
 }
 
 message CreateResourcePolicyRequest {
+    // name
+    //
+    // The name of the resource policy
     string name = 1;
+    // resourceUUID
+    //
+    // The resource UUID. If both name and UUID are provided, the name
+    // is ignored and only the UUID is used.
     string resourceUUID = 2;
+    // resourceName
+    //
+    // The resource name. If both name and UUID are provided, the name
+    // is ignored and only the UUID is used.
     string resourceName = 3;
+    // projectName
+    //
+    // The project this resource policy belongs to.
     string projectName = 4;
-    api.duros.v2.SchedulePolicy schedulePolicy = 5;
+    // schedulePolicy
+    //
+    // The schedule policy for this resource policy.
+    lightbits.api.duros.v2.SchedulePolicy schedulePolicy = 5;
+    // description
+    //
+    // A short (up to 256B) description for this resource.
     string description = 6;
 }
 
@@ -4098,8 +4216,11 @@ message CreatePolicyRequest {
     string name = 1;
     // Policy description
     //
-    // Policy description
+    // Policy description, up to 256B in length
     string description = 2;
+    // The policy
+    //
+    // Details of the policy to create
     oneof policy {
         QoSRateLimitPolicy qoSRateLimitPolicy = 3;
         // in the future we will move here schedule policy as well as other policies.
@@ -4107,10 +4228,23 @@ message CreatePolicyRequest {
 }
 
 message UpdatePolicyRequest {
+    // UUID
+    //
+    // The UUID of the policy request to update. If both name and UUID are provided,
+    // the name is ignored.
     string UUID = 1;
+    // name
+    //
+    // The name of the policy request to update. If both name and UUID are provided,
+    // the name is ignored.
     string name = 2;
+    // description
+    //
+    // A short (up to 256B) description for this resource.
     string description = 3;
-
+    // policy
+    //
+    // At the moment, this can only be the QoSRateLimitPolicy to be updated
     oneof policy {
         QoSRateLimitPolicy qoSRateLimitPolicy = 4;
         // in the future we will move here schedule policy as well as other policies.
@@ -4133,7 +4267,7 @@ message ResourcePolicy {
     string resourceUUID = 3;
     string resourceName = 4;
     string projectName = 5;
-    api.duros.v2.SchedulePolicy schedulePolicy = 6;
+    lightbits.api.duros.v2.SchedulePolicy schedulePolicy = 6;
     string description = 7;
     State state = 8;
 }
@@ -4158,9 +4292,21 @@ message Policy {
 }
 
 message UpdateResourcePolicyRequest {
+    // UUID
+    //
+    // The UUID of the resource policy request to update
     string UUID = 1;
+    // projectName
+    //
+    // The name of the project this resource policy request belongs to
     string projectName = 2;
-    api.duros.v2.SchedulePolicy schedulePolicy = 3;
+    // schedulePolicy
+    //
+    // The updated schedule policy
+    lightbits.api.duros.v2.SchedulePolicy schedulePolicy = 3;
+    // description
+    //
+    // An updated short (up to 256B) description
     string description = 4;
 }
 
@@ -4282,7 +4428,7 @@ message LabelMatchExpression {
     };
     // Volume affinity operation
     //
-    // Volume affinity operator, In specifies that placement logic will match nodes that have labels in labelValueKeyPairs list 
+    // Volume affinity operator, In specifies that placement logic will match nodes that have labels in labelValueKeyPairs list
     Operator operator = 1;
     // Volume affinity operation Key/Value pairs
     //
@@ -4502,7 +4648,7 @@ message QoSRateLimitPolicy {
         // Volume read bandwidth limits, specified in units of IOPs per GB of volume size. 0 means unlimited.
         uint32 readIOPSPerGBLimit = 2;
     }
-   
+
     // projectsNamesScope
     //
     // Lists the projects that have access to this policy (relavent if policyVisibility=Scoped)
