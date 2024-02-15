@@ -212,6 +212,8 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		return nil, err
 	}
 
+	log.Infof("connected")
+
 	c := durosv2.NewDurosAPIClient(res.conn)
 	return c, nil
 }
