@@ -98,6 +98,7 @@ func main() {
 
 		dialConfig.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{clientCertificate},
+			MinVersion:   tls.VersionTLS12,
 			RootCAs:      certPool,
 			ServerName:   serverName,
 		}
