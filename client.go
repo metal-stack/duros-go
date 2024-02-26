@@ -6,7 +6,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"math/rand"
+	"net"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -27,6 +30,7 @@ import (
 )
 
 var (
+	hostRegex *regexp.Regexp
 	//nolint
 	prng = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
@@ -43,19 +47,12 @@ const (
 	defaultUserAgent = "duros-go"
 )
 
-// client for the duros grpc endpoint
-type client struct {
-	eps  EPs
-	conn *grpc.ClientConn
-	log  *zap.SugaredLogger
-}
-
 // DialConfig is the configuration to create a duros-api connection
 type DialConfig struct {
-	Endpoints EPs
-	Scheme    GRPCScheme
-	Token     string
-	Log       *zap.SugaredLogger
+	Endpoint        string
+	Scheme          GRPCScheme
+	Token           string
+	Log             *zap.SugaredLogger
 	// UserAgent to use, if empty duros-go is used
 	UserAgent string
 	TLSConfig *tls.Config
@@ -66,6 +63,10 @@ type Credentials struct {
 	Certificates []tls.Certificate
 	RootCAs      *x509.CertPool
 	ServerName   string
+}
+
+func init() {
+	hostRegex = regexp.MustCompile(`^([a-zA-Z0-9.\[\]:%-]+)$`)
 }
 
 // Dial creates a LightOS cluster client. it is a blocking call and will only
@@ -82,9 +83,9 @@ type Credentials struct {
 // passed here) - `DeadlineExceeded` will be returned as usual, and the caller
 // can retry the operation.
 func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error) {
-	if !config.Endpoints.isValid() {
+	if err := isValid(config.Endpoint); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
-			"invalid target endpoints specified: [%s]", config.Endpoints)
+			"invalid target endpoints specified: %v", err)
 	}
 	id := fmt.Sprintf("%07s", strconv.FormatUint(uint64(prng.Uint32()), 36))
 	if config.Log == nil {
@@ -99,14 +100,9 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 
 	log.Infow("connecting...",
 		"client", ua,
-		"targets", config.Endpoints,
+		"target", config.Endpoint,
 		"client-id", id,
 	)
-
-	res := &client{
-		eps: config.Endpoints.clone(),
-		log: log,
-	}
 
 	zapOpts := []grpc_zap.Option{
 		grpc_zap.WithLevels(grpcToZapLevel),
@@ -168,21 +164,15 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		return nil, fmt.Errorf("unsupported scheme:%v", config.Scheme)
 	}
 
-	var err error
-	res.conn, err = grpc.DialContext(
-		ctx,
-		"ipv4:"+config.Endpoints.String(),
-		opts...,
-	)
+	conn, err := grpc.DialContext(ctx, config.Endpoint, opts...)
 	if err != nil {
-		log.Errorw("failed to connect", "endpoints", config.Endpoints.String(), "error", err.Error())
+		log.Errorw("failed to connect", "endpoints", config.Endpoint, "error", err.Error())
 		return nil, err
 	}
 
 	log.Infof("connected")
 
-	c := durosv2.NewDurosAPIClient(res.conn)
-	return c, nil
+	return durosv2.NewDurosAPIClient(conn), nil
 }
 
 type tokenAuth struct {
@@ -224,4 +214,26 @@ func grpcToZapLevel(code codes.Code) zapcore.Level {
 	default:
 		return zapcore.ErrorLevel
 	}
+}
+
+func isValid(endpoint string) error {
+	host, port, err := net.SplitHostPort(endpoint)
+	if err != nil {
+		//nolint dunno howto convert this to errors.As
+		if addrErr, ok := err.(*net.AddrError); ok {
+			return fmt.Errorf("%s", addrErr.Err)
+		}
+		// shouldn't happen, but...
+		return err
+	}
+	if strings.TrimSpace(host) == "" {
+		return fmt.Errorf("invalid empty host")
+	}
+	if !hostRegex.MatchString(host) {
+		return fmt.Errorf("invalid host %q", host)
+	}
+	if _, err = strconv.ParseUint(port, 10, 16); err != nil {
+		return fmt.Errorf("invalid port number %q", port)
+	}
+	return nil
 }
