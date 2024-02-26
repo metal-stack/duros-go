@@ -162,10 +162,10 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	}
 
 	opts := []grpc.DialOption{
-		grpc.WithBlock(),
+		//grpc.WithBlock(),
 		grpc.WithDisableRetry(),
 		grpc.WithUserAgent(ua),
-		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
+		grpc.WithDefaultCallOptions(grpc.WaitForReady(false)),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(interceptors...)),
 		grpc.WithKeepaliveParams(kal),
 		grpc.WithConnectParams(cp),
