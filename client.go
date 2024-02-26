@@ -204,7 +204,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	var err error
 	res.conn, err = grpc.DialContext(
 		ctx,
-		config.Endpoints.String(),
+		"ipv4:"+config.Endpoints.String(),
 		opts...,
 	)
 	if err != nil {
