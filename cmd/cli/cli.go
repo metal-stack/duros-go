@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	duros "github.com/metal-stack/duros-go"
+	"github.com/metal-stack/duros-go"
 	v2 "github.com/metal-stack/duros-go/api/duros/v2"
 	"go.uber.org/zap"
 )
@@ -37,7 +37,7 @@ htcrucZWyL4=
 
 func main() {
 	var (
-		endpoints  string
+		endpoint   string
 		token      string
 		scheme     string
 		caFile     string
@@ -47,7 +47,7 @@ func main() {
 	)
 	flag.StringVar(&token, "token", "", "The token to authenticate against the lightbits api.")
 	flag.StringVar(&scheme, "scheme", "grpcs", "The scheme to connect to the lightbits api, can be grpc|grpcs")
-	flag.StringVar(&endpoints, "endpoints", "localhost:443", "The endpoints, in the form host:port,host:port of the lightbits api.")
+	flag.StringVar(&endpoint, "endpoint", "localhost:443", "The endpoint, in the form host:port of the lightbits api.")
 	flag.StringVar(&caFile, "ca-file", "", "the filename of the ca for certificate based authentication")
 	flag.StringVar(&certFile, "cert-file", "", "the filename of the ca certificate for certificate based authentication")
 	flag.StringVar(&keyFile, "key-file", "", "the filename of the key  for certificate based authentication")
@@ -71,7 +71,7 @@ func main() {
 
 	ctx := context.Background()
 	dialConfig := duros.DialConfig{
-		Endpoints: duros.MustParseCSV(endpoints),
+		Endpoint:  endpoint,
 		Scheme:    grpcScheme,
 		Token:     token,
 		Log:       zlog.Sugar(),

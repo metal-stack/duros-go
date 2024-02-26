@@ -6,8 +6,11 @@ import (
 	"crypto/x509"
 	"fmt"
 	"math/rand"
+	"net"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -28,6 +31,7 @@ import (
 )
 
 var (
+	hostRegex *regexp.Regexp
 	//nolint
 	prng = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
@@ -44,16 +48,9 @@ const (
 	defaultUserAgent = "duros-go"
 )
 
-// client for the duros grpc endpoint
-type client struct {
-	eps  EPs
-	conn *grpc.ClientConn
-	log  *zap.SugaredLogger
-}
-
 // DialConfig is the configuration to create a duros-api connection
 type DialConfig struct {
-	Endpoints       EPs
+	Endpoint        string
 	Scheme          GRPCScheme
 	Token           string
 	Credentials     *Credentials
@@ -82,6 +79,10 @@ type ByteCredentials struct {
 	CA         []byte
 }
 
+func init() {
+	hostRegex = regexp.MustCompile(`^([a-zA-Z0-9.\[\]:%-]+)$`)
+}
+
 // Dial creates a LightOS cluster client. it is a blocking call and will only
 // return once the connection to [at least one of the] `targets` has been
 // actually established - subject to `ctx` limitations. if `ctx` specified
@@ -100,9 +101,9 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		return nil, status.Errorf(codes.InvalidArgument,
 			"if you provide credentials, provide either file or byte credentials but not both")
 	}
-	if !config.Endpoints.isValid() {
+	if err := isValid(config.Endpoint); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
-			"invalid target endpoints specified: [%s]", config.Endpoints)
+			"invalid target endpoints specified: %v", err)
 	}
 	id := fmt.Sprintf("%07s", strconv.FormatUint(uint64(prng.Uint32()), 36))
 	if config.Log == nil {
@@ -117,14 +118,9 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 
 	log.Infow("connecting...",
 		"client", ua,
-		"targets", config.Endpoints,
+		"target", config.Endpoint,
 		"client-id", id,
 	)
-
-	res := &client{
-		eps: config.Endpoints.clone(),
-		log: log,
-	}
 
 	zapOpts := []grpc_zap.Option{
 		grpc_zap.WithLevels(grpcToZapLevel),
@@ -201,21 +197,15 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		return nil, fmt.Errorf("unsupported scheme:%v", config.Scheme)
 	}
 
-	var err error
-	res.conn, err = grpc.DialContext(
-		ctx,
-		config.Endpoints.String(),
-		opts...,
-	)
+	conn, err := grpc.DialContext(ctx, config.Endpoint, opts...)
 	if err != nil {
-		log.Errorw("failed to connect", "endpoints", config.Endpoints.String(), "error", err.Error())
+		log.Errorw("failed to connect", "endpoints", config.Endpoint, "error", err.Error())
 		return nil, err
 	}
 
 	log.Infof("connected")
 
-	c := durosv2.NewDurosAPIClient(res.conn)
-	return c, nil
+	return durosv2.NewDurosAPIClient(conn), nil
 }
 
 type tokenAuth struct {
@@ -317,4 +307,26 @@ func (c ByteCredentials) getTransportCredentials() (credentials.TransportCredent
 		MinVersion:   tls.VersionTLS12,
 	})
 	return creds, nil
+}
+
+func isValid(endpoint string) error {
+	host, port, err := net.SplitHostPort(endpoint)
+	if err != nil {
+		//nolint dunno howto convert this to errors.As
+		if addrErr, ok := err.(*net.AddrError); ok {
+			return fmt.Errorf("%s", addrErr.Err)
+		}
+		// shouldn't happen, but...
+		return err
+	}
+	if strings.TrimSpace(host) == "" {
+		return fmt.Errorf("invalid empty host")
+	}
+	if !hostRegex.MatchString(host) {
+		return fmt.Errorf("invalid host %q", host)
+	}
+	if _, err = strconv.ParseUint(port, 10, 16); err != nil {
+		return fmt.Errorf("invalid port number %q", port)
+	}
+	return nil
 }
