@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/google/uuid"
-	duros "github.com/metal-stack/duros-go"
+	"github.com/metal-stack/duros-go"
 	v2 "github.com/metal-stack/duros-go/api/duros/v2"
 	"go.uber.org/zap"
 )
@@ -77,14 +80,28 @@ func main() {
 		Log:       zlog.Sugar(),
 		UserAgent: "duros-go-cli",
 	}
+
 	if caFile != "" && certFile != "" && keyFile != "" && serverName != "" {
-		creds := &duros.Credentials{
-			CAFile:     caFile,
-			Certfile:   certFile,
-			Keyfile:    keyFile,
-			ServerName: serverName,
+		clientCertificate, err := tls.LoadX509KeyPair(certFile, keyFile)
+		if err != nil {
+			panic(err)
 		}
-		dialConfig.Credentials = creds
+
+		ca, err := os.ReadFile(caFile)
+		if err != nil {
+			panic(err)
+		}
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(ca) {
+			panic(fmt.Errorf("failed to append ca cert: %s", caFile))
+		}
+
+		dialConfig.TLSConfig = &tls.Config{
+			Certificates: []tls.Certificate{clientCertificate},
+			MinVersion:   tls.VersionTLS12,
+			RootCAs:      certPool,
+			ServerName:   serverName,
+		}
 	}
 
 	durosClient, err := duros.Dial(ctx, dialConfig)
