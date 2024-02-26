@@ -52,13 +52,13 @@ type client struct {
 
 // DialConfig is the configuration to create a duros-api connection
 type DialConfig struct {
-	Endpoints   EPs
-	Scheme      GRPCScheme
-	Token       string
-	Credentials *Credentials
-	Log         *zap.SugaredLogger
+	Endpoints EPs
+	Scheme    GRPCScheme
+	Token     string
+	Log       *zap.SugaredLogger
 	// UserAgent to use, if empty duros-go is used
 	UserAgent string
+	TLSConfig *tls.Config
 }
 
 // Credentials specify the TLS Certificate based authentication for the grpc connection
@@ -163,12 +163,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	case GRPCS:
 		log.Infof("connecting securely")
-		if config.Credentials != nil {
-			opts = append(opts, grpc.WithTransportCredentials(config.Credentials.getTransportCredentials()))
-		} else {
-			//nolint
-			opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})))
-		}
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(config.TLSConfig)))
 	default:
 		return nil, fmt.Errorf("unsupported scheme:%v", config.Scheme)
 	}
@@ -229,13 +224,4 @@ func grpcToZapLevel(code codes.Code) zapcore.Level {
 	default:
 		return zapcore.ErrorLevel
 	}
-}
-
-func (c Credentials) getTransportCredentials() credentials.TransportCredentials {
-	return credentials.NewTLS(&tls.Config{
-		Certificates: c.Certificates,
-		RootCAs:      c.RootCAs,
-		ServerName:   c.ServerName,
-		MinVersion:   tls.VersionTLS12,
-	})
 }

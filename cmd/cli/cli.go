@@ -96,7 +96,7 @@ func main() {
 			panic(fmt.Errorf("failed to append ca cert: %s", caFile))
 		}
 
-		dialConfig.Credentials = &duros.Credentials{
+		dialConfig.TLSConfig = &tls.Config{
 			Certificates: []tls.Certificate{clientCertificate},
 			RootCAs:      certPool,
 			ServerName:   serverName,
