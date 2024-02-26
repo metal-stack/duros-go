@@ -3,7 +3,6 @@ package duros
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -59,13 +58,6 @@ type DialConfig struct {
 	// UserAgent to use, if empty duros-go is used
 	UserAgent string
 	TLSConfig *tls.Config
-}
-
-// Credentials specify the TLS Certificate based authentication for the grpc connection
-type Credentials struct {
-	Certificates []tls.Certificate
-	RootCAs      *x509.CertPool
-	ServerName   string
 }
 
 // Dial creates a LightOS cluster client. it is a blocking call and will only
