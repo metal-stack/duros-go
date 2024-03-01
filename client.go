@@ -312,11 +312,6 @@ func (c ByteCredentials) getTransportCredentials() (credentials.TransportCredent
 func isValid(endpoint string) error {
 	host, port, err := net.SplitHostPort(endpoint)
 	if err != nil {
-		//nolint dunno howto convert this to errors.As
-		if addrErr, ok := err.(*net.AddrError); ok {
-			return fmt.Errorf("%s", addrErr.Err)
-		}
-		// shouldn't happen, but...
 		return err
 	}
 	if strings.TrimSpace(host) == "" {
