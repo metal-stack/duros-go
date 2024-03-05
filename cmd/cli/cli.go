@@ -4,11 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/metal-stack/duros-go"
 	v2 "github.com/metal-stack/duros-go/api/duros/v2"
-	"go.uber.org/zap"
 )
 
 const (
@@ -55,10 +55,6 @@ func main() {
 
 	flag.Parse()
 
-	zlog, err := zap.NewProduction()
-	if err != nil {
-		panic((err))
-	}
 	var grpcScheme duros.GRPCScheme
 	switch scheme {
 	case "grpc":
@@ -74,7 +70,7 @@ func main() {
 		Endpoint:  endpoint,
 		Scheme:    grpcScheme,
 		Token:     token,
-		Log:       zlog.Sugar(),
+		Log:       slog.Default(),
 		UserAgent: "duros-go-cli",
 	}
 	if caFile != "" && certFile != "" && keyFile != "" && serverName != "" {
