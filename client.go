@@ -5,16 +5,14 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"os"
 	"strconv"
 	"time"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
 	"google.golang.org/grpc/balancer/roundrobin"
@@ -48,7 +46,7 @@ const (
 type client struct {
 	eps  EPs
 	conn *grpc.ClientConn
-	log  *zap.SugaredLogger
+	log  *slog.Logger
 }
 
 // DialConfig is the configuration to create a duros-api connection
@@ -58,7 +56,7 @@ type DialConfig struct {
 	Token           string
 	Credentials     *Credentials
 	ByteCredentials *ByteCredentials
-	Log             *zap.SugaredLogger
+	Log             *slog.Logger
 	// UserAgent to use, if empty duros-go is used
 	UserAgent string
 }
@@ -115,7 +113,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		ua = config.UserAgent
 	}
 
-	log.Infow("connecting...",
+	log.Info("connecting...",
 		"client", ua,
 		"targets", config.Endpoints,
 		"client-id", id,
@@ -124,16 +122,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	res := &client{
 		eps: config.Endpoints.clone(),
 		log: log,
-	}
-
-	zapOpts := []grpc_zap.Option{
-		grpc_zap.WithLevels(grpcToZapLevel),
-	}
-	interceptors := []grpc.UnaryClientInterceptor{
-		grpc_zap.UnaryClientInterceptor(log.Desugar(), zapOpts...),
-		grpc_zap.PayloadUnaryClientInterceptor(log.Desugar(),
-			func(context.Context, string) bool { return true },
-		),
 	}
 
 	// these are broadly in line with the expected server SLOs:
@@ -162,11 +150,11 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	}
 
 	opts := []grpc.DialOption{
-		grpc.WithBlock(),
 		grpc.WithDisableRetry(),
 		grpc.WithUserAgent(ua),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
-		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(interceptors...)),
+		grpc.WithChainUnaryInterceptor(
+			logging.UnaryClientInterceptor(interceptorLogger(log))),
 		grpc.WithKeepaliveParams(kal),
 		grpc.WithConnectParams(cp),
 		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, roundrobin.Name)),
@@ -177,10 +165,10 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 	// Configure tls ca certificate based auth if credentials are given
 	switch config.Scheme {
 	case GRPC:
-		log.Infof("connecting insecurely")
+		log.Info("connecting insecurely")
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	case GRPCS:
-		log.Infof("connecting securely")
+		log.Info("connecting securely")
 		if config.Credentials != nil {
 			creds, err := config.Credentials.getTransportCredentials()
 			if err != nil {
@@ -208,11 +196,11 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		opts...,
 	)
 	if err != nil {
-		log.Errorw("failed to connect", "endpoints", config.Endpoints.String(), "error", err.Error())
+		log.Error("failed to connect", "endpoints", config.Endpoints.String(), "error", err.Error())
 		return nil, err
 	}
 
-	log.Infof("connected")
+	log.Info("connected")
 
 	c := durosv2.NewDurosAPIClient(res.conn)
 	return c, nil
@@ -230,33 +218,6 @@ func (t tokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[st
 
 func (tokenAuth) RequireTransportSecurity() bool {
 	return true
-}
-
-func grpcToZapLevel(code codes.Code) zapcore.Level {
-	switch code {
-	case codes.OK,
-		codes.Canceled,
-		codes.DeadlineExceeded,
-		codes.NotFound,
-		codes.Unavailable:
-		return zapcore.InfoLevel
-	case codes.Aborted,
-		codes.AlreadyExists,
-		codes.FailedPrecondition,
-		codes.InvalidArgument,
-		codes.OutOfRange,
-		codes.PermissionDenied,
-		codes.ResourceExhausted,
-		codes.Unauthenticated:
-		return zapcore.WarnLevel
-	case codes.DataLoss,
-		codes.Internal,
-		codes.Unimplemented,
-		codes.Unknown:
-		return zapcore.ErrorLevel
-	default:
-		return zapcore.ErrorLevel
-	}
 }
 
 func (c Credentials) getTransportCredentials() (credentials.TransportCredentials, error) {
@@ -317,4 +278,23 @@ func (c ByteCredentials) getTransportCredentials() (credentials.TransportCredent
 		MinVersion:   tls.VersionTLS12,
 	})
 	return creds, nil
+}
+
+// interceptorLogger adapts slog logger to interceptor logger.
+// This code is simple enough to be copied and not imported.
+func interceptorLogger(l *slog.Logger) logging.Logger {
+	return logging.LoggerFunc(func(_ context.Context, lvl logging.Level, msg string, fields ...any) {
+		switch lvl {
+		case logging.LevelDebug:
+			l.Debug(msg, fields...)
+		case logging.LevelInfo:
+			l.Info(msg, fields...)
+		case logging.LevelWarn:
+			l.Warn(msg, fields...)
+		case logging.LevelError:
+			l.Error(msg, fields...)
+		default:
+			panic(fmt.Sprintf("unknown level %v", lvl))
+		}
+	})
 }
