@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/timeout"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/backoff"
@@ -155,7 +154,6 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		grpc.WithUserAgent(ua),
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		grpc.WithChainUnaryInterceptor(
-			timeout.UnaryClientInterceptor(500*time.Millisecond),
 			logging.UnaryClientInterceptor(interceptorLogger(log))),
 		grpc.WithKeepaliveParams(kal),
 		grpc.WithConnectParams(cp),
