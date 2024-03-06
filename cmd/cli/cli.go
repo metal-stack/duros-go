@@ -7,11 +7,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/metal-stack/duros-go"
 	v2 "github.com/metal-stack/duros-go/api/duros/v2"
-	"go.uber.org/zap"
 )
 
 const (
@@ -40,7 +40,7 @@ htcrucZWyL4=
 
 func main() {
 	var (
-		endpoints  string
+		endpoint   string
 		token      string
 		scheme     string
 		caFile     string
@@ -50,7 +50,7 @@ func main() {
 	)
 	flag.StringVar(&token, "token", "", "The token to authenticate against the lightbits api.")
 	flag.StringVar(&scheme, "scheme", "grpcs", "The scheme to connect to the lightbits api, can be grpc|grpcs")
-	flag.StringVar(&endpoints, "endpoints", "localhost:443", "The endpoints, in the form host:port,host:port of the lightbits api.")
+	flag.StringVar(&endpoint, "endpoint", "localhost:443", "The endpoint, in the form host:port of the lightbits api.")
 	flag.StringVar(&caFile, "ca-file", "", "the filename of the ca for certificate based authentication")
 	flag.StringVar(&certFile, "cert-file", "", "the filename of the ca certificate for certificate based authentication")
 	flag.StringVar(&keyFile, "key-file", "", "the filename of the key  for certificate based authentication")
@@ -58,10 +58,6 @@ func main() {
 
 	flag.Parse()
 
-	zlog, err := zap.NewProduction()
-	if err != nil {
-		panic((err))
-	}
 	var grpcScheme duros.GRPCScheme
 	switch scheme {
 	case "grpc":
@@ -74,10 +70,10 @@ func main() {
 
 	ctx := context.Background()
 	dialConfig := duros.DialConfig{
-		Endpoints: duros.MustParseCSV(endpoints),
+		Endpoint:  endpoint,
 		Scheme:    grpcScheme,
 		Token:     token,
-		Log:       zlog.Sugar(),
+		Log:       slog.Default(),
 		UserAgent: "duros-go-cli",
 	}
 
