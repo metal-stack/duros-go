@@ -94,7 +94,7 @@ func init() {
 // longer than the actual operation context timeout (as opposed to the `ctx`
 // passed here) - `DeadlineExceeded` will be returned as usual, and the caller
 // can retry the operation.
-func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error) {
+func Dial(config DialConfig) (durosv2.DurosAPIClient, error) {
 	if config.Credentials != nil && config.ByteCredentials != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"if you provide credentials, provide either file or byte credentials but not both")
@@ -185,7 +185,7 @@ func Dial(ctx context.Context, config DialConfig) (durosv2.DurosAPIClient, error
 		return nil, fmt.Errorf("unsupported scheme:%v", config.Scheme)
 	}
 
-	conn, err := grpc.DialContext(ctx, config.Endpoint, opts...)
+	conn, err := grpc.NewClient(config.Endpoint, opts...)
 	if err != nil {
 		log.Error("failed to connect", "endpoints", config.Endpoint, "error", err.Error())
 		return nil, err
