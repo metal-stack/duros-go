@@ -81,19 +81,7 @@ func init() {
 	hostRegex = regexp.MustCompile(`^([a-zA-Z0-9.\[\]:%-]+)$`)
 }
 
-// Dial creates a LightOS cluster client. it is a blocking call and will only
-// return once the connection to [at least one of the] `targets` has been
-// actually established - subject to `ctx` limitations. if `ctx` specified
-// timeout or duration - dialling (and only dialling!) timeout will be set
-// accordingly. `ctx` can also be used to cancel the dialling process, as per
-// usual.
-//
-// the cluster client will make an effort to transparently reconnect to one of
-// the `targets` in case of connection loss. if the process of finding a live
-// and responsive target amongst `targets` and establishing the connection takes
-// longer than the actual operation context timeout (as opposed to the `ctx`
-// passed here) - `DeadlineExceeded` will be returned as usual, and the caller
-// can retry the operation.
+// Dial creates a LightOS cluster client.
 func Dial(config DialConfig) (durosv2.DurosAPIClient, error) {
 	if config.Credentials != nil && config.ByteCredentials != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
