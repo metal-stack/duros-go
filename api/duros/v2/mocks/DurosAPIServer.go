@@ -1712,6 +1712,36 @@ func (_m *DurosAPIServer) RollbackVolume(_a0 context.Context, _a1 *v2.RollbackVo
 	return r0, r1
 }
 
+// SetClusterEncryption provides a mock function with given fields: _a0, _a1
+func (_m *DurosAPIServer) SetClusterEncryption(_a0 context.Context, _a1 *v2.SetClusterEncryptionRequest) (*v2.SetClusterEncryptionResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetClusterEncryption")
+	}
+
+	var r0 *v2.SetClusterEncryptionResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.SetClusterEncryptionRequest) (*v2.SetClusterEncryptionResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.SetClusterEncryptionRequest) *v2.SetClusterEncryptionResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.SetClusterEncryptionResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.SetClusterEncryptionRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateAdminEndpoint provides a mock function with given fields: _a0, _a1
 func (_m *DurosAPIServer) UpdateAdminEndpoint(_a0 context.Context, _a1 *v2.UpdateAdminEndpointRequest) (*v2.AdminEndpoint, error) {
 	ret := _m.Called(_a0, _a1)

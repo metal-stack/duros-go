@@ -42,6 +42,7 @@ const (
 	DurosAPI_ListServers_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/ListServers"
 	DurosAPI_UpgradeServer_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/UpgradeServer"
 	DurosAPI_UpgradeCluster_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/UpgradeCluster"
+	DurosAPI_SetClusterEncryption_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/SetClusterEncryption"
 	DurosAPI_CreateServer_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/CreateServer"
 	DurosAPI_ReplaceNode_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/ReplaceNode"
 	DurosAPI_DeleteServer_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/DeleteServer"
@@ -114,6 +115,7 @@ type DurosAPIClient interface {
 	ListServers(ctx context.Context, in *ListServersRequest, opts ...grpc.CallOption) (*ListServersResponse, error)
 	UpgradeServer(ctx context.Context, in *UpgradeServerRequest, opts ...grpc.CallOption) (*UpgradeServerResponse, error)
 	UpgradeCluster(ctx context.Context, in *UpgradeClusterRequest, opts ...grpc.CallOption) (*UpgradeClusterResponse, error)
+	SetClusterEncryption(ctx context.Context, in *SetClusterEncryptionRequest, opts ...grpc.CallOption) (*SetClusterEncryptionResponse, error)
 	CreateServer(ctx context.Context, in *CreateServerRequest, opts ...grpc.CallOption) (*Server, error)
 	ReplaceNode(ctx context.Context, in *ReplaceNodeRequest, opts ...grpc.CallOption) (*ReplaceNodeResponse, error)
 	DeleteServer(ctx context.Context, in *DeleteServerRequest, opts ...grpc.CallOption) (*DeleteServerResponse, error)
@@ -383,6 +385,15 @@ func (c *durosAPIClient) UpgradeServer(ctx context.Context, in *UpgradeServerReq
 func (c *durosAPIClient) UpgradeCluster(ctx context.Context, in *UpgradeClusterRequest, opts ...grpc.CallOption) (*UpgradeClusterResponse, error) {
 	out := new(UpgradeClusterResponse)
 	err := c.cc.Invoke(ctx, DurosAPI_UpgradeCluster_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) SetClusterEncryption(ctx context.Context, in *SetClusterEncryptionRequest, opts ...grpc.CallOption) (*SetClusterEncryptionResponse, error) {
+	out := new(SetClusterEncryptionResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_SetClusterEncryption_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -811,6 +822,7 @@ type DurosAPIServer interface {
 	ListServers(context.Context, *ListServersRequest) (*ListServersResponse, error)
 	UpgradeServer(context.Context, *UpgradeServerRequest) (*UpgradeServerResponse, error)
 	UpgradeCluster(context.Context, *UpgradeClusterRequest) (*UpgradeClusterResponse, error)
+	SetClusterEncryption(context.Context, *SetClusterEncryptionRequest) (*SetClusterEncryptionResponse, error)
 	CreateServer(context.Context, *CreateServerRequest) (*Server, error)
 	ReplaceNode(context.Context, *ReplaceNodeRequest) (*ReplaceNodeResponse, error)
 	DeleteServer(context.Context, *DeleteServerRequest) (*DeleteServerResponse, error)
@@ -926,6 +938,9 @@ func (UnimplementedDurosAPIServer) UpgradeServer(context.Context, *UpgradeServer
 }
 func (UnimplementedDurosAPIServer) UpgradeCluster(context.Context, *UpgradeClusterRequest) (*UpgradeClusterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpgradeCluster not implemented")
+}
+func (UnimplementedDurosAPIServer) SetClusterEncryption(context.Context, *SetClusterEncryptionRequest) (*SetClusterEncryptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetClusterEncryption not implemented")
 }
 func (UnimplementedDurosAPIServer) CreateServer(context.Context, *CreateServerRequest) (*Server, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateServer not implemented")
@@ -1466,6 +1481,24 @@ func _DurosAPI_UpgradeCluster_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DurosAPIServer).UpgradeCluster(ctx, req.(*UpgradeClusterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_SetClusterEncryption_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetClusterEncryptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).SetClusterEncryption(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_SetClusterEncryption_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).SetClusterEncryption(ctx, req.(*SetClusterEncryptionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2352,6 +2385,10 @@ var DurosAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpgradeCluster",
 			Handler:    _DurosAPI_UpgradeCluster_Handler,
+		},
+		{
+			MethodName: "SetClusterEncryption",
+			Handler:    _DurosAPI_SetClusterEncryption_Handler,
 		},
 		{
 			MethodName: "CreateServer",
