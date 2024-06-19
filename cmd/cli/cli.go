@@ -83,7 +83,7 @@ func main() {
 		dialConfig.Credentials = creds
 	}
 
-	durosClient, err := duros.Dial(ctx, dialConfig)
+	durosClient, err := duros.Dial(dialConfig)
 	if err != nil {
 		panic(err)
 	}

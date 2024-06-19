@@ -1,11 +1,16 @@
-version: v1
+version: v2
+deps:
+  - buf.build/googleapis/googleapis
 lint:
   use:
     - MINIMAL
   except:
-    # TODO remove these
-    - SERVICE_SUFFIX
+    - PACKAGE_NO_IMPORT_CYCLE
     - RPC_REQUEST_STANDARD_NAME
     - RPC_RESPONSE_STANDARD_NAME
-deps:
-  - buf.build/googleapis/googleapis
+    - SERVICE_SUFFIX
+  disallow_comment_ignores: true
+breaking:
+  except:
+    - EXTENSION_NO_DELETE
+    - FIELD_SAME_DEFAULT
