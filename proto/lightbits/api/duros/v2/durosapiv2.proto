@@ -1001,6 +1001,46 @@ service DurosAPI {
         };
     }
 
+    rpc SetClusterEncryption(SetClusterEncryptionRequest) returns (SetClusterEncryptionResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/encryption"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Set cluster encryption.";
+            description: "Set encryption on the cluster. Each volume will be encrypted with a Data Encryption Key (DEK) which is in turn encrypted by a Key Encryption Key (KEK).";
+            tags: "encryption";
+            responses: {
+                key: "500";
+                value: {
+                    description: "System internal error.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
     rpc CreateServer(CreateServerRequest) returns (Server) {
         option (google.api.http) = {
             post: "/api/v2/servers"
@@ -2958,7 +2998,23 @@ service DurosAPI {
 
 }
 
-message LogRequest {}
+message LogRequest {
+    // Optional SkipStatistics
+    //
+    // Fetch log will download by default all the statistics from the the relavant server
+    // By passing this parameter fetch logs will skip the statistics collect
+    bool   SkipStatistics = 1;
+    bool   CaptureCpuAndTcpDump = 2;
+    uint32 NumOfDaysToCollectLogs = 3;
+    bool   CollectServicesLbcliEtcd = 4;
+    uint32 IntervalBetweenBEReadCycles = 5;
+    bool   DontCollectlogs = 6;
+    string LogFilename = 7;
+    uint32 NumOfstatisticsToCapture = 8;
+    bool   DontCompressOutput = 9;
+    bool   IoNice = 10;
+    bool   UseHighCompression = 11;
+}
 
 message AdminEndpoint {
     uint32 port = 1;
@@ -3013,11 +3069,35 @@ message CreateCredentialRequest {
     bytes payload = 4;
 }
 
+// CredsKind specifies the intended usage and origin of the credentials. it can not be
+// set directly by the user when uploading creds and can't be modified at all after the
+// creds were created.
+enum CredsKind {
+    // Credentials directly managed by the users.
+    UserCreds = 0;
+
+    // Credentials that will be used by Lightbits Photon to submit requests either on
+    // behalf of the Photon users, or for Photon requests to fetch the cluster metadata.
+    //
+    // These credentials can be viewed by the users, but can only be modified indirectly,
+    // as part of the Beacon service configuration/management process.
+    BeaconCreds = 2;
+
+    // Lightbits server encountered credentials possibly created by a newer Lightbits
+    // SW version than that running on the server itself.
+    UnknownKind = 127;
+}
+
 message Credential {
     string projectName = 1;
     string ID = 2;
     CredsType type = 3;
     bytes payload = 4;
+
+    // kind
+    //
+    // CredsKind specifies the origin and intended usage of the credentials.
+    CredsKind kind = 5;
 }
 
 message DeleteCredentialRequest {
@@ -3233,6 +3313,25 @@ message DeleteServerRequest {
     //
     // The server's name for the delete server request.
     string name = 2;
+
+    // forceDelete
+    //
+    // Optional. Setting forceDelete will override some of the delete
+    // server pre-checks.
+    // When set to False (default), a server cannot be deleted if
+    // there are any resources attached to the server (e.g., node replace
+    // was issued, server nodes entered permanent failure states and
+    // resources were migrated.)
+    // When set to True the delete operation bypasses checks to verify
+    // if server still has any resources attached to it and starts the
+    // delete operation in the background. The operation will not
+    // complete and will remain in the background until the server
+    // resources will have been detached from the server.
+    // Note that a server with volumes/snapshots/clones with a single
+    // replica cannot be deleted, even with forceDelete set to
+    // True. You must remove the 1x replica volumes/snapshots/clones
+    // before deleting the server.
+    bool forceDelete = 3;
 }
 
 message ReplaceNodeRequest {
@@ -3251,6 +3350,10 @@ message CreateServerRequest {
     //
     // Optional. When true, bypasses validation if given endpoint is used by another server
     bool reuseIP = 3;
+    // extendCluster
+    // 
+    // Optional. When true, the cluster is extended with new server and its resources, enabling new volumes placement on the server (nodes of this server will come up as active). Default is False (the nodes of this server will be added to cluster as unattached, and may be used to move over resources from an existing failed server using replace node api command).
+    bool extendCluster = 4;
 }
 
 message UpdateVolumeRequest {
@@ -3328,6 +3431,14 @@ message UpgradeClusterRequest {
     //
     // Optional. Proxy server information for upgrade behind proxy.
     ProxyInfo ProxyInfo = 3;
+}
+
+message SetClusterEncryptionRequest {
+    enum EncryptionMode {
+        Disable = 0;
+        Enable = 1;
+    }
+    EncryptionMode EncryptionCommand = 1;
 }
 
 message GetClusterRequest {
@@ -3581,6 +3692,8 @@ message UpgradeServerResponse {}
 
 message UpgradeClusterResponse {}
 
+message SetClusterEncryptionResponse {}
+
 message ReplaceNodeResponse {}
 
 message DeleteServerResponse {}
@@ -3789,6 +3902,7 @@ message ClusterHealth {
     uint32 numReadOnlyVolumes = 3;
     uint32 numNotAvailableVolumes = 4;
     uint32 numInactiveNodes = 5;
+    uint32 numHealthyVolumes = 6;
 }
 
 enum ProtectionStateEnum {
@@ -3876,7 +3990,14 @@ message Volume {
     //
     // Optional volume's QoS policy name (if not specified project policy is used)
     string qosPolicyName = 22;
+    // primaryNodeUUID
+    //
+    // UUID of the primary node data is Read/Written for this volume.
     string primaryNodeUUID = 23;
+    // creationTime
+    //
+    // Time of volume creation (UTC).
+    google.protobuf.Timestamp creationTime = 24;
 }
 
 message ServerEvictionStatus {
@@ -3886,6 +4007,7 @@ message ServerEvictionStatus {
         Evicting    = 2;
         Aborting    = 3;
         Completed   = 4;
+        Aborted     = 5;
     }
     // status
     //
@@ -4027,6 +4149,10 @@ message Server {
     // 
     // Parameters of the last (or active) server eviction process
     ServerEvictionStatus LastEviction = 14;
+    // Server Health
+    //
+    // Server health: OK- server healthy, Warning high utilisation or failed disk under rebuild, Error - Inactive nodes or nodes nearing/in Read-only.
+    ClusterHealth.State health = 15;
 }
 
 message GetRoleRequest {
@@ -4690,3 +4816,17 @@ message UpdateProjectRequest {
 }
 
 message UpdateProjectResponse {}
+
+message ClusterEncryptionStatus {
+    enum State {
+        Disabled = 0; // Encryption is disabled
+        Enabling = 1; // Enabling cluster encryption
+        Enabled = 2;  // Cluster encryption is enabled
+        Unknown = 3;  // Unknown state
+    }
+
+    // EncryptionState
+    //
+    // The current state of the cluster encryption
+    State EncryptionState = 1;
+}

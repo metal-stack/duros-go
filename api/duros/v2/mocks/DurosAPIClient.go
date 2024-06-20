@@ -2126,6 +2126,43 @@ func (_m *DurosAPIClient) RollbackVolume(ctx context.Context, in *v2.RollbackVol
 	return r0, r1
 }
 
+// SetClusterEncryption provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) SetClusterEncryption(ctx context.Context, in *v2.SetClusterEncryptionRequest, opts ...grpc.CallOption) (*v2.SetClusterEncryptionResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetClusterEncryption")
+	}
+
+	var r0 *v2.SetClusterEncryptionResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.SetClusterEncryptionRequest, ...grpc.CallOption) (*v2.SetClusterEncryptionResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.SetClusterEncryptionRequest, ...grpc.CallOption) *v2.SetClusterEncryptionResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.SetClusterEncryptionResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.SetClusterEncryptionRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateAdminEndpoint provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) UpdateAdminEndpoint(ctx context.Context, in *v2.UpdateAdminEndpointRequest, opts ...grpc.CallOption) (*v2.AdminEndpoint, error) {
 	_va := make([]interface{}, len(opts))
