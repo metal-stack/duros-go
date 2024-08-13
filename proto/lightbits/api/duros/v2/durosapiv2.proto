@@ -4,6 +4,7 @@ package lightbits.api.duros.v2;
 
 import "lightbits/api/duros/v2/schedule_policy.proto";
 import "lightbits/api/duros/v2/statisticsapiv2.proto";
+import "lightbits/api/duros/v2/security.proto";
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
 import "google/protobuf/duration.proto";
@@ -1001,14 +1002,14 @@ service DurosAPI {
         };
     }
 
-    rpc SetClusterEncryption(SetClusterEncryptionRequest) returns (SetClusterEncryptionResponse) {
+    rpc EnableClusterEncryption(EnableClusterEncryptionRequest) returns (EnableClusterEncryptionResponse) {
         option (google.api.http) = {
-            post: "/api/v2/cluster/encryption"
+            post: "/api/v2/cluster/encryption/enable"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Set cluster encryption.";
-            description: "Set encryption on the cluster. Each volume will be encrypted with a Data Encryption Key (DEK) which is in turn encrypted by a Key Encryption Key (KEK).";
+            summary: "Enable Cluster level encryption (Beta)";
+            description: "Enable data encryption for data at rest. Once enabled, each volume will be encrypted with a Data Encryption Key (DEK) which is in turn encrypted by a Key Encryption Key (KEK). Note: This feature is not readily available and offers only limited support for evaluative purposes. It cannot be disabled once activated and must not be enabled in production environments at this time.";
             tags: "encryption";
             responses: {
                 key: "500";
@@ -1036,6 +1037,13 @@ service DurosAPI {
                 value: {
                     description: "Permission denied.";
                     schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "501";
+                value: {
+                    description: "Unimplemented capability.";
+                    schema: { json_schema: { type: INTEGER; } }
                 }
             }
         };
@@ -2750,6 +2758,13 @@ service DurosAPI {
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
+            responses: {
+                key: "501";
+                value: {
+                    description: "Unimplemented capability.";
+                    schema: { json_schema: { type: INTEGER; } }
+                }
+            }
         };
     }
 
@@ -2975,7 +2990,7 @@ service DurosAPI {
             responses: {
                 key: "500";
                 value: {
-                    description: "Internal error of LightOS.";
+                    description: "Internal error of Lightbits.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2990,6 +3005,740 @@ service DurosAPI {
                 key: "403";
                 value: {
                     description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc RotateClusterRootKey (RotateClusterRootKeyRequest) returns (RotateClusterRootKeyResponse){
+        option (google.api.http) = {
+            post: "/api/v2/cluster/clusterRootKey/rotate"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Rotate cluster root encryption key (Mock).";
+            description: "Rotate the Cluster Level Encryption Key (KEK). After the rotation all the DEK's will be encrypted with the new KEK and the new KEK will be stored securely in the Cluster. Note: This feature is not readily available and offers only limited support for evaluative purposes.";
+            tags: "encryption";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "501";
+                value: {
+                    description: "Unimplemented capability.";
+                    schema: { json_schema: { type: INTEGER; } }
+                }
+            
+            }
+        };
+    }
+
+    rpc GetClusterRootKey (GetClusterRootKeyRequest) returns (GetClusterRootKeyResponse){
+        option (google.api.http) = {
+            get: "/api/v2/cluster/clusterRootkey"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get cluster root encryption key (Mock).";
+            description: "Securely export the Cluster Level Encryption Key (KEK). As a security measure the exported key in the response will be encrypted. Note: This feature is not readily available and offers only limited support for evaluative purposes.";
+            tags: "encryption";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "501";
+                value: {
+                    description: "Unimplemented capability.";
+                    schema: { json_schema: { type: INTEGER; } }
+                }
+            }
+        };
+    }
+
+    rpc CreateIdpConfiguration(CreateIDPConfigurationRequest) returns (IDPConfiguration) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/IdpConfiguration"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Create an IdP configuration.";
+            description: "Create an IdP configuration.";
+            tags: "idp configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DeleteIdpConfiguration(DeleteIDPConfigurationRequest) returns (DeleteIDPConfigurationResponse) {
+        option (google.api.http) = {
+            delete: "/api/v2/cluster/IdpConfiguration/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete an IdP configuration.";
+            description: "Delete an IdP configuration.";
+            tags: "idp configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Idp configuration with the name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateIdpConfiguration(UpdateIDPConfigurationRequest) returns (IDPConfiguration) {
+        option (google.api.http) = {
+            put: "/api/v2/cluster/IdpConfiguration"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update an IdP configuration.";
+            description: "Update an Idp configuration.";
+            tags: "idp configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Idp configuration with the name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListIdpConfigurations(ListIDPConfigurationsRequest) returns (ListIDPConfigurationsResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/IdpConfiguration"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Listing IdP configurations.";
+            description: "Listing IdP configurations.";
+            tags: "idp configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetIdpConfiguration(GetIDPConfigurationRequest) returns (IDPConfiguration) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/IdpConfiguration/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get an IdP configuration.";
+            description: "Get an IdP configuration.";
+            tags: "idp configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Idp configuration with the name is not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc CreateAuthGroupAccess(CreateAuthGroupAccessRequest) returns (AuthGroupAccess) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/AuthGroupAccess"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Create an Auth group access.";
+            description: "Create a map entry between a group and an access right (scope and role).";
+            tags: "Auth group access";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateAuthGroupAccess(UpdateAuthGroupAccessRequest) returns (AuthGroupAccess) {
+        option (google.api.http) = {
+            put: "/api/v2/cluster/AuthGroupAccess"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update an Auth group access.";
+            description: "Update a map entry between a group and an access right (scope and role).";
+            tags: "Auth group access";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Auth group not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DeleteAuthGroupAccess(DeleteAuthGroupAccessRequest) returns (DeleteAuthGroupAccessResponse) {
+        option (google.api.http) = {
+            delete: "/api/v2/cluster/AuthGroupAccess/{IdpGroupName}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete an Auth group access.";
+            description: "Delete a map entry between a group and an access right (scope and role).";
+            tags: "Auth group access.";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Auth group not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetAuthGroupAccess(GetAuthGroupAccessRequest) returns (AuthGroupAccess) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/AuthGroupAccess/{IdpGroupName}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get an Auth group access.";
+            description: "Get a map entry between a group and an access right (scope and role).";
+            tags: "Auth group access";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Auth group not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListAuthGroupAccesses(ListAuthGroupAccessesRequest) returns (ListAuthGroupAccessesResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/AuthGroupAccess"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List all auth-groups to access-right entries.";
+            description: "List all map entries between a group and an access right (scope and role).";
+            tags: "Auth group access";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc EnableClusterInBandAuth(EnableClusterInBandAuthRequest) returns (EnableClusterInBandAuthResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/inBandAuth/enable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Enable In-Band cluster authentication (Beta)";
+            description: "Enables NVNMe-oF In Band Authentication, This allows Lighbits cluster to selectively restrict the set of NVMe hosts (clients) that are allowed to connect to the NVMe target (Lightbits cluster), and also (optionally), restrict the set NVMe targets that a given NVMe host will trust and connect to. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "encryption";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DisableClusterInBandAuth(DisableClusterInBandAuthRequest) returns (DisableClusterInBandAuthResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/inBandAuth/disable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Disable In-Band cluster authentication (Beta)";
+            description: "Disables NVMe-oF In Band Authentication, hosts may connect to Lighbits cluster without establishing trust (the default Lighbits cluster configuration). In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "encryption";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc CreateTrustedHost(CreateTrustedHostRequest) returns (TrustedHost){
+        option (google.api.http) = {
+            post: "/api/v2/projects/{projectName}/trustedHosts"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Create a trusted host resource.";
+            description: "Create a trusted host resource with configuration parameters needed for authentication and NVMe connectivity, When In-Band Authentication is enabled, only trusted hosts may connect to Lightbits cluster. For each trusted host an associated Lightbits resource must be created using this command. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "409";
+                value: {
+                    description: "Host with the provided host name and project name already exists.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DeleteTrustedHost(DeleteTrustedHostRequest) returns (DeleteTrustedHostResponse){
+        option (google.api.http) = {
+            delete: "/api/v2/projects/{projectName}/trustedHosts/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete a host.";
+            description: "Delete a trusted host configuration. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find host name/ project .";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetTrustedHost(GetTrustedHostRequest) returns (TrustedHost){
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/trustedHosts/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get a host.";
+            description: "Get a trusted host configuration. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find host name/ project .";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListTrustedHosts(ListTrustedHostsRequest) returns (ListTrustedHostsResponse){
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/trustedHosts"
+            additional_bindings {
+                get: "/api/v2/hosts"
+            }
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "return a list of trusted hosts configuration's";
+            description: "return a list of trusted hosts configuration's. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find host name/ project .";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateTrustedHost(UpdateTrustedHostRequest) returns (TrustedHost){
+        option (google.api.http) = {
+            put: "/api/v2/projects/{projectName}/trustedHosts/{name}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Update a host.";
+            description: "Update a trusted host configuration, optionally modyfing labels. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find host name/ project .";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc SetTrustedHostSecret(SetTrustedHostSecretsRequest) returns (SetTrustedHostSecretsResponse){
+        option (google.api.http) = {
+            put: "/api/v2/projects/{projectName}/trustedHostSecrets/{name}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Set the secrets for a host.";
+            description: "Set hosts secrets for a trusted host to allow trusted connectivity between Lightbits Cluster and hosts as part of In-Band Authentication support. Specifying a host secret is mandatory for trusted connect of host to Lightbits cluster, Specifying a target secret, either explicitly or by using auto-gen mode, is optional, allowing only trusted Lighbits cluster to connect to host, if no target secret is specified the target secret type will be set to disable. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find host name/ project .";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetTrustedHostSecret(GetTrustedHostSecretsRequest) returns (GetTrustedHostSecretsResponse){
+        option (google.api.http) = {
+            get: "/api/v2/projects/{projectName}/trustedHostSecrets/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get secrets of a host.";
+            description: "Get a trusted host secrets required for authentication and connection. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            tags: "authentication";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid arguments.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find host name/ project .";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3301,6 +4050,16 @@ message DisableServerRequest {
     // If you want the data eviction process, even at the risk of potentially losing some data that couldn’t be evicted,
     // set both evictData and ForceDisable to True.
     bool evictData = 4;
+
+    // permanentFailureTimeout
+    //
+    // Setting a value for this parameter will override the permanent failure timeout at the cluster level.
+    // This may be used  when a user wants to take a server into maintenance state and avoid data migration
+    // during this time. Valid values are 1 hour or longer, "0"  value should be used to specify an infinite timeout.
+    // Permanent failure timeout is a string constructed by a decimal number followed
+    // by the units: ns, us, ms, s, m, h. For example: 7200s, 120m, 2h
+    // This value will be oveeride once the server is re-enabled. Default value: null
+    google.protobuf.Duration permanentFailureTimeout = 5;
 }
 
 message DeleteServerRequest {
@@ -3433,12 +4192,7 @@ message UpgradeClusterRequest {
     ProxyInfo ProxyInfo = 3;
 }
 
-message SetClusterEncryptionRequest {
-    enum EncryptionMode {
-        Disable = 0;
-        Enable = 1;
-    }
-    EncryptionMode EncryptionCommand = 1;
+message EnableClusterEncryptionRequest {
 }
 
 message GetClusterRequest {
@@ -3692,7 +4446,7 @@ message UpgradeServerResponse {}
 
 message UpgradeClusterResponse {}
 
-message SetClusterEncryptionResponse {}
+message EnableClusterEncryptionResponse {}
 
 message ReplaceNodeResponse {}
 
@@ -3772,6 +4526,12 @@ message ClusterLastUpgrade {
 }
 
 message ClusterInfo {
+    enum AuthenticationMode {
+        UnKnown = 0;
+        Enabled  = 2;
+        Disabled  = 3;
+    }
+
     // cluster UUID
     //
     // UUID of cluster
@@ -3835,6 +4595,7 @@ message ClusterInfo {
     //
     // Parameters of the last (or active) cluster upgrade process
     ClusterLastUpgrade lastUpgrade = 14;
+    AuthenticationMode inBandAuthMode = 15;
 }
 
 message ClusterInfoV2 {
@@ -3888,6 +4649,9 @@ message ClusterInfoV2 {
     //
     // Parameters of the last (or active) cluster upgrade process
     ClusterLastUpgrade lastUpgrade = 15;
+
+    // Encryption info
+    ClusterEncryptionStatus encryptionStatus = 16;
 }
 
 message ClusterHealth {
@@ -4153,6 +4917,10 @@ message Server {
     //
     // Server health: OK- server healthy, Warning high utilisation or failed disk under rebuild, Error - Inactive nodes or nodes nearing/in Read-only.
     ClusterHealth.State health = 15;
+    // Server Permanenet failure configuration
+    //
+    // Permanenet failure timeout at the server level. If set, overrides the cluster configuration. value of "0" sets it to infinite.
+    google.protobuf.Duration ServerPermanenetFailureTimeout = 16;
 }
 
 message GetRoleRequest {
@@ -4825,8 +5593,186 @@ message ClusterEncryptionStatus {
         Unknown = 3;  // Unknown state
     }
 
-    // EncryptionState
-    //
-    // The current state of the cluster encryption
-    State EncryptionState = 1;
+    State encryptionState = 1;
+    uint64 kekGeneration = 2;
+    google.protobuf.Timestamp kekUpdateDate = 3;
+}
+
+message RotateClusterRootKeyRequest {}
+
+message RotateClusterRootKeyResponse {}
+
+message GetClusterRootKeyRequest {
+    uint64 encryptingKeyGeneration = 1;
+    bytes userPublicKey = 2;
+}
+
+message GetClusterRootKeyResponse {
+    message KeyObject{
+        bytes encryptedKey = 1;
+        uint64 encryptingKeyGeneration = 2;
+    }
+    repeated KeyObject keys = 1;
+    bytes clusterPublicKey = 2;
+}
+
+enum IDPType {
+    unknownIdp = 0;
+    ADFS     = 1;
+}
+
+
+
+// IDPConfiguration represents the configuration for the Identity Provider (IdP) in LB cluster.
+message IDPConfiguration {
+    enum IDPConfigurationState {
+        Unknown    = 0;
+        Creating   = 1;
+        Active     = 2;
+        Updating   = 3;
+        Failed     = 4;
+    }
+
+    // name
+    // Represents the name of an entity.
+    string name = 1;
+
+    // idpIssuerURL
+    // The URL of the Identity Provider (IdP) issuer.
+    string idpIssuerURL = 2;
+
+    // state
+    // Represents the state of the IdP configuration.
+    // This field is used to indicate the current state of the IdP configuration.
+    IDPConfigurationState state = 3;
+
+    // Type
+    // Represents the type of an IdP (Identity Provider).
+    // The IDPType enum is used to specify the type of an IdP.
+    IDPType Type = 4;
+
+    // clientID
+    // clientID is the application (Lightbits) ID registered in the IdP
+    string clientID = 5;
+
+
+    // UUID
+    // Represents the UUID of an entity.
+    string UUID = 6;
+}
+
+message CreateIDPConfigurationRequest {
+    // name
+    // Represents the name of an entity.
+    string name = 1;
+
+    // idpIssuerURL
+    // The URL of the Identity Provider (IdP) issuer.
+    string idpIssuerURL = 2;
+
+    // Type
+    // Represents the type of an IdP (Identity Provider).
+    // The IDPType enum is used to specify the type of an IdP.
+    IDPType Type = 3;
+
+    // clientID
+    // clientID is the application (Lightbits) ID registered in the IdP
+    string clientID = 4;
+}
+
+message UpdateIDPConfigurationRequest {
+    // name
+    // Represents the name of an entity.
+    string name = 1;
+
+    // idpIssuerURL
+    // The URL of the Identity Provider (IdP) issuer.
+    string idpIssuerURL = 2;
+
+    // Type
+    // Represents the type of an IdP (Identity Provider).
+    // The IDPType enum is used to specify the type of an IdP.
+    IDPType Type = 3;
+
+    // clientID
+    // clientID is the application (Lightbits) ID registered in the IdP
+    string clientID = 4;
+}
+
+message ListIDPConfigurationsRequest{}
+
+message ListIDPConfigurationsResponse{
+    repeated IDPConfiguration IDPConfigurations = 1;
+}
+
+message GetIDPConfigurationRequest {
+    string name = 1;
+}
+
+message DeleteIDPConfigurationRequest {
+    string name = 1;
+}
+
+message DeleteIDPConfigurationResponse {}
+
+message AuthGroupAccess {
+    // IdpGroupName
+    // Represents the name of the group in the IdP server.
+    string IdpGroupName = 1;
+
+    // scope
+    // Represents the scope of the group in lightbits cluster.
+    string scope = 2;
+
+    // role
+    // Represents the role of the group in lightbits cluster.
+    string role = 3;
+}
+
+message CreateAuthGroupAccessRequest {
+    // IdpGroupName
+    // Represents the name of the group in the IdP server.
+    string IdpGroupName = 1;
+
+    // scope
+    // Represents the scope of the group in lightbits cluster.
+    string scope = 2;
+
+    // role
+    // Represents the role of the group in lightbits cluster.
+    string role = 3;
+}
+
+message UpdateAuthGroupAccessRequest {
+    // IdpGroupName
+    // Represents the name of the group in the IdP server.
+    string IdpGroupName = 1;
+
+    // scope
+    // Represents the scope of the group in lightbits cluster.
+    string scope = 2;
+
+    // role
+    // Represents the role of the group in lightbits cluster.
+    string role = 3;
+}
+
+message DeleteAuthGroupAccessRequest {
+    // IdpGroupName
+    // Represents the name of the group in the IdP server.
+    string IdpGroupName = 1;
+}
+
+message GetAuthGroupAccessRequest {
+    // IdpGroupName
+    // Represents the name of the group in the IdP server.
+    string IdpGroupName = 1;
+}
+
+message ListAuthGroupAccessesRequest {}
+
+message DeleteAuthGroupAccessResponse {}
+
+message ListAuthGroupAccessesResponse {
+    repeated AuthGroupAccess AuthGroupAccesses = 1;
 }
