@@ -2,6 +2,6 @@ version: v2
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.34.2
     out: ../api
-  - remote: buf.build/grpc/go:v1.3.0
+  - remote: buf.build/grpc/go:v1.5.1
     out: ../api
     opt: require_unimplemented_servers=false

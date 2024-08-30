@@ -108,6 +108,10 @@ message NodeStatisticsApi {
     //
     // Number of data integrity errors that were detected by the GC.
     uint64 GarbageCollectorDataIntegrityErrors = 13;
+    // Metadata utilization
+    //
+    // Metadata RAM utilization, shown as: used/available
+    double metadataUtilization = 14;
 }
 
 

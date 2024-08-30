@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package lightbits.api.duros.v2;
+
+option go_package = "duros/v2;v2";
+
+message Label { 
+    string key = 1;
+    string value = 2;
+}
