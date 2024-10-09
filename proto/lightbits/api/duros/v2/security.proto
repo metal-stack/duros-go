@@ -9,7 +9,7 @@ import "lightbits/api/duros/v2/labels.proto";
 
 message TrustedHost {
     //
-    // Unique name identyfing the trusted host.
+    // Unique name identifying the trusted host.
     string name = 1;
     //
     // Project this host belongs to.
@@ -28,7 +28,7 @@ message TrustedHost {
 
 message CreateTrustedHostRequest{
     //
-    // Unique name identyfing the trusted host to create.
+    // Unique name identifying the trusted host to create.
     string name = 1;
     //
     // Project this trusted host belongs to.
@@ -105,13 +105,13 @@ message ListTrustedHostsResponse {
 
 enum TargetSecretType {
     //
-    // Disabled, Lighbits cluster may connect to trusted host without any secret.
+    // Disabled, Lightbits cluster may connect to trusted host without any secret.
     Disabled = 0;
     //
-    // Enabled, Lighbits cluster must have a target secret specified to connect to a trusted host.
+    // Enabled, Lightbits cluster must have a target secret specified to connect to a trusted host.
     Enabled = 1;
     //
-    // Auto generated secret. Lighbits cluster will automaticly generate a target secret and use this when connecting to the trusted host.
+    // Auto generated secret. Lightbits cluster will automatically generate a target secret and use this when connecting to the trusted host.
     AutoGenSecret = 2;
 }
 

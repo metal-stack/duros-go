@@ -94,11 +94,16 @@ const (
 	DurosAPI_UpdateIdpConfiguration_FullMethodName   = "/lightbits.api.duros.v2.DurosAPI/UpdateIdpConfiguration"
 	DurosAPI_ListIdpConfigurations_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/ListIdpConfigurations"
 	DurosAPI_GetIdpConfiguration_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/GetIdpConfiguration"
-	DurosAPI_CreateAuthGroupAccess_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/CreateAuthGroupAccess"
-	DurosAPI_UpdateAuthGroupAccess_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/UpdateAuthGroupAccess"
-	DurosAPI_DeleteAuthGroupAccess_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/DeleteAuthGroupAccess"
-	DurosAPI_GetAuthGroupAccess_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/GetAuthGroupAccess"
-	DurosAPI_ListAuthGroupAccesses_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/ListAuthGroupAccesses"
+	DurosAPI_CreateIdpClientConf_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/CreateIdpClientConf"
+	DurosAPI_DeleteIdpClientConf_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/DeleteIdpClientConf"
+	DurosAPI_UpdateIdpClientConf_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/UpdateIdpClientConf"
+	DurosAPI_ListIdpClientConfs_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/ListIdpClientConfs"
+	DurosAPI_GetIdpClientConf_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/GetIdpClientConf"
+	DurosAPI_CreateAuthMapEntry_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/CreateAuthMapEntry"
+	DurosAPI_UpdateAuthMapEntry_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/UpdateAuthMapEntry"
+	DurosAPI_DeleteAuthMapEntry_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/DeleteAuthMapEntry"
+	DurosAPI_GetAuthMapEntry_FullMethodName          = "/lightbits.api.duros.v2.DurosAPI/GetAuthMapEntry"
+	DurosAPI_ListAuthMapEntries_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/ListAuthMapEntries"
 	DurosAPI_EnableClusterInBandAuth_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/EnableClusterInBandAuth"
 	DurosAPI_DisableClusterInBandAuth_FullMethodName = "/lightbits.api.duros.v2.DurosAPI/DisableClusterInBandAuth"
 	DurosAPI_CreateTrustedHost_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/CreateTrustedHost"
@@ -188,11 +193,16 @@ type DurosAPIClient interface {
 	UpdateIdpConfiguration(ctx context.Context, in *UpdateIDPConfigurationRequest, opts ...grpc.CallOption) (*IDPConfiguration, error)
 	ListIdpConfigurations(ctx context.Context, in *ListIDPConfigurationsRequest, opts ...grpc.CallOption) (*ListIDPConfigurationsResponse, error)
 	GetIdpConfiguration(ctx context.Context, in *GetIDPConfigurationRequest, opts ...grpc.CallOption) (*IDPConfiguration, error)
-	CreateAuthGroupAccess(ctx context.Context, in *CreateAuthGroupAccessRequest, opts ...grpc.CallOption) (*AuthGroupAccess, error)
-	UpdateAuthGroupAccess(ctx context.Context, in *UpdateAuthGroupAccessRequest, opts ...grpc.CallOption) (*AuthGroupAccess, error)
-	DeleteAuthGroupAccess(ctx context.Context, in *DeleteAuthGroupAccessRequest, opts ...grpc.CallOption) (*DeleteAuthGroupAccessResponse, error)
-	GetAuthGroupAccess(ctx context.Context, in *GetAuthGroupAccessRequest, opts ...grpc.CallOption) (*AuthGroupAccess, error)
-	ListAuthGroupAccesses(ctx context.Context, in *ListAuthGroupAccessesRequest, opts ...grpc.CallOption) (*ListAuthGroupAccessesResponse, error)
+	CreateIdpClientConf(ctx context.Context, in *CreateIdpClientConfRequest, opts ...grpc.CallOption) (*IdpClientConf, error)
+	DeleteIdpClientConf(ctx context.Context, in *DeleteIdpClientConfRequest, opts ...grpc.CallOption) (*DeleteIdpClientConfResponse, error)
+	UpdateIdpClientConf(ctx context.Context, in *UpdateIdpClientConfRequest, opts ...grpc.CallOption) (*IdpClientConf, error)
+	ListIdpClientConfs(ctx context.Context, in *ListIdpClientConfsRequest, opts ...grpc.CallOption) (*ListIdpClientConfsResponse, error)
+	GetIdpClientConf(ctx context.Context, in *GetIdpClientConfRequest, opts ...grpc.CallOption) (*IdpClientConf, error)
+	CreateAuthMapEntry(ctx context.Context, in *CreateAuthMapEntryRequest, opts ...grpc.CallOption) (*AuthMapEntry, error)
+	UpdateAuthMapEntry(ctx context.Context, in *UpdateAuthMapEntryRequest, opts ...grpc.CallOption) (*AuthMapEntry, error)
+	DeleteAuthMapEntry(ctx context.Context, in *DeleteAuthMapEntryRequest, opts ...grpc.CallOption) (*DeleteAuthMapEntryResponse, error)
+	GetAuthMapEntry(ctx context.Context, in *GetAuthMapEntryRequest, opts ...grpc.CallOption) (*AuthMapEntry, error)
+	ListAuthMapEntries(ctx context.Context, in *ListAuthMapEntriesRequest, opts ...grpc.CallOption) (*ListAuthMapEntriesResponse, error)
 	EnableClusterInBandAuth(ctx context.Context, in *EnableClusterInBandAuthRequest, opts ...grpc.CallOption) (*EnableClusterInBandAuthResponse, error)
 	DisableClusterInBandAuth(ctx context.Context, in *DisableClusterInBandAuthRequest, opts ...grpc.CallOption) (*DisableClusterInBandAuthResponse, error)
 	CreateTrustedHost(ctx context.Context, in *CreateTrustedHostRequest, opts ...grpc.CallOption) (*TrustedHost, error)
@@ -961,50 +971,100 @@ func (c *durosAPIClient) GetIdpConfiguration(ctx context.Context, in *GetIDPConf
 	return out, nil
 }
 
-func (c *durosAPIClient) CreateAuthGroupAccess(ctx context.Context, in *CreateAuthGroupAccessRequest, opts ...grpc.CallOption) (*AuthGroupAccess, error) {
+func (c *durosAPIClient) CreateIdpClientConf(ctx context.Context, in *CreateIdpClientConfRequest, opts ...grpc.CallOption) (*IdpClientConf, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthGroupAccess)
-	err := c.cc.Invoke(ctx, DurosAPI_CreateAuthGroupAccess_FullMethodName, in, out, cOpts...)
+	out := new(IdpClientConf)
+	err := c.cc.Invoke(ctx, DurosAPI_CreateIdpClientConf_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *durosAPIClient) UpdateAuthGroupAccess(ctx context.Context, in *UpdateAuthGroupAccessRequest, opts ...grpc.CallOption) (*AuthGroupAccess, error) {
+func (c *durosAPIClient) DeleteIdpClientConf(ctx context.Context, in *DeleteIdpClientConfRequest, opts ...grpc.CallOption) (*DeleteIdpClientConfResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthGroupAccess)
-	err := c.cc.Invoke(ctx, DurosAPI_UpdateAuthGroupAccess_FullMethodName, in, out, cOpts...)
+	out := new(DeleteIdpClientConfResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_DeleteIdpClientConf_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *durosAPIClient) DeleteAuthGroupAccess(ctx context.Context, in *DeleteAuthGroupAccessRequest, opts ...grpc.CallOption) (*DeleteAuthGroupAccessResponse, error) {
+func (c *durosAPIClient) UpdateIdpClientConf(ctx context.Context, in *UpdateIdpClientConfRequest, opts ...grpc.CallOption) (*IdpClientConf, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteAuthGroupAccessResponse)
-	err := c.cc.Invoke(ctx, DurosAPI_DeleteAuthGroupAccess_FullMethodName, in, out, cOpts...)
+	out := new(IdpClientConf)
+	err := c.cc.Invoke(ctx, DurosAPI_UpdateIdpClientConf_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *durosAPIClient) GetAuthGroupAccess(ctx context.Context, in *GetAuthGroupAccessRequest, opts ...grpc.CallOption) (*AuthGroupAccess, error) {
+func (c *durosAPIClient) ListIdpClientConfs(ctx context.Context, in *ListIdpClientConfsRequest, opts ...grpc.CallOption) (*ListIdpClientConfsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthGroupAccess)
-	err := c.cc.Invoke(ctx, DurosAPI_GetAuthGroupAccess_FullMethodName, in, out, cOpts...)
+	out := new(ListIdpClientConfsResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_ListIdpClientConfs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *durosAPIClient) ListAuthGroupAccesses(ctx context.Context, in *ListAuthGroupAccessesRequest, opts ...grpc.CallOption) (*ListAuthGroupAccessesResponse, error) {
+func (c *durosAPIClient) GetIdpClientConf(ctx context.Context, in *GetIdpClientConfRequest, opts ...grpc.CallOption) (*IdpClientConf, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListAuthGroupAccessesResponse)
-	err := c.cc.Invoke(ctx, DurosAPI_ListAuthGroupAccesses_FullMethodName, in, out, cOpts...)
+	out := new(IdpClientConf)
+	err := c.cc.Invoke(ctx, DurosAPI_GetIdpClientConf_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) CreateAuthMapEntry(ctx context.Context, in *CreateAuthMapEntryRequest, opts ...grpc.CallOption) (*AuthMapEntry, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthMapEntry)
+	err := c.cc.Invoke(ctx, DurosAPI_CreateAuthMapEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) UpdateAuthMapEntry(ctx context.Context, in *UpdateAuthMapEntryRequest, opts ...grpc.CallOption) (*AuthMapEntry, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthMapEntry)
+	err := c.cc.Invoke(ctx, DurosAPI_UpdateAuthMapEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) DeleteAuthMapEntry(ctx context.Context, in *DeleteAuthMapEntryRequest, opts ...grpc.CallOption) (*DeleteAuthMapEntryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAuthMapEntryResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_DeleteAuthMapEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) GetAuthMapEntry(ctx context.Context, in *GetAuthMapEntryRequest, opts ...grpc.CallOption) (*AuthMapEntry, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AuthMapEntry)
+	err := c.cc.Invoke(ctx, DurosAPI_GetAuthMapEntry_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) ListAuthMapEntries(ctx context.Context, in *ListAuthMapEntriesRequest, opts ...grpc.CallOption) (*ListAuthMapEntriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAuthMapEntriesResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_ListAuthMapEntries_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1179,11 +1239,16 @@ type DurosAPIServer interface {
 	UpdateIdpConfiguration(context.Context, *UpdateIDPConfigurationRequest) (*IDPConfiguration, error)
 	ListIdpConfigurations(context.Context, *ListIDPConfigurationsRequest) (*ListIDPConfigurationsResponse, error)
 	GetIdpConfiguration(context.Context, *GetIDPConfigurationRequest) (*IDPConfiguration, error)
-	CreateAuthGroupAccess(context.Context, *CreateAuthGroupAccessRequest) (*AuthGroupAccess, error)
-	UpdateAuthGroupAccess(context.Context, *UpdateAuthGroupAccessRequest) (*AuthGroupAccess, error)
-	DeleteAuthGroupAccess(context.Context, *DeleteAuthGroupAccessRequest) (*DeleteAuthGroupAccessResponse, error)
-	GetAuthGroupAccess(context.Context, *GetAuthGroupAccessRequest) (*AuthGroupAccess, error)
-	ListAuthGroupAccesses(context.Context, *ListAuthGroupAccessesRequest) (*ListAuthGroupAccessesResponse, error)
+	CreateIdpClientConf(context.Context, *CreateIdpClientConfRequest) (*IdpClientConf, error)
+	DeleteIdpClientConf(context.Context, *DeleteIdpClientConfRequest) (*DeleteIdpClientConfResponse, error)
+	UpdateIdpClientConf(context.Context, *UpdateIdpClientConfRequest) (*IdpClientConf, error)
+	ListIdpClientConfs(context.Context, *ListIdpClientConfsRequest) (*ListIdpClientConfsResponse, error)
+	GetIdpClientConf(context.Context, *GetIdpClientConfRequest) (*IdpClientConf, error)
+	CreateAuthMapEntry(context.Context, *CreateAuthMapEntryRequest) (*AuthMapEntry, error)
+	UpdateAuthMapEntry(context.Context, *UpdateAuthMapEntryRequest) (*AuthMapEntry, error)
+	DeleteAuthMapEntry(context.Context, *DeleteAuthMapEntryRequest) (*DeleteAuthMapEntryResponse, error)
+	GetAuthMapEntry(context.Context, *GetAuthMapEntryRequest) (*AuthMapEntry, error)
+	ListAuthMapEntries(context.Context, *ListAuthMapEntriesRequest) (*ListAuthMapEntriesResponse, error)
 	EnableClusterInBandAuth(context.Context, *EnableClusterInBandAuthRequest) (*EnableClusterInBandAuthResponse, error)
 	DisableClusterInBandAuth(context.Context, *DisableClusterInBandAuthRequest) (*DisableClusterInBandAuthResponse, error)
 	CreateTrustedHost(context.Context, *CreateTrustedHostRequest) (*TrustedHost, error)
@@ -1424,20 +1489,35 @@ func (UnimplementedDurosAPIServer) ListIdpConfigurations(context.Context, *ListI
 func (UnimplementedDurosAPIServer) GetIdpConfiguration(context.Context, *GetIDPConfigurationRequest) (*IDPConfiguration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIdpConfiguration not implemented")
 }
-func (UnimplementedDurosAPIServer) CreateAuthGroupAccess(context.Context, *CreateAuthGroupAccessRequest) (*AuthGroupAccess, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateAuthGroupAccess not implemented")
+func (UnimplementedDurosAPIServer) CreateIdpClientConf(context.Context, *CreateIdpClientConfRequest) (*IdpClientConf, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateIdpClientConf not implemented")
 }
-func (UnimplementedDurosAPIServer) UpdateAuthGroupAccess(context.Context, *UpdateAuthGroupAccessRequest) (*AuthGroupAccess, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateAuthGroupAccess not implemented")
+func (UnimplementedDurosAPIServer) DeleteIdpClientConf(context.Context, *DeleteIdpClientConfRequest) (*DeleteIdpClientConfResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteIdpClientConf not implemented")
 }
-func (UnimplementedDurosAPIServer) DeleteAuthGroupAccess(context.Context, *DeleteAuthGroupAccessRequest) (*DeleteAuthGroupAccessResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteAuthGroupAccess not implemented")
+func (UnimplementedDurosAPIServer) UpdateIdpClientConf(context.Context, *UpdateIdpClientConfRequest) (*IdpClientConf, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateIdpClientConf not implemented")
 }
-func (UnimplementedDurosAPIServer) GetAuthGroupAccess(context.Context, *GetAuthGroupAccessRequest) (*AuthGroupAccess, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAuthGroupAccess not implemented")
+func (UnimplementedDurosAPIServer) ListIdpClientConfs(context.Context, *ListIdpClientConfsRequest) (*ListIdpClientConfsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListIdpClientConfs not implemented")
 }
-func (UnimplementedDurosAPIServer) ListAuthGroupAccesses(context.Context, *ListAuthGroupAccessesRequest) (*ListAuthGroupAccessesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListAuthGroupAccesses not implemented")
+func (UnimplementedDurosAPIServer) GetIdpClientConf(context.Context, *GetIdpClientConfRequest) (*IdpClientConf, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIdpClientConf not implemented")
+}
+func (UnimplementedDurosAPIServer) CreateAuthMapEntry(context.Context, *CreateAuthMapEntryRequest) (*AuthMapEntry, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAuthMapEntry not implemented")
+}
+func (UnimplementedDurosAPIServer) UpdateAuthMapEntry(context.Context, *UpdateAuthMapEntryRequest) (*AuthMapEntry, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAuthMapEntry not implemented")
+}
+func (UnimplementedDurosAPIServer) DeleteAuthMapEntry(context.Context, *DeleteAuthMapEntryRequest) (*DeleteAuthMapEntryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAuthMapEntry not implemented")
+}
+func (UnimplementedDurosAPIServer) GetAuthMapEntry(context.Context, *GetAuthMapEntryRequest) (*AuthMapEntry, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAuthMapEntry not implemented")
+}
+func (UnimplementedDurosAPIServer) ListAuthMapEntries(context.Context, *ListAuthMapEntriesRequest) (*ListAuthMapEntriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAuthMapEntries not implemented")
 }
 func (UnimplementedDurosAPIServer) EnableClusterInBandAuth(context.Context, *EnableClusterInBandAuthRequest) (*EnableClusterInBandAuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EnableClusterInBandAuth not implemented")
@@ -2811,92 +2891,182 @@ func _DurosAPI_GetIdpConfiguration_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DurosAPI_CreateAuthGroupAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateAuthGroupAccessRequest)
+func _DurosAPI_CreateIdpClientConf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateIdpClientConfRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DurosAPIServer).CreateAuthGroupAccess(ctx, in)
+		return srv.(DurosAPIServer).CreateIdpClientConf(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DurosAPI_CreateAuthGroupAccess_FullMethodName,
+		FullMethod: DurosAPI_CreateIdpClientConf_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DurosAPIServer).CreateAuthGroupAccess(ctx, req.(*CreateAuthGroupAccessRequest))
+		return srv.(DurosAPIServer).CreateIdpClientConf(ctx, req.(*CreateIdpClientConfRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DurosAPI_UpdateAuthGroupAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateAuthGroupAccessRequest)
+func _DurosAPI_DeleteIdpClientConf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteIdpClientConfRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DurosAPIServer).UpdateAuthGroupAccess(ctx, in)
+		return srv.(DurosAPIServer).DeleteIdpClientConf(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DurosAPI_UpdateAuthGroupAccess_FullMethodName,
+		FullMethod: DurosAPI_DeleteIdpClientConf_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DurosAPIServer).UpdateAuthGroupAccess(ctx, req.(*UpdateAuthGroupAccessRequest))
+		return srv.(DurosAPIServer).DeleteIdpClientConf(ctx, req.(*DeleteIdpClientConfRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DurosAPI_DeleteAuthGroupAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteAuthGroupAccessRequest)
+func _DurosAPI_UpdateIdpClientConf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateIdpClientConfRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DurosAPIServer).DeleteAuthGroupAccess(ctx, in)
+		return srv.(DurosAPIServer).UpdateIdpClientConf(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DurosAPI_DeleteAuthGroupAccess_FullMethodName,
+		FullMethod: DurosAPI_UpdateIdpClientConf_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DurosAPIServer).DeleteAuthGroupAccess(ctx, req.(*DeleteAuthGroupAccessRequest))
+		return srv.(DurosAPIServer).UpdateIdpClientConf(ctx, req.(*UpdateIdpClientConfRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DurosAPI_GetAuthGroupAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAuthGroupAccessRequest)
+func _DurosAPI_ListIdpClientConfs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListIdpClientConfsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DurosAPIServer).GetAuthGroupAccess(ctx, in)
+		return srv.(DurosAPIServer).ListIdpClientConfs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DurosAPI_GetAuthGroupAccess_FullMethodName,
+		FullMethod: DurosAPI_ListIdpClientConfs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DurosAPIServer).GetAuthGroupAccess(ctx, req.(*GetAuthGroupAccessRequest))
+		return srv.(DurosAPIServer).ListIdpClientConfs(ctx, req.(*ListIdpClientConfsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DurosAPI_ListAuthGroupAccesses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListAuthGroupAccessesRequest)
+func _DurosAPI_GetIdpClientConf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIdpClientConfRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DurosAPIServer).ListAuthGroupAccesses(ctx, in)
+		return srv.(DurosAPIServer).GetIdpClientConf(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DurosAPI_ListAuthGroupAccesses_FullMethodName,
+		FullMethod: DurosAPI_GetIdpClientConf_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DurosAPIServer).ListAuthGroupAccesses(ctx, req.(*ListAuthGroupAccessesRequest))
+		return srv.(DurosAPIServer).GetIdpClientConf(ctx, req.(*GetIdpClientConfRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_CreateAuthMapEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAuthMapEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).CreateAuthMapEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_CreateAuthMapEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).CreateAuthMapEntry(ctx, req.(*CreateAuthMapEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_UpdateAuthMapEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAuthMapEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).UpdateAuthMapEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_UpdateAuthMapEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).UpdateAuthMapEntry(ctx, req.(*UpdateAuthMapEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_DeleteAuthMapEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAuthMapEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).DeleteAuthMapEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_DeleteAuthMapEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).DeleteAuthMapEntry(ctx, req.(*DeleteAuthMapEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_GetAuthMapEntry_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuthMapEntryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).GetAuthMapEntry(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_GetAuthMapEntry_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).GetAuthMapEntry(ctx, req.(*GetAuthMapEntryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_ListAuthMapEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAuthMapEntriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).ListAuthMapEntries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_ListAuthMapEntries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).ListAuthMapEntries(ctx, req.(*ListAuthMapEntriesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3363,24 +3533,44 @@ var DurosAPI_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DurosAPI_GetIdpConfiguration_Handler,
 		},
 		{
-			MethodName: "CreateAuthGroupAccess",
-			Handler:    _DurosAPI_CreateAuthGroupAccess_Handler,
+			MethodName: "CreateIdpClientConf",
+			Handler:    _DurosAPI_CreateIdpClientConf_Handler,
 		},
 		{
-			MethodName: "UpdateAuthGroupAccess",
-			Handler:    _DurosAPI_UpdateAuthGroupAccess_Handler,
+			MethodName: "DeleteIdpClientConf",
+			Handler:    _DurosAPI_DeleteIdpClientConf_Handler,
 		},
 		{
-			MethodName: "DeleteAuthGroupAccess",
-			Handler:    _DurosAPI_DeleteAuthGroupAccess_Handler,
+			MethodName: "UpdateIdpClientConf",
+			Handler:    _DurosAPI_UpdateIdpClientConf_Handler,
 		},
 		{
-			MethodName: "GetAuthGroupAccess",
-			Handler:    _DurosAPI_GetAuthGroupAccess_Handler,
+			MethodName: "ListIdpClientConfs",
+			Handler:    _DurosAPI_ListIdpClientConfs_Handler,
 		},
 		{
-			MethodName: "ListAuthGroupAccesses",
-			Handler:    _DurosAPI_ListAuthGroupAccesses_Handler,
+			MethodName: "GetIdpClientConf",
+			Handler:    _DurosAPI_GetIdpClientConf_Handler,
+		},
+		{
+			MethodName: "CreateAuthMapEntry",
+			Handler:    _DurosAPI_CreateAuthMapEntry_Handler,
+		},
+		{
+			MethodName: "UpdateAuthMapEntry",
+			Handler:    _DurosAPI_UpdateAuthMapEntry_Handler,
+		},
+		{
+			MethodName: "DeleteAuthMapEntry",
+			Handler:    _DurosAPI_DeleteAuthMapEntry_Handler,
+		},
+		{
+			MethodName: "GetAuthMapEntry",
+			Handler:    _DurosAPI_GetAuthMapEntry_Handler,
+		},
+		{
+			MethodName: "ListAuthMapEntries",
+			Handler:    _DurosAPI_ListAuthMapEntries_Handler,
 		},
 		{
 			MethodName: "EnableClusterInBandAuth",

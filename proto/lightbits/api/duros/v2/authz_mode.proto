@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package lightbits.api.duros.v2;
+
+option go_package = "duros/v2;v2";
+
+enum AuthorizationMode{
+    UnknownAuthzMode = 0;
+    App = 1;
+    User = 2;
+}
