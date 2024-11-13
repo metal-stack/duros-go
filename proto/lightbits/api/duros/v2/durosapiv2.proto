@@ -2,16 +2,19 @@ syntax = "proto3";
 
 package lightbits.api.duros.v2;
 
-import "lightbits/api/duros/v2/schedule_policy.proto";
-import "lightbits/api/duros/v2/statisticsapiv2.proto";
-import "lightbits/api/duros/v2/security.proto";
+option go_package = "duros/v2;v2";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/timestamp.proto";
 import "grpc/gateway/protoc_gen_swagger/options/annotations.proto";
-
-option go_package = "duros/v2;v2";
+import "lightbits/api/duros/v2/statisticsapiv2.proto";
+import "lightbits/api/duros/v2/schedule_policy.proto";
+import "lightbits/api/duros/v2/security.proto";
+import "lightbits/api/duros/v2/labels.proto";
+import "lightbits/api/duros/v2/authz_mode.proto";
+import "lightbits/api/duros/v2/proxy_info.proto";
 
 service DurosAPI {
     rpc GetVersion(GetVersionRequest) returns (Version) {
@@ -460,8 +463,8 @@ service DurosAPI {
             get: "/api/v2/nvmeDevices"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Retrieve list of nvme devices with filtering option.";
-            description: "A request to list nvme devices is exposed via this API. The list of nvme devices can be filtered by the following parameters:  1. ServerUUID - e.g.  api/v2/nvmeDevices?ServerUUID=<UUID> 2. NodeUUID - e.g.  api/v2/nvmeDevices?NodeUUID=<UUID>";
+            summary: "Retrieve list of NVMe devices with filtering option.";
+            description: "A request to list NVMe devices is exposed via this API. The list of NVMe devices can be filtered by the following parameters:  1. ServerUUID - e.g.  api/v2/nvmeDevices?ServerUUID=<UUID> 2. NodeUUID - e.g.  api/v2/nvmeDevices?NodeUUID=<UUID>";
             tags: "node";
             responses: {
                 key: "500";
@@ -492,8 +495,8 @@ service DurosAPI {
             get: "/api/v2/nvmeDevices/{Serial}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Retrieve a specific nvme device with filtering option";
-            description: "Request nvme device info by serial. Example usage: api/v2/nvmeDevices/15eb21c0-35ae-478d-b";
+            summary: "Retrieve a specific NVMe device with filtering option";
+            description: "Request NVMe device info by serial. Example usage: api/v2/nvmeDevices/15eb21c0-35ae-478d-b";
             tags: "get nvme-device";
             responses: {
                 key: "500";
@@ -754,7 +757,7 @@ service DurosAPI {
             }
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            description: "update volume enable the change of the following attributes:\nACL list\nIPACL list";
+            description: "Update volume enable the change of the following attributes:\nACL list\nIP-ACL list.";
             summary: "Update volume.";
             tags: "echo rpc";
             responses: {
@@ -868,7 +871,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             description: "Retrieve servers list with filtering option.";
-            summary: "A request to list servers is exposed via this API. The results can be filtered by supplying the following filters: 1. Name - e.g.  /api/v2/servers?Name=<Name> 2. UUID - e.g.  /api/v2/servers?UUID=<UUID> 3. UpgradeablilityState - e.g.  /api/v2/servers?UpgradeablilityState=<UpgradeablilityState>";
+            summary: "A request to list servers is exposed via this API. The results can be filtered by supplying the following filters: 1. Name - e.g.  /api/v2/servers?Name=<Name> 2. UUID - e.g.  /api/v2/servers?UUID=<UUID>";
             tags: "list servers";
             responses: {
                 key: "500";
@@ -1056,7 +1059,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create Server.";
-            description: "A request to create a new server.  The requires paramaters in the body are:  1. serverEndpoints - url list of the new server ip addresses as well as etcd ports for peer communication e.g: http://10.0.0.1:2380";
+            description: "A request to create a new server.  The requires parameters in the body are:  1. serverEndpoints - url list of the new server ip addresses as well as etcd ports for peer communication e.g: http://10.0.0.1:2380";
             tags: "upgrade";
             responses: {
                 key: "500";
@@ -1103,7 +1106,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Replace Node.";
-            description: "The request is identified by the UUID of the replaced node (referred as SrcNodeUUID).\nThe required paramaters in the body are:\n1. TargetNodeUUID - the UUID of the target node that replaces the src Node. The command shall succeed only if srcNode is Inactive, and targetNode is Unattached. So user shall disable the server of the srcNode (that will make the node Inactive), and assure that targetNode is Unattached (possibly as a new node without assigned PGs or by replacing its PG to another node)";
+            description: "The request is identified by the UUID of the replaced node (referred as SrcNodeUUID).\nThe required parameters in the body are:\n1. TargetNodeUUID - the UUID of the target node that replaces the src Node. The command shall succeed only if srcNode is Inactive, and targetNode is Unattached. So user shall disable the server of the srcNode (that will make the node Inactive), and assure that targetNode is Unattached (possibly as a new node without assigned PGs or by replacing its PG to another node)";
             tags: "replace node";
             responses: {
                 key: "400";
@@ -2197,7 +2200,7 @@ service DurosAPI {
             responses: {
                 key: "400";
                 value: {
-                    description: "Provided invalid argument(s) with one of the following reasons: \nmandatory argument is missing, \nmutually exclusive arguments were provided \ninvalid argument is provided \nthe system is not in the right state to fullfill the update.";
+                    description: "Provided invalid argument(s) with one of the following reasons: \nmandatory argument is missing, \nmutually exclusive arguments were provided \ninvalid argument is provided.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2257,7 +2260,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get policy.";
-            description: "A request to get polic by either name or UUID";
+            description: "A request to get policy by either name or UUID";
             tags: "get policy";
             responses: {
                 key: "400";
@@ -2970,8 +2973,8 @@ service DurosAPI {
             get: "/api/v2/projects/{projectName}/snapshots/diff/{snapshotUUID}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "list changed LBAs between a volume's snapshots.";
-            description: "list changed LBAs between a volume's snapshots (optionally list all snapshots LBAs)";
+            summary: "List changed LBAs between a volume's snapshots.";
+            description: "List changed LBAs between a volume's snapshots (optionally list all snapshots LBAs)";
             tags: "list changed blocks";
             responses: {
                 key: "400";
@@ -3245,15 +3248,15 @@ service DurosAPI {
         };
     }
 
-    rpc CreateAuthGroupAccess(CreateAuthGroupAccessRequest) returns (AuthGroupAccess) {
+    rpc CreateIdpClientConf(CreateIdpClientConfRequest) returns (IdpClientConf) {
         option (google.api.http) = {
-            post: "/api/v2/cluster/AuthGroupAccess"
+            post: "/api/v2/cluster/idpClientConfs"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Create an Auth group access.";
-            description: "Create a map entry between a group and an access right (scope and role).";
-            tags: "Auth group access";
+            summary: "Create an idp-client-configuration.";
+            description: "Create an idp-client-configuration.";
+            tags: "idp client configuration";
             responses: {
                 key: "400";
                 value: {
@@ -3278,15 +3281,54 @@ service DurosAPI {
         };
     }
 
-    rpc UpdateAuthGroupAccess(UpdateAuthGroupAccessRequest) returns (AuthGroupAccess) {
+    rpc DeleteIdpClientConf(DeleteIdpClientConfRequest) returns (DeleteIdpClientConfResponse) {
         option (google.api.http) = {
-            put: "/api/v2/cluster/AuthGroupAccess"
+            delete: "/api/v2/cluster/idpClientConfs/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Delete an idp-client-configuration.";
+            description: "Delete an idp-client-configuration.";
+            tags: "idp client configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "idp-client-configuration with the specidied name was not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateIdpClientConf(UpdateIdpClientConfRequest) returns (IdpClientConf) {
+        option (google.api.http) = {
+            put: "/api/v2/cluster/idpClientConfs/{name}"
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Update an Auth group access.";
-            description: "Update a map entry between a group and an access right (scope and role).";
-            tags: "Auth group access";
+            summary: "Update an idp-client-configuration.";
+            description: "Update an idp-client-configuration.";
+            tags: "idp client configuration";
             responses: {
                 key: "400";
                 value: {
@@ -3311,21 +3353,53 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Auth group not found.";
+                    description: "idp-client-configuration with the specigied name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
         };
     }
 
-    rpc DeleteAuthGroupAccess(DeleteAuthGroupAccessRequest) returns (DeleteAuthGroupAccessResponse) {
+    rpc ListIdpClientConfs(ListIdpClientConfsRequest) returns (ListIdpClientConfsResponse) {
         option (google.api.http) = {
-            delete: "/api/v2/cluster/AuthGroupAccess/{IdpGroupName}"
+            get: "/api/v2/cluster/idpClientConfs"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Delete an Auth group access.";
-            description: "Delete a map entry between a group and an access right (scope and role).";
-            tags: "Auth group access.";
+            summary: "Listing idp-client-configurations.";
+            description: "Listing idp-client-configurations.";
+            tags: "idp client configuration";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetIdpClientConf(GetIdpClientConfRequest) returns (IdpClientConf) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/idpClientConfs/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get an idp-client-configuration.";
+            description: "Get an idp-client-configuration.";
+            tags: "idp client configuration";
             responses: {
                 key: "400";
                 value: {
@@ -3350,21 +3424,55 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Auth group not found.";
+                    description: "idp-client-configuration with the specified name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
         };
     }
 
-    rpc GetAuthGroupAccess(GetAuthGroupAccessRequest) returns (AuthGroupAccess) {
+    rpc CreateAuthMapEntry(CreateAuthMapEntryRequest) returns (AuthMapEntry) {
         option (google.api.http) = {
-            get: "/api/v2/cluster/AuthGroupAccess/{IdpGroupName}"
+            post: "/api/v2/cluster/authMaps"
+            body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get an Auth group access.";
-            description: "Get a map entry between a group and an access right (scope and role).";
-            tags: "Auth group access";
+            summary: "Create an authorisation map entry.";
+            description: "Create a map entry between a group/clientID and an access right (scope and role).";
+            tags: "Auth map entry";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc UpdateAuthMapEntry(UpdateAuthMapEntryRequest) returns (AuthMapEntry) {
+        option (google.api.http) = {
+            put: "/api/v2/cluster/authMaps/{name}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "update an authorisation map entry";
+            description: "Update an authorisation map entry between a group/clientID and an access right (scope and role).";
+            tags: "Auth map entry";
             responses: {
                 key: "400";
                 value: {
@@ -3389,21 +3497,99 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Auth group not found.";
+                    description: "Auth map entry not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
         };
     }
 
-    rpc ListAuthGroupAccesses(ListAuthGroupAccessesRequest) returns (ListAuthGroupAccessesResponse) {
+    rpc DeleteAuthMapEntry(DeleteAuthMapEntryRequest) returns (DeleteAuthMapEntryResponse) {
         option (google.api.http) = {
-            get: "/api/v2/cluster/AuthGroupAccess"
+            delete: "/api/v2/cluster/authMaps/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "List all auth-groups to access-right entries.";
-            description: "List all map entries between a group and an access right (scope and role).";
-            tags: "Auth group access";
+            summary: "Delete an authorisation map entry";
+            description: "Delete an authorisation map entry between a group/clientID and an access right (scope and role).";
+            tags: "Auth map entry.";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Auth map entry not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc GetAuthMapEntry(GetAuthMapEntryRequest) returns (AuthMapEntry) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/authMaps/{name}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get an authorisation map entry.";
+            description: "Get an authorisation map entry between a group/clientID and an access right (scope and role).";
+            tags: "Auth map entry";
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Auth map entry not found.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc ListAuthMapEntries(ListAuthMapEntriesRequest) returns (ListAuthMapEntriesResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/cluster/authMaps"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List all authorisation map entries.";
+            description: "List all map entries between a group/clientID (client-id/group-name) and an access right (scope and role).";
+            tags: "Auth map entry";
             responses: {
                 key: "400";
                 value: {
@@ -3435,7 +3621,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Enable In-Band cluster authentication (Beta)";
-            description: "Enables NVNMe-oF In Band Authentication, This allows Lighbits cluster to selectively restrict the set of NVMe hosts (clients) that are allowed to connect to the NVMe target (Lightbits cluster), and also (optionally), restrict the set NVMe targets that a given NVMe host will trust and connect to. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            description: "Enables NVMe-oF In Band Authentication, This allows Lightbits cluster to selectively restrict the set of NVMe hosts (clients) that are allowed to connect to the NVMe target (Lightbits cluster), and also (optionally), restrict the set NVMe targets that a given NVMe host will trust and connect to. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
             tags: "encryption";
             responses: {
                 key: "401";
@@ -3461,7 +3647,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Disable In-Band cluster authentication (Beta)";
-            description: "Disables NVMe-oF In Band Authentication, hosts may connect to Lighbits cluster without establishing trust (the default Lighbits cluster configuration). In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            description: "Disables NVMe-oF In Band Authentication, hosts may connect to Lightbits cluster without establishing trust (the default Lightbits cluster configuration). In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
             tags: "encryption";
             responses: {
                 key: "401";
@@ -3606,8 +3792,8 @@ service DurosAPI {
             }
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "return a list of trusted hosts configuration's";
-            description: "return a list of trusted hosts configuration's. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            summary: "Return a list of trusted hosts configuration's.";
+            description: "Return a list of trusted hosts configuration's. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
             tags: "authentication";
             responses: {
                 key: "400";
@@ -3647,7 +3833,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update a host.";
-            description: "Update a trusted host configuration, optionally modyfing labels. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            description: "Update a trusted host configuration, optionally modifying labels. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
             tags: "authentication";
             responses: {
                 key: "400";
@@ -3687,7 +3873,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Set the secrets for a host.";
-            description: "Set hosts secrets for a trusted host to allow trusted connectivity between Lightbits Cluster and hosts as part of In-Band Authentication support. Specifying a host secret is mandatory for trusted connect of host to Lightbits cluster, Specifying a target secret, either explicitly or by using auto-gen mode, is optional, allowing only trusted Lighbits cluster to connect to host, if no target secret is specified the target secret type will be set to disable. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
+            description: "Set hosts secrets for a trusted host to allow trusted connectivity between Lightbits Cluster and hosts as part of In-Band Authentication support. Specifying a host secret is mandatory for trusted connect of host to Lightbits cluster, Specifying a target secret, either explicitly or by using auto-gen mode, is optional, allowing only trusted Lightbits cluster to connect to host, if no target secret is specified the target secret type will be set to disable. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
             tags: "authentication";
             responses: {
                 key: "400";
@@ -3750,7 +3936,7 @@ service DurosAPI {
 message LogRequest {
     // Optional SkipStatistics
     //
-    // Fetch log will download by default all the statistics from the the relavant server
+    // Fetch log will download by default all the statistics from the relevant server
     // By passing this parameter fetch logs will skip the statistics collect
     bool   SkipStatistics = 1;
     bool   CaptureCpuAndTcpDump = 2;
@@ -3819,8 +4005,8 @@ message CreateCredentialRequest {
 }
 
 // CredsKind specifies the intended usage and origin of the credentials. it can not be
-// set directly by the user when uploading creds and can't be modified at all after the
-// creds were created.
+// set directly by the user when uploading credentials and can't be modified at all after the
+// credentials were created.
 enum CredsKind {
     // Credentials directly managed by the users.
     UserCreds = 0;
@@ -3998,6 +4184,10 @@ message CreateVolumeRequest {
         string qosPolicyUUID = 13;
         string qosPolicyName = 14;
     }
+    // labels
+    //
+    // User defined labels are optional for a volume. Labels are key-value pairs. A volume can have up to 16 labels, label-key and label-value length must be between 1 and 253 characters and may contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and dot (.). When creating a clone, if labels are passed the clone will be created with them, otherwise, the labels are copied from the snapshot used for the clone.
+    repeated Label labels = 15;
 }
 
 message DeleteVolumeRequest {
@@ -4058,7 +4248,7 @@ message DisableServerRequest {
     // during this time. Valid values are 1 hour or longer, "0"  value should be used to specify an infinite timeout.
     // Permanent failure timeout is a string constructed by a decimal number followed
     // by the units: ns, us, ms, s, m, h. For example: 7200s, 120m, 2h
-    // This value will be oveeride once the server is re-enabled. Default value: null
+    // This value will be override once the server is re-enabled. Default value: null
     google.protobuf.Duration permanentFailureTimeout = 5;
 }
 
@@ -4144,21 +4334,11 @@ message UpdateVolumeRequest {
     // To intentionally shrink volume size, provide updated volume size and set force to true
     bool Force = 9;
     string name = 10;
-}
 
-message ProxyInfo {
-    // URL
+    // labels
     //
-    // URL of the proxy server. Pattern: "http://<server-ip>:<port>"
-    string URL = 1;
-    // Username
-    //
-    // Username for the proxy server
-    string Username = 2;
-    // Password
-    //
-    // Password for the proxy server
-    string Password = 3;
+    // User defined labels are optional for a volume. Labels are key-value pairs. A volume can have up to 16 labels, label-key and label-value length must be between 1 and 253 characters and may contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and dot (.). If labels are passed during volume update the existing volume's labels are replaced with the new ones. Otherwise, the labels are untouched.
+    repeated Label labels = 11;
 }
 
 message UpgradeServerRequest {
@@ -4169,7 +4349,7 @@ message UpgradeServerRequest {
     string InstallPkgUri = 2;
     // ForceUpgrade
     //
-    // Optional. When true, bypasses the upgradrability (loss of service) check.
+    // Optional. When true, bypasses the upgradability (loss of service) check.
     bool ForceUpgrade = 3;
     // ProxyInfo
     //
@@ -4184,7 +4364,7 @@ message UpgradeClusterRequest {
     string InstallPkgUri = 1;
     // UUIDs
     //
-    // Optional. Servers with given UUIDs are upgraded. If not given, all servers in the cluster are upgraded according to upgradeablity (loss of service) check.
+    // Optional. Servers with given UUIDs are upgraded. If not given, all servers in the cluster are upgraded according to upgradability (loss of service) check.
     repeated string UUIDs = 2;
     // ProxyInfo
     //
@@ -4193,6 +4373,15 @@ message UpgradeClusterRequest {
 }
 
 message EnableClusterEncryptionRequest {
+    enum KeyStore {
+        unknown = 0;
+        tpm = 1;
+        file = 2;
+    }
+    // KeyStore
+    //
+    // Optional. Where to store the Encryption KEK on file or in tpm.
+    KeyStore keyStore = 1;
 }
 
 message GetClusterRequest {
@@ -4238,11 +4427,11 @@ message ListEventsRequest {
     string nextToken = 2;
     // since
     //
-    // Optional. Return a list of events with a timestamp not earlier than the given timestamp. Timstamp format must be given in UTC Time in ISO-8601, e.g: 2000-01-01T12:00:00.000Z.
+    // Optional. Return a list of events with a timestamp not earlier than the given timestamp. Timestamp format must be given in UTC Time in ISO-8601, e.g: 2000-01-01T12:00:00.000Z.
 	string since = 3;
     // until
     //
-    // Optional. Return a list of events with a timestamp not later than the given timestamp. Timstamp format must be given in UTC Time in ISO-8601, e.g: 2000-01-01T12:00:00.000Z.
+    // Optional. Return a list of events with a timestamp not later than the given timestamp. Timestamp format must be given in UTC Time in ISO-8601, e.g: 2000-01-01T12:00:00.000Z.
 	string until = 4;
     // limit
     //
@@ -4331,7 +4520,7 @@ message UserNvmeDevicesResponse {
 
     // Total capacity of the device in bytes
     uint64 size = 1;
-    // The numa node ID this device is associated with
+    // The NUMA node ID this device is associated with
     uint64 numaNodeID = 2;
     // model
     //
@@ -4351,11 +4540,11 @@ message UserNvmeDevicesResponse {
     StateEnum state = 6;
         // device time of failure
     //
-    // Timestamp that will be updated in case the device have failed
+    // Timestamp that will be updated in case the device has failed
     google.protobuf.Timestamp failureTime = 7;
     // device rebuild completion time
     //
-    // Timestamp that will be updated once gftl have completed
+    // Timestamp that will be updated once GFTL has completed
     // to rebuild all the data that the device had, and we are safe
     // for second failure
     google.protobuf.Timestamp rebuildCompletionTime = 8;
@@ -4383,11 +4572,11 @@ message DurosNodeInfo {
         Unknown = 0;
         // node is completed join cluster flow
         Active = 1;
-        // node is is the process of coming up (startign required services) and joining cluster
+        // node is is the process of coming up (starting required services) and joining cluster
         Activating = 2;
         // node is is Inactive (this includes internal states Removing and failed)
         Inactive = 3;
-        // node is not attched to cluster (none of cluster pgs contain this pg)
+        // node is not attached to cluster (none of cluster pgs contain this pg)
         Unattached = 4;
         // Attaching node to cluster ongoing (replacing old node in pgs with this node)
         Attaching = 6;
@@ -4407,7 +4596,7 @@ message DurosNodeInfo {
     string UUID = 2;
     State state = 3;
     StatusEnum status = 4;
-    // peer <ip>:<port> service datapath IP
+    // peer <ip>:<port> service data-path IP
     string nvmeEndpoint = 5;
     repeated string failureDomains = 6;
     string failureInfo = 7;
@@ -4704,7 +4893,7 @@ message Volume {
     // List of node UUIDs this volume is placed over.
     repeated string nodeList = 4;
     string UUID = 5;
-    // nsid
+    // NSID
     //
     // Volume's Namespace ID
     uint32 nsid = 6;
@@ -4762,6 +4951,10 @@ message Volume {
     //
     // Time of volume creation (UTC).
     google.protobuf.Timestamp creationTime = 24;
+    // labels
+    //
+    // Optionally add labels to a volume.
+    repeated Label labels = 25;
 }
 
 message ServerEvictionStatus {
@@ -4917,9 +5110,9 @@ message Server {
     //
     // Server health: OK- server healthy, Warning high utilisation or failed disk under rebuild, Error - Inactive nodes or nodes nearing/in Read-only.
     ClusterHealth.State health = 15;
-    // Server Permanenet failure configuration
+    // Server Permanent failure configuration
     //
-    // Permanenet failure timeout at the server level. If set, overrides the cluster configuration. value of "0" sets it to infinite.
+    // Permanent failure timeout at the server level. If set, overrides the cluster configuration. value of "0" sets it to infinite.
     google.protobuf.Duration ServerPermanenetFailureTimeout = 16;
 }
 
@@ -4980,6 +5173,10 @@ message Snapshot {
     string ETag = 19;
     string projectName = 20;
     string primaryNodeUUID = 21;
+    // labels
+    //
+    // Once a snapshot is taken, the volume's labels are copied to the snapshot. Once a clone is created, if the user does not pass new labels on clone creation, the cloned volume labels are copied from the source snapshot labels.
+    repeated Label labels = 22;
 }
 
 message DeleteSnapshotRequest {
@@ -5268,7 +5465,7 @@ message ClusterConfigParam {
     string name = 1;
     // ClusterConfigParam value
     //
-    // value of cluster config parameter, units defined acording to parameter
+    // value of cluster config parameter, where the specific units are specific to the specified parameter
     string value = 2;
 }
 
@@ -5317,7 +5514,7 @@ message LabelValueKeyPair {
 
 message LabelMatchExpression {
     enum Operator {
-        Unkown = 0;
+        Unknown = 0;
         In = 1;
     };
     // Volume affinity operation
@@ -5326,7 +5523,7 @@ message LabelMatchExpression {
     Operator operator = 1;
     // Volume affinity operation Key/Value pairs
     //
-    // Volume affinity KeyPairs, Key currntly must be fd (failure domain), value should specify the failure domains we want to match
+    // Volume affinity KeyPairs, Key currently must be fd (failure domain), value should specify the failure domains we want to match
     repeated LabelValueKeyPair labelValueKeyPairs = 2;
 }
 
@@ -5435,9 +5632,6 @@ message Event {
         Volume = 3;
         NVMeSSD = 4;
         Server = 5;
-
-        // XXX: do we really need a new type for data-integrity events or we can use NVMESSD?
-        // in some cases, the corruption is not due to malfunctioning ssds in the node that reported such event.
         DataIntegrity = 6;
     }
 
@@ -5480,7 +5674,7 @@ message Event {
     uint32 CauseCode = 10;
     // The Event Description
     string Description = 11;
-    // Component info (speific to type)
+    // Component info (specific to type)
     oneof ComponentInfo {
         ComponentVolumesInfo ComponentVolumesInfo = 201;
         ComponentNVMeSSDInfo ComponentNVMeSSDInfo = 202;
@@ -5498,7 +5692,7 @@ enum PolicyVisibility {
     Unavailable = 0;
     // Scoped
     //
-    // Scoped - Indicates a private (scoped) policy (avaialble only to projects specified in projectsNamesScope)
+    // Scoped - Indicates a private (scoped) policy (available only to projects specified in projectsNamesScope)
     Scoped = 1;
     // Global
     //
@@ -5545,7 +5739,7 @@ message QoSRateLimitPolicy {
 
     // projectsNamesScope
     //
-    // Lists the projects that have access to this policy (relavent if policyVisibility=Scoped)
+    // Lists the projects that have access to this policy (relevant if policyVisibility=Scoped)
     repeated string projectsNamesScope = 3;
     // Policy Visibility
     //
@@ -5603,16 +5797,34 @@ message RotateClusterRootKeyRequest {}
 message RotateClusterRootKeyResponse {}
 
 message GetClusterRootKeyRequest {
+    // encryptingKeyGeneration
+    //
+    // The Generation key you want to export.
     uint64 encryptingKeyGeneration = 1;
+    // userPublicKey
+    //
+    // Public key to use in order to encrypt the exported KEK.
     bytes userPublicKey = 2;
 }
 
 message GetClusterRootKeyResponse {
     message KeyObject{
+        // encryptedKey
+        //
+        // Cluster Encryption key encrypted with the given public key
         bytes encryptedKey = 1;
+        // encryptingKeyGeneration
+        //
+        // The Generation of the exported key
         uint64 encryptingKeyGeneration = 2;
     }
+    // keys
+    //
+    // The object that includes each exported key and its generation.
     repeated KeyObject keys = 1;
+    // clusterPublicKey
+    //
+    // The public key you should save in order to encrypt the key when you need to import it back to the cluster
     bytes clusterPublicKey = 2;
 }
 
@@ -5620,8 +5832,6 @@ enum IDPType {
     unknownIdp = 0;
     ADFS     = 1;
 }
-
-
 
 // IDPConfiguration represents the configuration for the Identity Provider (IdP) in LB cluster.
 message IDPConfiguration {
@@ -5634,50 +5844,60 @@ message IDPConfiguration {
     }
 
     // name
+    //
     // Represents the name of an entity.
     string name = 1;
 
     // idpIssuerURL
+    //
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
 
     // state
+    //
     // Represents the state of the IdP configuration.
     // This field is used to indicate the current state of the IdP configuration.
     IDPConfigurationState state = 3;
 
     // Type
+    //
     // Represents the type of an IdP (Identity Provider).
     // The IDPType enum is used to specify the type of an IdP.
     IDPType Type = 4;
 
-    // clientID
-    // clientID is the application (Lightbits) ID registered in the IdP
-    string clientID = 5;
-
-
     // UUID
+    //
     // Represents the UUID of an entity.
-    string UUID = 6;
+    string UUID = 5;
+
+    // ProxyInfo
+    //
+    // Optional. Proxy server information for idp behind proxy.
+    ProxyInfo ProxyInfo = 6;
 }
 
 message CreateIDPConfigurationRequest {
     // name
+    //
     // Represents the name of an entity.
     string name = 1;
 
     // idpIssuerURL
+    //
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
 
     // Type
+    //
     // Represents the type of an IdP (Identity Provider).
     // The IDPType enum is used to specify the type of an IdP.
     IDPType Type = 3;
 
-    // clientID
-    // clientID is the application (Lightbits) ID registered in the IdP
-    string clientID = 4;
+    // ProxyInfo
+    //
+    // Optional. Proxy server information for idp behind proxy.
+    // Proxy support for IdP: currently only supports insecure access, Username and Password should not be used.
+    ProxyInfo ProxyInfo = 4;
 }
 
 message UpdateIDPConfigurationRequest {
@@ -5694,9 +5914,12 @@ message UpdateIDPConfigurationRequest {
     // The IDPType enum is used to specify the type of an IdP.
     IDPType Type = 3;
 
-    // clientID
-    // clientID is the application (Lightbits) ID registered in the IdP
-    string clientID = 4;
+    // ProxyInfo
+    //
+    // Optional. Proxy server information for idp behind proxy.
+    // Proxy support for IdP: currently only supports insecure access, Username and Password should not be used.
+    ProxyInfo ProxyInfo = 4;
+
 }
 
 message ListIDPConfigurationsRequest{}
@@ -5715,10 +5938,197 @@ message DeleteIDPConfigurationRequest {
 
 message DeleteIDPConfigurationResponse {}
 
-message AuthGroupAccess {
-    // IdpGroupName
-    // Represents the name of the group in the IdP server.
-    string IdpGroupName = 1;
+// idp-client-configuration represents a configuration for idp-client
+// in LB cluster.
+message IdpClientConf {
+    // UUID
+    //
+    // the UUID of the idp-client-config entry.
+    string UUID = 1;
+
+    // name
+    //
+    // a unique name for the idp-client-conf.
+    string name = 2;
+
+    // clientId
+    //
+    // unique client ID identifier registered in the IdP to identify a
+    // specific application (or a client) that wants to access resources
+    // from Lightbits cluster.
+    string clientId = 3;
+
+    // idpConfName
+    //
+    // a reference to the IdP configuration that will use this this client
+    // configuration.
+    string idpConfName = 4;
+
+    // userClaimName
+    //
+    // when working in user authorization mode, the user claim name specifies
+    // the name of the field in JWT claim from which to extract the identifier
+    // value from.
+    // Note, this field is only required when authzMode=user.
+    string userClaimName = 5;
+
+    // authzMode
+    //
+    // the authorization mode determines whether it's a user authorization or
+    // application authorization.
+    AuthorizationMode authzMode = 6;
+}
+
+message CreateIdpClientConfRequest {
+    // name
+    //
+    // a unique name for the idp-client-conf.
+    string name = 1;
+
+    // clientId
+    //
+    // unique client ID identifier registered in the IdP to identify a
+    // specific application (or a client) that wants to access resources
+    // from Lightbits cluster.
+    string clientId = 2;
+
+    // idpConfName
+    //
+    // a reference to the IdP configuration that will use this this client
+    // configuration.
+    string idpConfName = 3;
+
+    // userClaimName
+    //
+    // when working in user authorization mode, the user claim name specifies
+    // the name of the field in JWT claim from which to extract the identifier
+    // value from.
+    // Note, this field is only required when authzMode=user.
+    string userClaimName = 4;
+
+    // authzMode
+    //
+    // the authorization mode determines whether it's a user authorization or
+    // application authorization.
+    AuthorizationMode authzMode = 5;
+}
+
+message UpdateIdpClientConfRequest {
+    // name
+    //
+    // the name of the idp-client-conf to update.
+    string name = 1;
+
+    // userClaimName
+    //
+    // when working in user authorization mode, the user claim name specifies
+    // the name of the field in JWT claim from which to extract the identifier
+    // value from.
+    // Note, this field is only required when authzMode=user.
+    string userClaimName = 2;
+}
+
+message GetIdpClientConfRequest {
+    // name
+    //
+    // the name of the idp-client-conf to get.
+    string name = 1;
+}
+
+message DeleteIdpClientConfRequest {
+    // name
+    //
+    // the name of the idp-client-conf to get.
+    string name = 1;
+}
+
+message DeleteIdpClientConfResponse {}
+
+message ListIdpClientConfsRequest{}
+
+message ListIdpClientConfsResponse{
+    repeated IdpClientConf IdpClientConfs = 1;
+}
+
+message AuthMapEntry {
+    enum StateEnum {
+        Unknown = 0;
+        Creating = 1;
+        Available = 2;
+        Deleting = 3;
+        Updating = 4;
+        Failed = 5;
+    }
+
+    // State
+    // AuthMapEntry state
+    StateEnum state = 1;
+
+    // UUID
+    // AuthMapEntry UUID
+    string UUID = 2;
+
+    // Name
+    // Name of specific authorisation mapping entry.
+    string name = 3;
+
+    // Identifier
+    // Identifier to map application or group to Lightbits scope/role
+    // when using authMode=app this field should specify an identifier
+    // of the clientID of the relevant application. if using authMode=user
+    // this should specify a group name.
+    string identifier = 4;
+
+    // Scope
+    // Represents the scope of the group in lightbits cluster.
+    string scope = 5;
+
+    // Role
+    // Represents the role of the group in lightbits cluster.
+    string role = 6;
+
+    // AuthorizationMode
+    // Represents the authorisation mode for the clientID
+    AuthorizationMode authzMode = 7;
+
+    // idpConfigurationName
+    // idp configuration that is associated with this authorisation map entry.
+    string idpConfigurationName = 8;
+}
+
+message CreateAuthMapEntryRequest {
+    // Name
+    // Name of specific authorisation mapping entry.
+    string name = 1;
+
+    // Identifier
+    // Identifier to map application or group to Lightbits scope/role
+    // when using authMode=app this field should specify an identifier
+    // of the clientID of the relevant application. if using authMode=user
+    // this should specify a group name.
+    string identifier = 2;
+
+    // scope
+    // Represents the scope of the group in lightbits cluster.
+    string scope = 3;
+
+    // role
+    // Represents the role of the group in lightbits cluster.
+    string role = 4;
+
+    // AuthorizationMode
+    // Represents the authorisation mode for the clientID
+    AuthorizationMode authzMode = 5;
+
+    // idpConfigurationName
+    // idp configuration that is associated with this authorisation map entry.
+    string idpConfigurationName = 6;
+}
+
+message UpdateAuthMapEntryRequest {
+    // name
+    // Name of specific authorisation mapping entry.
+    string name = 1;
 
     // scope
     // Represents the scope of the group in lightbits cluster.
@@ -5727,52 +6137,39 @@ message AuthGroupAccess {
     // role
     // Represents the role of the group in lightbits cluster.
     string role = 3;
+
+    // AuthorizationMode
+    // Represents the authorisation mode for the clientID
+    AuthorizationMode authzMode = 4;
+
+    // Identifier
+    // Identifier to map application or group to Lightbits scope/role
+    // when using authMode=app this field should specify an identifier
+    // of the clientID of the relevant application. if using authMode=user
+    // this should specify a group name.
+    string identifier = 5;
+
+    // idpConfigurationName
+    // idp configuration that is associated with this authorisation map entry.
+    string idpConfigurationName = 6;
 }
 
-message CreateAuthGroupAccessRequest {
-    // IdpGroupName
-    // Represents the name of the group in the IdP server.
-    string IdpGroupName = 1;
-
-    // scope
-    // Represents the scope of the group in lightbits cluster.
-    string scope = 2;
-
-    // role
-    // Represents the role of the group in lightbits cluster.
-    string role = 3;
+message DeleteAuthMapEntryRequest {
+    // name
+    // Name of specific authorisation mapping entry.
+    string name = 1;
 }
 
-message UpdateAuthGroupAccessRequest {
-    // IdpGroupName
-    // Represents the name of the group in the IdP server.
-    string IdpGroupName = 1;
-
-    // scope
-    // Represents the scope of the group in lightbits cluster.
-    string scope = 2;
-
-    // role
-    // Represents the role of the group in lightbits cluster.
-    string role = 3;
+message GetAuthMapEntryRequest {
+    // name
+    // Name of specific authorisation mapping entry.
+    string name = 1;
 }
 
-message DeleteAuthGroupAccessRequest {
-    // IdpGroupName
-    // Represents the name of the group in the IdP server.
-    string IdpGroupName = 1;
-}
+message ListAuthMapEntriesRequest {}
 
-message GetAuthGroupAccessRequest {
-    // IdpGroupName
-    // Represents the name of the group in the IdP server.
-    string IdpGroupName = 1;
-}
+message DeleteAuthMapEntryResponse {}
 
-message ListAuthGroupAccessesRequest {}
-
-message DeleteAuthGroupAccessResponse {}
-
-message ListAuthGroupAccessesResponse {
-    repeated AuthGroupAccess AuthGroupAccesses = 1;
+message ListAuthMapEntriesResponse {
+    repeated AuthMapEntry AuthMapEntries = 1;
 }

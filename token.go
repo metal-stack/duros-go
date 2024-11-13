@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	v2 "github.com/metal-stack/duros-go/api/duros/v2"
 )
@@ -28,19 +28,23 @@ func NewJWTTokenForCredential(subject, issuer string, credential *v2.Credential,
 // subject: 'sub' claim, who will be using this JWT, example a persons or tenants name
 // kid: this is the "key ID", the name of the credential (pub key) as uploaded
 // to LightOS. it is of the form "<scope>:<name>", e.g.:
-//     system:root - your root pub key, installed during system deployment
-//     tenant-foo:first-cred - pub key of tenant tenant-foo uploaded as credential named first-cred.
-//   the JWTs are validated using the specific pub keys, so a corresponding
-//   credential must already exist in LightOS.
+//
+//	  system:root - your root pub key, installed during system deployment
+//	  tenant-foo:first-cred - pub key of tenant tenant-foo uploaded as credential named first-cred.
+//	the JWTs are validated using the specific pub keys, so a corresponding
+//	credential must already exist in LightOS.
+//
 // roles: list of roles this token should contain, must be in the form of
-//   foo:admin which gives this user  (subject) admin rights to the foo resource
+//
+//	foo:admin which gives this user  (subject) admin rights to the foo resource
+//
 // expires: Duration after which this token will expire.
 // keyPair: RSA public and private key which should be used to sign this token
 func NewJWTToken(subject, issuer string, kid string, roles []string, expires time.Duration, keyPair *rsa.PrivateKey) (string, error) {
 	now := time.Now().UTC()
 	claims := &lbJWTClaims{
 		// see overview of "registered" JWT claims as used by jwt-go here:
-		//   https://pkg.go.dev/github.com/golang-jwt/jwt/v4?utm_source=godoc#RegisteredClaims
+		//   https://pkg.go.dev/github.com/golang-jwt/jwt/v5?utm_source=godoc#RegisteredClaims
 		// see the semantics of the registered claims here:
 		//   https://en.wikipedia.org/wiki/JSON_Web_Token#Standard_fields
 		RegisteredClaims: jwt.RegisteredClaims{

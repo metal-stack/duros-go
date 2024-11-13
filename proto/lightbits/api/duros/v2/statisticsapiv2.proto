@@ -49,7 +49,7 @@ message ClusterStatisticsApi {
     //
     // Estimate of total available logical storage based on current compression ratio (effective * compression)
     uint64 estimatedLogicalStorage = 10;
-    // commpression ratio
+    // compression ratio
     //
     // compression ratio logicalUsedStorage/physicalUsedStorage
     double compressionRatio = 11;
@@ -92,7 +92,7 @@ message NodeStatisticsApi {
     //
     // Estimate of total available logical storage based on current compression ratio (effective * compression)
     uint64 estimatedLogicalStorage = 9;
-    // commpression ratio
+    // compression ratio
     //
     // compression ratio logicalUsedStorage/physicalUsedStorage
     double compressionRatio = 10;
@@ -124,11 +124,11 @@ message VolumeStatisticsApi {
     //
     // Physical storage space used by volume excluding parity, given in bytes.
     uint64 physicalUsedStorage = 2;
-    // commpression ratio
+    // compression ratio
     //
     // compression ratio userWritten/physicalCapacity
     double compressionRatio = 3;
-    // total commpression ratio
+    // total compression ratio
     //
     // compression ratio sum(userWritten) / sum(physical capacity)
     double totalCompressionRatio = 4; //need to decide on a name
