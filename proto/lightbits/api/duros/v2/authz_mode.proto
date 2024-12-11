@@ -1,11 +1,33 @@
 syntax = "proto3";
-
 package lightbits.api.duros.v2;
 
 option go_package = "duros/v2;v2";
 
 enum AuthorizationMode{
+    // 0
+    //
+    // Unknown authorization mode. This is for internal use only.
     UnknownAuthzMode = 0;
+    // 1
+    //
+    // Application authorization mode. In this mode, the client ID in the access token,
+    //  is first looked up for a matching IdP client configuration, If found, then the client ID is mapped to a
+    //  a matching Auth Map Entry that will return correct scope and role. If no match is found then an error is returned.
     App = 1;
+    // 2
+    //
+    // User authorization mode. In this mode, the client ID in the access token,
+    //  is first looked up for a matching IdP client configuration, If found, Then the value in field in
+    //  specified by claim name is looked up for a matching Auth Map Entry that will return correct scope and role.
+    //  If no match is found then an error is returned.
     User = 2;
+    // 3
+    //
+    // Converge authorization mode. In this mode, the client ID in access token,
+    //  is first looked up for a matching IdP client configuration, if no match is found,
+    //  then value of access token field specified by claim name is looked up for a matching Auth Map Entry that will 
+    //  return correct scope and role.
+    //  Only a single IdP client configuration using AuthorizationMode = Converge is allowed.
+    //  The clientID value for an IdPClientConf using Converge mode must be set to NOT_APPLICABLE.
+    Converge = 3;
 }
