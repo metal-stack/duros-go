@@ -7,14 +7,14 @@ option go_package = "duros/v2;v2";
 message ProxyInfo {
     // URL
     //
-    // URL of the proxy server. Pattern: "http://<server-ip>:<port>"
+    // URL of the proxy server. Pattern: "http://<server-ip>:<port>".
     string URL = 1;
     // Username
     //
-    // Username for the proxy server
+    // Username for the proxy server.
     string Username = 2;
     // Password
     //
-    // Password for the proxy server
+    // Password for the proxy server.
     string Password = 3;
 }

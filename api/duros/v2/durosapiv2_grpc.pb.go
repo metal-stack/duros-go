@@ -20,99 +20,101 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DurosAPI_GetVersion_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/GetVersion"
-	DurosAPI_CreateVolume_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/CreateVolume"
-	DurosAPI_DeleteVolume_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/DeleteVolume"
-	DurosAPI_ListVolumes_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/ListVolumes"
-	DurosAPI_ListEvents_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/ListEvents"
-	DurosAPI_GetHost_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/GetHost"
-	DurosAPI_ListHosts_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/ListHosts"
-	DurosAPI_GetVolume_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/GetVolume"
-	DurosAPI_ListNodes_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/ListNodes"
-	DurosAPI_GetNode_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/GetNode"
-	DurosAPI_ListNvmeDevices_FullMethodName          = "/lightbits.api.duros.v2.DurosAPI/ListNvmeDevices"
-	DurosAPI_GetNvmeDevice_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/GetNvmeDevice"
-	DurosAPI_FetchLogs_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/FetchLogs"
-	DurosAPI_GetCluster_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/GetCluster"
-	DurosAPI_GetClusterInfo_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/GetClusterInfo"
-	DurosAPI_UpdateNvmeDevice_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/UpdateNvmeDevice"
-	DurosAPI_AddNvmeDevice_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/AddNvmeDevice"
-	DurosAPI_UpdateVolume_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/UpdateVolume"
-	DurosAPI_GetServer_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/GetServer"
-	DurosAPI_ListServers_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/ListServers"
-	DurosAPI_UpgradeServer_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/UpgradeServer"
-	DurosAPI_UpgradeCluster_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/UpgradeCluster"
-	DurosAPI_EnableClusterEncryption_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/EnableClusterEncryption"
-	DurosAPI_CreateServer_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/CreateServer"
-	DurosAPI_ReplaceNode_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/ReplaceNode"
-	DurosAPI_DeleteServer_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/DeleteServer"
-	DurosAPI_EnableServer_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/EnableServer"
-	DurosAPI_DisableServer_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/DisableServer"
-	DurosAPI_CreateProject_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/CreateProject"
-	DurosAPI_UpdateProject_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/UpdateProject"
-	DurosAPI_DeleteProject_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/DeleteProject"
-	DurosAPI_ListProjects_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/ListProjects"
-	DurosAPI_GetProject_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/GetProject"
-	DurosAPI_CreateCredential_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/CreateCredential"
-	DurosAPI_DeleteCredential_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/DeleteCredential"
-	DurosAPI_ListCredentials_FullMethodName          = "/lightbits.api.duros.v2.DurosAPI/ListCredentials"
-	DurosAPI_GetCredential_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/GetCredential"
-	DurosAPI_GetRole_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/GetRole"
-	DurosAPI_ListRoles_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/ListRoles"
-	DurosAPI_CreateAdminEndpoint_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/CreateAdminEndpoint"
-	DurosAPI_DeleteAdminEndpoint_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/DeleteAdminEndpoint"
-	DurosAPI_ListAdminEndpoints_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/ListAdminEndpoints"
-	DurosAPI_UpdateAdminEndpoint_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/UpdateAdminEndpoint"
-	DurosAPI_GetAdminEndpoint_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/GetAdminEndpoint"
-	DurosAPI_CreateResourcePolicy_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/CreateResourcePolicy"
-	DurosAPI_CreatePolicy_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/CreatePolicy"
-	DurosAPI_UpdatePolicy_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/UpdatePolicy"
-	DurosAPI_UpdateResourcePolicy_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/UpdateResourcePolicy"
-	DurosAPI_GetPolicy_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/GetPolicy"
-	DurosAPI_ListPolicies_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/ListPolicies"
-	DurosAPI_ListResourcePolicies_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/ListResourcePolicies"
-	DurosAPI_GetResourcePolicy_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/GetResourcePolicy"
-	DurosAPI_DeleteResourcePolicy_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/DeleteResourcePolicy"
-	DurosAPI_DeletePolicy_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/DeletePolicy"
-	DurosAPI_CreateSnapshot_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/CreateSnapshot"
-	DurosAPI_GetSnapshot_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/GetSnapshot"
-	DurosAPI_ListSnapshots_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/ListSnapshots"
-	DurosAPI_DeleteSnapshot_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/DeleteSnapshot"
-	DurosAPI_GetFeatureFlag_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/GetFeatureFlag"
-	DurosAPI_EnableFeatureFlag_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/EnableFeatureFlag"
-	DurosAPI_DisableFeatureFlag_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/DisableFeatureFlag"
-	DurosAPI_ListFeatureFlags_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/ListFeatureFlags"
-	DurosAPI_GetClusterConfigParam_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/GetClusterConfigParam"
-	DurosAPI_UpdateClusterConfigParam_FullMethodName = "/lightbits.api.duros.v2.DurosAPI/UpdateClusterConfigParam"
-	DurosAPI_ListClusterConfigParams_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/ListClusterConfigParams"
-	DurosAPI_RollbackVolume_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/RollbackVolume"
-	DurosAPI_ListChangedBlocks_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/ListChangedBlocks"
-	DurosAPI_RotateClusterRootKey_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/RotateClusterRootKey"
-	DurosAPI_GetClusterRootKey_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/GetClusterRootKey"
-	DurosAPI_CreateIdpConfiguration_FullMethodName   = "/lightbits.api.duros.v2.DurosAPI/CreateIdpConfiguration"
-	DurosAPI_DeleteIdpConfiguration_FullMethodName   = "/lightbits.api.duros.v2.DurosAPI/DeleteIdpConfiguration"
-	DurosAPI_UpdateIdpConfiguration_FullMethodName   = "/lightbits.api.duros.v2.DurosAPI/UpdateIdpConfiguration"
-	DurosAPI_ListIdpConfigurations_FullMethodName    = "/lightbits.api.duros.v2.DurosAPI/ListIdpConfigurations"
-	DurosAPI_GetIdpConfiguration_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/GetIdpConfiguration"
-	DurosAPI_CreateIdpClientConf_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/CreateIdpClientConf"
-	DurosAPI_DeleteIdpClientConf_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/DeleteIdpClientConf"
-	DurosAPI_UpdateIdpClientConf_FullMethodName      = "/lightbits.api.duros.v2.DurosAPI/UpdateIdpClientConf"
-	DurosAPI_ListIdpClientConfs_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/ListIdpClientConfs"
-	DurosAPI_GetIdpClientConf_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/GetIdpClientConf"
-	DurosAPI_CreateAuthMapEntry_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/CreateAuthMapEntry"
-	DurosAPI_UpdateAuthMapEntry_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/UpdateAuthMapEntry"
-	DurosAPI_DeleteAuthMapEntry_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/DeleteAuthMapEntry"
-	DurosAPI_GetAuthMapEntry_FullMethodName          = "/lightbits.api.duros.v2.DurosAPI/GetAuthMapEntry"
-	DurosAPI_ListAuthMapEntries_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/ListAuthMapEntries"
-	DurosAPI_EnableClusterInBandAuth_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/EnableClusterInBandAuth"
-	DurosAPI_DisableClusterInBandAuth_FullMethodName = "/lightbits.api.duros.v2.DurosAPI/DisableClusterInBandAuth"
-	DurosAPI_CreateTrustedHost_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/CreateTrustedHost"
-	DurosAPI_DeleteTrustedHost_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/DeleteTrustedHost"
-	DurosAPI_GetTrustedHost_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/GetTrustedHost"
-	DurosAPI_ListTrustedHosts_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/ListTrustedHosts"
-	DurosAPI_UpdateTrustedHost_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/UpdateTrustedHost"
-	DurosAPI_SetTrustedHostSecret_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/SetTrustedHostSecret"
-	DurosAPI_GetTrustedHostSecret_FullMethodName     = "/lightbits.api.duros.v2.DurosAPI/GetTrustedHostSecret"
+	DurosAPI_GetVersion_FullMethodName                     = "/lightbits.api.duros.v2.DurosAPI/GetVersion"
+	DurosAPI_CreateVolume_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/CreateVolume"
+	DurosAPI_DeleteVolume_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/DeleteVolume"
+	DurosAPI_ListVolumes_FullMethodName                    = "/lightbits.api.duros.v2.DurosAPI/ListVolumes"
+	DurosAPI_ListEvents_FullMethodName                     = "/lightbits.api.duros.v2.DurosAPI/ListEvents"
+	DurosAPI_GetHost_FullMethodName                        = "/lightbits.api.duros.v2.DurosAPI/GetHost"
+	DurosAPI_ListHosts_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/ListHosts"
+	DurosAPI_GetVolume_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/GetVolume"
+	DurosAPI_ListNodes_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/ListNodes"
+	DurosAPI_GetNode_FullMethodName                        = "/lightbits.api.duros.v2.DurosAPI/GetNode"
+	DurosAPI_ListNvmeDevices_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/ListNvmeDevices"
+	DurosAPI_GetNvmeDevice_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/GetNvmeDevice"
+	DurosAPI_FetchLogs_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/FetchLogs"
+	DurosAPI_GetCluster_FullMethodName                     = "/lightbits.api.duros.v2.DurosAPI/GetCluster"
+	DurosAPI_GetClusterInfo_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/GetClusterInfo"
+	DurosAPI_UpdateNvmeDevice_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/UpdateNvmeDevice"
+	DurosAPI_AddNvmeDevice_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/AddNvmeDevice"
+	DurosAPI_UpdateVolume_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/UpdateVolume"
+	DurosAPI_GetServer_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/GetServer"
+	DurosAPI_ListServers_FullMethodName                    = "/lightbits.api.duros.v2.DurosAPI/ListServers"
+	DurosAPI_UpgradeServer_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/UpgradeServer"
+	DurosAPI_UpgradeCluster_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/UpgradeCluster"
+	DurosAPI_EnableClusterEncryption_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/EnableClusterEncryption"
+	DurosAPI_CreateServer_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/CreateServer"
+	DurosAPI_ReplaceNode_FullMethodName                    = "/lightbits.api.duros.v2.DurosAPI/ReplaceNode"
+	DurosAPI_DeleteServer_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/DeleteServer"
+	DurosAPI_EnableServer_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/EnableServer"
+	DurosAPI_DisableServer_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/DisableServer"
+	DurosAPI_CreateProject_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/CreateProject"
+	DurosAPI_UpdateProject_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/UpdateProject"
+	DurosAPI_DeleteProject_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/DeleteProject"
+	DurosAPI_ListProjects_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/ListProjects"
+	DurosAPI_GetProject_FullMethodName                     = "/lightbits.api.duros.v2.DurosAPI/GetProject"
+	DurosAPI_CreateCredential_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/CreateCredential"
+	DurosAPI_DeleteCredential_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/DeleteCredential"
+	DurosAPI_ListCredentials_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/ListCredentials"
+	DurosAPI_GetCredential_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/GetCredential"
+	DurosAPI_GetRole_FullMethodName                        = "/lightbits.api.duros.v2.DurosAPI/GetRole"
+	DurosAPI_ListRoles_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/ListRoles"
+	DurosAPI_CreateAdminEndpoint_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/CreateAdminEndpoint"
+	DurosAPI_DeleteAdminEndpoint_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/DeleteAdminEndpoint"
+	DurosAPI_ListAdminEndpoints_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/ListAdminEndpoints"
+	DurosAPI_UpdateAdminEndpoint_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/UpdateAdminEndpoint"
+	DurosAPI_GetAdminEndpoint_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/GetAdminEndpoint"
+	DurosAPI_CreateResourcePolicy_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/CreateResourcePolicy"
+	DurosAPI_CreatePolicy_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/CreatePolicy"
+	DurosAPI_UpdatePolicy_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/UpdatePolicy"
+	DurosAPI_UpdateResourcePolicy_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/UpdateResourcePolicy"
+	DurosAPI_GetPolicy_FullMethodName                      = "/lightbits.api.duros.v2.DurosAPI/GetPolicy"
+	DurosAPI_ListPolicies_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/ListPolicies"
+	DurosAPI_ListResourcePolicies_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/ListResourcePolicies"
+	DurosAPI_GetResourcePolicy_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/GetResourcePolicy"
+	DurosAPI_DeleteResourcePolicy_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/DeleteResourcePolicy"
+	DurosAPI_DeletePolicy_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/DeletePolicy"
+	DurosAPI_CreateSnapshot_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/CreateSnapshot"
+	DurosAPI_GetSnapshot_FullMethodName                    = "/lightbits.api.duros.v2.DurosAPI/GetSnapshot"
+	DurosAPI_ListSnapshots_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/ListSnapshots"
+	DurosAPI_DeleteSnapshot_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/DeleteSnapshot"
+	DurosAPI_GetFeatureFlag_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/GetFeatureFlag"
+	DurosAPI_EnableFeatureFlag_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/EnableFeatureFlag"
+	DurosAPI_DisableFeatureFlag_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/DisableFeatureFlag"
+	DurosAPI_ListFeatureFlags_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/ListFeatureFlags"
+	DurosAPI_GetClusterConfigParam_FullMethodName          = "/lightbits.api.duros.v2.DurosAPI/GetClusterConfigParam"
+	DurosAPI_UpdateClusterConfigParam_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/UpdateClusterConfigParam"
+	DurosAPI_ListClusterConfigParams_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/ListClusterConfigParams"
+	DurosAPI_RollbackVolume_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/RollbackVolume"
+	DurosAPI_ListChangedBlocks_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/ListChangedBlocks"
+	DurosAPI_RotateClusterRootKey_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/RotateClusterRootKey"
+	DurosAPI_GetClusterRootKey_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/GetClusterRootKey"
+	DurosAPI_CreateIdpConfiguration_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/CreateIdpConfiguration"
+	DurosAPI_DeleteIdpConfiguration_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/DeleteIdpConfiguration"
+	DurosAPI_UpdateIdpConfiguration_FullMethodName         = "/lightbits.api.duros.v2.DurosAPI/UpdateIdpConfiguration"
+	DurosAPI_ListIdpConfigurations_FullMethodName          = "/lightbits.api.duros.v2.DurosAPI/ListIdpConfigurations"
+	DurosAPI_GetIdpConfiguration_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/GetIdpConfiguration"
+	DurosAPI_CreateIdpClientConf_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/CreateIdpClientConf"
+	DurosAPI_DeleteIdpClientConf_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/DeleteIdpClientConf"
+	DurosAPI_UpdateIdpClientConf_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/UpdateIdpClientConf"
+	DurosAPI_ListIdpClientConfs_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/ListIdpClientConfs"
+	DurosAPI_GetIdpClientConf_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/GetIdpClientConf"
+	DurosAPI_CreateAuthMapEntry_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/CreateAuthMapEntry"
+	DurosAPI_UpdateAuthMapEntry_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/UpdateAuthMapEntry"
+	DurosAPI_DeleteAuthMapEntry_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/DeleteAuthMapEntry"
+	DurosAPI_GetAuthMapEntry_FullMethodName                = "/lightbits.api.duros.v2.DurosAPI/GetAuthMapEntry"
+	DurosAPI_ListAuthMapEntries_FullMethodName             = "/lightbits.api.duros.v2.DurosAPI/ListAuthMapEntries"
+	DurosAPI_EnableClusterInBandAuth_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/EnableClusterInBandAuth"
+	DurosAPI_DisableClusterInBandAuth_FullMethodName       = "/lightbits.api.duros.v2.DurosAPI/DisableClusterInBandAuth"
+	DurosAPI_CreateTrustedHost_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/CreateTrustedHost"
+	DurosAPI_DeleteTrustedHost_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/DeleteTrustedHost"
+	DurosAPI_GetTrustedHost_FullMethodName                 = "/lightbits.api.duros.v2.DurosAPI/GetTrustedHost"
+	DurosAPI_ListTrustedHosts_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/ListTrustedHosts"
+	DurosAPI_UpdateTrustedHost_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/UpdateTrustedHost"
+	DurosAPI_SetTrustedHostSecret_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/SetTrustedHostSecret"
+	DurosAPI_GetTrustedHostSecret_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/GetTrustedHostSecret"
+	DurosAPI_EnableFederatedAuthentication_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/EnableFederatedAuthentication"
+	DurosAPI_DisableFederatedAuthentication_FullMethodName = "/lightbits.api.duros.v2.DurosAPI/DisableFederatedAuthentication"
 )
 
 // DurosAPIClient is the client API for DurosAPI service.
@@ -212,6 +214,8 @@ type DurosAPIClient interface {
 	UpdateTrustedHost(ctx context.Context, in *UpdateTrustedHostRequest, opts ...grpc.CallOption) (*TrustedHost, error)
 	SetTrustedHostSecret(ctx context.Context, in *SetTrustedHostSecretsRequest, opts ...grpc.CallOption) (*SetTrustedHostSecretsResponse, error)
 	GetTrustedHostSecret(ctx context.Context, in *GetTrustedHostSecretsRequest, opts ...grpc.CallOption) (*GetTrustedHostSecretsResponse, error)
+	EnableFederatedAuthentication(ctx context.Context, in *EnableFederatedAuthenticationRequest, opts ...grpc.CallOption) (*EnableFederatedAuthenticationResponse, error)
+	DisableFederatedAuthentication(ctx context.Context, in *DisableFederatedAuthenticationRequest, opts ...grpc.CallOption) (*DisableFederatedAuthenticationResponse, error)
 }
 
 type durosAPIClient struct {
@@ -1161,6 +1165,26 @@ func (c *durosAPIClient) GetTrustedHostSecret(ctx context.Context, in *GetTruste
 	return out, nil
 }
 
+func (c *durosAPIClient) EnableFederatedAuthentication(ctx context.Context, in *EnableFederatedAuthenticationRequest, opts ...grpc.CallOption) (*EnableFederatedAuthenticationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EnableFederatedAuthenticationResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_EnableFederatedAuthentication_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) DisableFederatedAuthentication(ctx context.Context, in *DisableFederatedAuthenticationRequest, opts ...grpc.CallOption) (*DisableFederatedAuthenticationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DisableFederatedAuthenticationResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_DisableFederatedAuthentication_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DurosAPIServer is the server API for DurosAPI service.
 // All implementations should embed UnimplementedDurosAPIServer
 // for forward compatibility.
@@ -1258,6 +1282,8 @@ type DurosAPIServer interface {
 	UpdateTrustedHost(context.Context, *UpdateTrustedHostRequest) (*TrustedHost, error)
 	SetTrustedHostSecret(context.Context, *SetTrustedHostSecretsRequest) (*SetTrustedHostSecretsResponse, error)
 	GetTrustedHostSecret(context.Context, *GetTrustedHostSecretsRequest) (*GetTrustedHostSecretsResponse, error)
+	EnableFederatedAuthentication(context.Context, *EnableFederatedAuthenticationRequest) (*EnableFederatedAuthenticationResponse, error)
+	DisableFederatedAuthentication(context.Context, *DisableFederatedAuthenticationRequest) (*DisableFederatedAuthenticationResponse, error)
 }
 
 // UnimplementedDurosAPIServer should be embedded to have
@@ -1545,6 +1571,12 @@ func (UnimplementedDurosAPIServer) SetTrustedHostSecret(context.Context, *SetTru
 }
 func (UnimplementedDurosAPIServer) GetTrustedHostSecret(context.Context, *GetTrustedHostSecretsRequest) (*GetTrustedHostSecretsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTrustedHostSecret not implemented")
+}
+func (UnimplementedDurosAPIServer) EnableFederatedAuthentication(context.Context, *EnableFederatedAuthenticationRequest) (*EnableFederatedAuthenticationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnableFederatedAuthentication not implemented")
+}
+func (UnimplementedDurosAPIServer) DisableFederatedAuthentication(context.Context, *DisableFederatedAuthenticationRequest) (*DisableFederatedAuthenticationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableFederatedAuthentication not implemented")
 }
 func (UnimplementedDurosAPIServer) testEmbeddedByValue() {}
 
@@ -3233,6 +3265,42 @@ func _DurosAPI_GetTrustedHostSecret_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DurosAPI_EnableFederatedAuthentication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnableFederatedAuthenticationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).EnableFederatedAuthentication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_EnableFederatedAuthentication_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).EnableFederatedAuthentication(ctx, req.(*EnableFederatedAuthenticationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_DisableFederatedAuthentication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DisableFederatedAuthenticationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).DisableFederatedAuthentication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_DisableFederatedAuthentication_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).DisableFederatedAuthentication(ctx, req.(*DisableFederatedAuthenticationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DurosAPI_ServiceDesc is the grpc.ServiceDesc for DurosAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -3607,6 +3675,14 @@ var DurosAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTrustedHostSecret",
 			Handler:    _DurosAPI_GetTrustedHostSecret_Handler,
+		},
+		{
+			MethodName: "EnableFederatedAuthentication",
+			Handler:    _DurosAPI_EnableFederatedAuthentication_Handler,
+		},
+		{
+			MethodName: "DisableFederatedAuthentication",
+			Handler:    _DurosAPI_DisableFederatedAuthentication_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

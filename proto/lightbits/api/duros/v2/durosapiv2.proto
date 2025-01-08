@@ -1011,8 +1011,8 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Enable Cluster level encryption (Beta)";
-            description: "Enable data encryption for data at rest. Once enabled, each volume will be encrypted with a Data Encryption Key (DEK) which is in turn encrypted by a Key Encryption Key (KEK). Note: This feature is not readily available and offers only limited support for evaluative purposes. It cannot be disabled once activated and must not be enabled in production environments at this time.";
+            summary: "Enable Cluster level encryption";
+            description: "Enables cluster-level encryption. Once enabled, each volume will be encrypted with a Data Encryption Key (DEK), which is in turn encrypted by a Key Encryption Key (KEK). In the body, users can select the KeyStore type tpm or file. Note: cluster-encryption cannot be disabled once enabled.";
             tags: "encryption";
             responses: {
                 key: "500";
@@ -3035,7 +3035,7 @@ service DurosAPI {
                     description: "Unimplemented capability.";
                     schema: { json_schema: { type: INTEGER; } }
                 }
-            
+
             }
         };
     }
@@ -3045,8 +3045,8 @@ service DurosAPI {
             get: "/api/v2/cluster/clusterRootkey"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get cluster root encryption key (Mock).";
-            description: "Securely export the Cluster Level Encryption Key (KEK). As a security measure the exported key in the response will be encrypted. Note: This feature is not readily available and offers only limited support for evaluative purposes.";
+            summary: "Get cluster root encryption key.";
+            description: "Securely export the Cluster-Level Encryption Key (KEK). As a security measure, the exported key in the response will be encrypted.";
             tags: "encryption";
             responses: {
                 key: "401";
@@ -3072,7 +3072,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create an IdP configuration.";
-            description: "Create an IdP configuration.";
+            description: "Create a configuration for a remote Identity Provider (IdP) that may be used to authorize access to the Lighbits cluster. Currently only a single IdP configuration is supported.";
             tags: "idp configuration";
             responses: {
                 key: "400";
@@ -3130,7 +3130,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Idp configuration with the name is not found.";
+                    description: "IdP configuration with the specified name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3144,7 +3144,7 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update an IdP configuration.";
-            description: "Update an Idp configuration.";
+            description: "Update an IdP configuration.";
             tags: "idp configuration";
             responses: {
                 key: "400";
@@ -3170,7 +3170,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Idp configuration with the name is not found.";
+                    description: "IdP configuration with the specified name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3241,7 +3241,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Idp configuration with the name is not found.";
+                    description: "IdP configuration with the specified name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3437,8 +3437,8 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Create an authorisation map entry.";
-            description: "Create a map entry between a group/clientID and an access right (scope and role).";
+            summary: "Create an authorization map entry.";
+            description: "Create an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
             tags: "Auth map entry";
             responses: {
                 key: "400";
@@ -3470,8 +3470,8 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "update an authorisation map entry";
-            description: "Update an authorisation map entry between a group/clientID and an access right (scope and role).";
+            summary: "update an authorization map entry";
+            description: "Update an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
             tags: "Auth map entry";
             responses: {
                 key: "400";
@@ -3509,8 +3509,8 @@ service DurosAPI {
             delete: "/api/v2/cluster/authMaps/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Delete an authorisation map entry";
-            description: "Delete an authorisation map entry between a group/clientID and an access right (scope and role).";
+            summary: "Delete an authorization map entry";
+            description: "Delete an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
             tags: "Auth map entry.";
             responses: {
                 key: "400";
@@ -3548,8 +3548,8 @@ service DurosAPI {
             get: "/api/v2/cluster/authMaps/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get an authorisation map entry.";
-            description: "Get an authorisation map entry between a group/clientID and an access right (scope and role).";
+            summary: "Get an authorization map entry.";
+            description: "Get an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
             tags: "Auth map entry";
             responses: {
                 key: "400";
@@ -3587,8 +3587,8 @@ service DurosAPI {
             get: "/api/v2/cluster/authMaps"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "List all authorisation map entries.";
-            description: "List all map entries between a group/clientID (client-id/group-name) and an access right (scope and role).";
+            summary: "List all authorization map entries.";
+            description: "List all map entries between a clientID/claim/group and an access right (scope and role).";
             tags: "Auth map entry";
             responses: {
                 key: "400";
@@ -3931,7 +3931,73 @@ service DurosAPI {
         };
     }
 
+    rpc EnableFederatedAuthentication(EnableFederatedAuthenticationRequest) returns (EnableFederatedAuthenticationResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/federatedAuthentication/enable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Enable Federated Authentication.";
+            description: "Enable Federated Authentication.";
+            tags: "authentication";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find cluster.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    rpc DisableFederatedAuthentication(DisableFederatedAuthenticationRequest) returns (DisableFederatedAuthenticationResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/cluster/federatedAuthentication/disable"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Disable Federated Authentication.";
+            description: "Disable Federated Authentication.";
+            tags: "authentication";
+            responses: {
+                key: "401";
+                value: {
+                    description: "Unauthorized: authentication failed.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "403";
+                value: {
+                    description: "Permission denied.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+            responses: {
+                key: "404";
+                value: {
+                    description: "Failed to find cluster.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
 }
+
 
 message LogRequest {
     // Optional SkipStatistics
@@ -4300,7 +4366,7 @@ message CreateServerRequest {
     // Optional. When true, bypasses validation if given endpoint is used by another server
     bool reuseIP = 3;
     // extendCluster
-    // 
+    //
     // Optional. When true, the cluster is extended with new server and its resources, enabling new volumes placement on the server (nodes of this server will come up as active). Default is False (the nodes of this server will be added to cluster as unattached, and may be used to move over resources from an existing failed server using replace node api command).
     bool extendCluster = 4;
 }
@@ -4374,9 +4440,8 @@ message UpgradeClusterRequest {
 
 message EnableClusterEncryptionRequest {
     enum KeyStore {
-        unknown = 0;
+        file = 0;
         tpm = 1;
-        file = 2;
     }
     // KeyStore
     //
@@ -4422,8 +4487,7 @@ message ListEventsRequest {
     string projectName = 1;
     // nextToken
     //
-    // Optional. A string combination of timestamp and event ID.
-    // Used to determine the first event in the response list of events.
+    // Optional. Specifies the first event to return when using consecutive paginated requests. Use the nextToken returned in the response of the previous request as the indication for the first event new request should fetch. Usually, the value of nextToken is an event ID.
     string nextToken = 2;
     // since
     //
@@ -4568,18 +4632,32 @@ message UserNvmeDevicesResponse {
 
 message DurosNodeInfo {
     enum State {
+        // 0
+        //
         // reserved value, default should return error, rather than a true  state that is incorrect
         Unknown = 0;
+        // 1
+        //
         // node is completed join cluster flow
         Active = 1;
+        // 2
+        //
         // node is is the process of coming up (starting required services) and joining cluster
         Activating = 2;
+        // 3
+        //
         // node is is Inactive (this includes internal states Removing and failed)
         Inactive = 3;
+        // 4
+        //
         // node is not attached to cluster (none of cluster pgs contain this pg)
         Unattached = 4;
+        // 6
+        //
         // Attaching node to cluster ongoing (replacing old node in pgs with this node)
         Attaching = 6;
+        // 7
+        //
         // Detaching node from cluster ongoing (replacing this node in pgs with this a new node)
         Detaching = 7;
     }
@@ -4785,6 +4863,16 @@ message ClusterInfo {
     // Parameters of the last (or active) cluster upgrade process
     ClusterLastUpgrade lastUpgrade = 14;
     AuthenticationMode inBandAuthMode = 15;
+
+    // encryptionStatus
+    //
+    // Information about the state of Cluster Level Encryption
+    ClusterEncryptionStatus encryptionStatus = 16;
+
+    // federatedAuthenticationStatus
+    //
+    // Information about the state of Federated Authentication
+    FederatedAuthenticationStatus federatedAuthenticationStatus = 17;
 }
 
 message ClusterInfoV2 {
@@ -4839,7 +4927,9 @@ message ClusterInfoV2 {
     // Parameters of the last (or active) cluster upgrade process
     ClusterLastUpgrade lastUpgrade = 15;
 
-    // Encryption info
+    // encryptionStatus
+    //
+    // Information about the state of Cluster Level Encryption
     ClusterEncryptionStatus encryptionStatus = 16;
 }
 
@@ -5103,7 +5193,7 @@ message Server {
     bool IsWitness = 13;
 
     // LastEviction
-    // 
+    //
     // Parameters of the last (or active) server eviction process
     ServerEvictionStatus LastEviction = 14;
     // Server Health
@@ -5633,6 +5723,7 @@ message Event {
         NVMeSSD = 4;
         Server = 5;
         DataIntegrity = 6;
+        ClusterEncryption = 7;
     }
 
     enum EventReportingService {
@@ -5792,6 +5883,24 @@ message ClusterEncryptionStatus {
     google.protobuf.Timestamp kekUpdateDate = 3;
 }
 
+enum IdpHealthStatus {
+    IdpHealthStatus_Healthy = 0;
+    IdpHealthStatus_UnHealthy = 1;
+    IdpHealthStatus_Unknown = 2;
+}
+
+message IdpHealthInfo {
+    string serverName = 1;
+    IdpHealthStatus idpHealthStatus = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    string healthErrorMessage = 4;
+}
+
+message FederatedAuthenticationStatus {
+    bool federatedAuthenticationEnabled = 1;
+    repeated IdpHealthInfo idpHealthInfos = 2;
+}
+
 message RotateClusterRootKeyRequest {}
 
 message RotateClusterRootKeyResponse {}
@@ -5799,7 +5908,7 @@ message RotateClusterRootKeyResponse {}
 message GetClusterRootKeyRequest {
     // encryptingKeyGeneration
     //
-    // The Generation key you want to export.
+    // The Generation key you want to export, if not specified the latest key will be exported.
     uint64 encryptingKeyGeneration = 1;
     // userPublicKey
     //
@@ -5811,21 +5920,17 @@ message GetClusterRootKeyResponse {
     message KeyObject{
         // encryptedKey
         //
-        // Cluster Encryption key encrypted with the given public key
+        // Cluster Encryption key encrypted with the given public key.
         bytes encryptedKey = 1;
         // encryptingKeyGeneration
         //
-        // The Generation of the exported key
+        // The Generation of the exported key.
         uint64 encryptingKeyGeneration = 2;
     }
     // keys
     //
     // The object that includes each exported key and its generation.
-    repeated KeyObject keys = 1;
-    // clusterPublicKey
-    //
-    // The public key you should save in order to encrypt the key when you need to import it back to the cluster
-    bytes clusterPublicKey = 2;
+    KeyObject key = 1;
 }
 
 enum IDPType {
@@ -5836,88 +5941,75 @@ enum IDPType {
 // IDPConfiguration represents the configuration for the Identity Provider (IdP) in LB cluster.
 message IDPConfiguration {
     enum IDPConfigurationState {
+        // 0
+        //
+        // For internal use only.
         Unknown    = 0;
+        // 1
+        //
+        // The IdP configuration is being created.
         Creating   = 1;
+        // 2
+        //
+        // The IdP configuration is active.
         Active     = 2;
+        // 3
+        //
+        // The IdP configuration is being updated.
         Updating   = 3;
+        // 4
+        //
+        // Failed to create a new IdP configuration.
         Failed     = 4;
     }
 
-    // name
     //
-    // Represents the name of an entity.
+    // Unique name identyfing this IdP configuration.
     string name = 1;
-
-    // idpIssuerURL
     //
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
-
-    // state
     //
-    // Represents the state of the IdP configuration.
-    // This field is used to indicate the current state of the IdP configuration.
+    // The current state of the IdP configuration.
     IDPConfigurationState state = 3;
-
-    // Type
     //
-    // Represents the type of an IdP (Identity Provider).
-    // The IDPType enum is used to specify the type of an IdP.
+    // Type of an IdP (Identity Provider). currently only ADFS is supported.
     IDPType Type = 4;
-
-    // UUID
     //
-    // Represents the UUID of an entity.
+    // The UUID of this IdP configuration.
     string UUID = 5;
-
-    // ProxyInfo
     //
-    // Optional. Proxy server information for idp behind proxy.
+    // Optional. Proxy server information for an IdP that is accessed via proxy.
     ProxyInfo ProxyInfo = 6;
 }
 
 message CreateIDPConfigurationRequest {
-    // name
     //
-    // Represents the name of an entity.
+    // The unique name to assign to this IdP configuration.
     string name = 1;
-
-    // idpIssuerURL
     //
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
-
-    // Type
     //
-    // Represents the type of an IdP (Identity Provider).
-    // The IDPType enum is used to specify the type of an IdP.
+    // Type of an IdP (Identity Provider). currently only ADFS is supported.
     IDPType Type = 3;
-
-    // ProxyInfo
     //
-    // Optional. Proxy server information for idp behind proxy.
-    // Proxy support for IdP: currently only supports insecure access, Username and Password should not be used.
+    // Optional. Proxy server information for an IdP that is accessed via proxy.
     ProxyInfo ProxyInfo = 4;
 }
 
 message UpdateIDPConfigurationRequest {
-    // name
-    // Represents the name of an entity.
+    //
+    // Specify name of the IdP configuration to update.
     string name = 1;
-
-    // idpIssuerURL
+    // 
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
-
-    // Type
-    // Represents the type of an IdP (Identity Provider).
-    // The IDPType enum is used to specify the type of an IdP.
+    // 
+    // The type of an IdP (Identity Provider). currently only ADFS is supported
     IDPType Type = 3;
-
-    // ProxyInfo
     //
-    // Optional. Proxy server information for idp behind proxy.
-    // Proxy support for IdP: currently only supports insecure access, Username and Password should not be used.
+    // Optional. Proxy server information for an IdP that is accessed via proxy.
     ProxyInfo ProxyInfo = 4;
 
 }
@@ -5938,107 +6030,100 @@ message DeleteIDPConfigurationRequest {
 
 message DeleteIDPConfigurationResponse {}
 
-// idp-client-configuration represents a configuration for idp-client
-// in LB cluster.
-message IdpClientConf {
-    // UUID
+// idp-client-configuration represents a configuration of an client specific IdP entry in LB cluster.
+// Lighbits cluster supports IdP client configurations with three types of authorization modes:
+// App, User, and Converge.
+// App authorization mode should be used when Lightbit should map a specific client to a scope and role.
+// User authorization mode should be used when Lightbits should map according to both the client ID and a specific claim in the JWT.
+// Converge mode is used when Lightbits should map only according to the claim in the JWT. In this mode the client ID is ignored.
+// Only a single such entry may be created for each IdP configuration. Lightbits API service would first attempt to check for a
+// dedicated IdP client configuration using this client ID. falling back to to an optional converge entry only if no direct client specific
+// entry is found.
+ message IdpClientConf {
     //
-    // the UUID of the idp-client-config entry.
+    // The UUID of the idp-client-config entry.
     string UUID = 1;
-
-    // name
     //
-    // a unique name for the idp-client-conf.
+    // A unique name of the idp-client-conf.
     string name = 2;
-
     // clientId
     //
-    // unique client ID identifier registered in the IdP to identify a
-    // specific application (or a client) that wants to access resources
-    // from Lightbits cluster.
+    // A unique client ID identifier registered in the IdP to identify a
+    //  specific application (or a client) that wants to access resources
+    //  from Lightbits cluster.
+    //  When using converge authorization mode, this field must be configured to:
+    //  NOT_APPLICABLE.
     string clientId = 3;
-
-    // idpConfName
     //
-    // a reference to the IdP configuration that will use this this client
-    // configuration.
+    // A reference to the IdP configuration that will use this client
+    //  configuration.
     string idpConfName = 4;
-
-    // userClaimName
     //
-    // when working in user authorization mode, the user claim name specifies
-    // the name of the field in JWT claim from which to extract the identifier
-    // value from.
-    // Note, this field is only required when authzMode=user.
-    string userClaimName = 5;
-
+    // When working in user authorization/converge mode, the claim name specifies
+    //  the name of the field in JWT claim from which to extract the identifier
+    //  value from.
+    //  Note, this field is only required when authzMode is user or converge.
+    string claimName = 5;
     // authzMode
     //
-    // the authorization mode determines whether it's a user authorization or
-    // application authorization.
+    // The authorization mode will determine what info from access JWT
+    //  will be mapped to matching scope/role in Lightbits cluster.  
+    //  The autherization mode can be one of the following:
+    //  user, app, converge.
     AuthorizationMode authzMode = 6;
 }
 
 message CreateIdpClientConfRequest {
-    // name
     //
-    // a unique name for the idp-client-conf.
+    // A unique name of the idp-client-conf.
     string name = 1;
-
     // clientId
     //
-    // unique client ID identifier registered in the IdP to identify a
-    // specific application (or a client) that wants to access resources
-    // from Lightbits cluster.
+    // A unique client ID identifier registered in the IdP to identify a
+    //  specific application (or a client) that wants to access resources
+    //  from Lightbits cluster.
+    //  When using converge authorization mode, this field must be configured to:
+    //  NOT_APPLICABLE.
     string clientId = 2;
-
-    // idpConfName
     //
-    // a reference to the IdP configuration that will use this this client
-    // configuration.
+    // A reference to the IdP configuration that will use this client
+    //  configuration.
     string idpConfName = 3;
-
-    // userClaimName
     //
-    // when working in user authorization mode, the user claim name specifies
-    // the name of the field in JWT claim from which to extract the identifier
-    // value from.
-    // Note, this field is only required when authzMode=user.
-    string userClaimName = 4;
-
-    // authzMode
+    // When working in user authorization/converge mode, the claim name specifies
+    //  the name of the field in JWT claim from which to extract the identifier
+    //  value from.
+    //  Note, this field is only required when authzMode is user or converge.
+    string claimName = 4;
     //
-    // the authorization mode determines whether it's a user authorization or
-    // application authorization.
+    // The authorization mode will determine what info from access JWT
+    //  will be mapped to matching scope/role in Lightbits cluster.  
+    //  The autherization mode can be one of the following:
+    //  user, app, converge.
     AuthorizationMode authzMode = 5;
 }
 
 message UpdateIdpClientConfRequest {
-    // name
     //
-    // the name of the idp-client-conf to update.
+    // The name of the idp-client-conf to update.
     string name = 1;
-
-    // userClaimName
     //
-    // when working in user authorization mode, the user claim name specifies
-    // the name of the field in JWT claim from which to extract the identifier
-    // value from.
-    // Note, this field is only required when authzMode=user.
-    string userClaimName = 2;
+    // When working in user authorization/converge mode, the claim name specifies
+    //  the name of the field in JWT claim from which to extract the identifier
+    //  value from.
+    //  Note, this field is only required when authzMode is user or converge.
+    string claimName = 2;
 }
 
 message GetIdpClientConfRequest {
-    // name
     //
-    // the name of the idp-client-conf to get.
+    // The name of the idp-client-conf to get.
     string name = 1;
 }
 
 message DeleteIdpClientConfRequest {
-    // name
     //
-    // the name of the idp-client-conf to get.
+    // The name of the idp-client-conf to delete.
     string name = 1;
 }
 
@@ -6051,118 +6136,82 @@ message ListIdpClientConfsResponse{
 }
 
 message AuthMapEntry {
-    enum StateEnum {
-        Unknown = 0;
-        Creating = 1;
-        Available = 2;
-        Deleting = 3;
-        Updating = 4;
-        Failed = 5;
-    }
-
-    // State
-    // AuthMapEntry state
-    StateEnum state = 1;
-
-    // UUID
+    reserved "state";
+    reserved 1;
+    // 
     // AuthMapEntry UUID
     string UUID = 2;
-
-    // Name
-    // Name of specific authorisation mapping entry.
+    // 
+    // Name of specific authorization mapping entry.
     string name = 3;
-
-    // Identifier
-    // Identifier to map application or group to Lightbits scope/role
-    // when using authMode=app this field should specify an identifier
-    // of the clientID of the relevant application. if using authMode=user
-    // this should specify a group name.
+    // 
+    // Identifier to map application or clientID/claim/group to Lightbits scope/role.
+    //  This should either have the clientID of the relevant application (app mode) or
+    //  an identifier of a specific claim/group exctracted from the field specified by claimName
+    //  (user or converge modes).
     string identifier = 4;
-
-    // Scope
-    // Represents the scope of the group in lightbits cluster.
+    // 
+    // Represents the scope assgined to this client/claim/group  in Lightbits cluster.
     string scope = 5;
-
-    // Role
-    // Represents the role of the group in lightbits cluster.
+    // 
+    // Represents the role assgined to this client/claim/group in Lightbits cluster.
     string role = 6;
-
-    // AuthorizationMode
-    // Represents the authorisation mode for the clientID
-    AuthorizationMode authzMode = 7;
-
-    // idpConfigurationName
-    // idp configuration that is associated with this authorisation map entry.
-    string idpConfigurationName = 8;
+    // 
+    // IdP configuration that is associated with this authorization map entry.
+    string idpConfigurationName = 7;
 }
 
 message CreateAuthMapEntryRequest {
-    // Name
-    // Name of specific authorisation mapping entry.
+    // 
+    // Name of specific authorization mapping entry.
     string name = 1;
-
-    // Identifier
-    // Identifier to map application or group to Lightbits scope/role
-    // when using authMode=app this field should specify an identifier
-    // of the clientID of the relevant application. if using authMode=user
-    // this should specify a group name.
+    // 
+    // Identifier to map application or clientID/claim/group to Lightbits scope/role.
+    //  This should either have the clientID of the relevant application (app mode) or
+    //  an identifier of a specific claim/group exctracted from the field specified by claimName
+    //  (user or converge modes).
     string identifier = 2;
-
-    // scope
-    // Represents the scope of the group in lightbits cluster.
+    // 
+    // Represents the scope assgined to this client/claim/group  in Lightbits cluster.
     string scope = 3;
-
-    // role
-    // Represents the role of the group in lightbits cluster.
+    // 
+    // Represents the role assgined to this client/claim/group in Lightbits cluster.
     string role = 4;
-
-    // AuthorizationMode
-    // Represents the authorisation mode for the clientID
-    AuthorizationMode authzMode = 5;
-
-    // idpConfigurationName
-    // idp configuration that is associated with this authorisation map entry.
-    string idpConfigurationName = 6;
+    // 
+    // Idp configuration that is associated with this authorization map entry.
+    string idpConfigurationName = 5;
 }
 
 message UpdateAuthMapEntryRequest {
-    // name
-    // Name of specific authorisation mapping entry.
+    // 
+    // Name of specific authorization mapping entry.
     string name = 1;
-
-    // scope
-    // Represents the scope of the group in lightbits cluster.
+    // 
+    // Represents the scope assgined to this client/claim/group  in Lightbits cluster.
     string scope = 2;
-
-    // role
-    // Represents the role of the group in lightbits cluster.
+    // 
+    // Represents the role assgined to this client/claim/group in Lightbits cluster.
     string role = 3;
-
-    // AuthorizationMode
-    // Represents the authorisation mode for the clientID
-    AuthorizationMode authzMode = 4;
-
-    // Identifier
-    // Identifier to map application or group to Lightbits scope/role
-    // when using authMode=app this field should specify an identifier
-    // of the clientID of the relevant application. if using authMode=user
-    // this should specify a group name.
-    string identifier = 5;
-
-    // idpConfigurationName
-    // idp configuration that is associated with this authorisation map entry.
-    string idpConfigurationName = 6;
+    // 
+    // Identifier to map application or claim/group to Lightbits scope/role.
+    //  This should either have the clientID of the relevant application (app mode) or
+    //  an identifier of a specific claim/group exctracted from the field specified by claimName
+    //  (user or converge modes).
+    string identifier = 4;
+    // 
+    // IdP configuration that is associated with this authorization map entry.
+    string idpConfigurationName = 5;
 }
 
 message DeleteAuthMapEntryRequest {
-    // name
-    // Name of specific authorisation mapping entry.
+    // 
+    // Name of specific authorization mapping entry.
     string name = 1;
 }
 
 message GetAuthMapEntryRequest {
-    // name
-    // Name of specific authorisation mapping entry.
+    // 
+    // Name of specific authorization mapping entry.
     string name = 1;
 }
 
@@ -6172,4 +6221,21 @@ message DeleteAuthMapEntryResponse {}
 
 message ListAuthMapEntriesResponse {
     repeated AuthMapEntry AuthMapEntries = 1;
+}
+
+message EnableFederatedAuthenticationRequest {}
+
+message EnableFederatedAuthenticationResponse {}
+
+message DisableFederatedAuthenticationRequest {}
+
+message DisableFederatedAuthenticationResponse {}
+
+enum fedAuthState {
+    FederatedAuthenticationDisabled = 0;
+    FederatedAuthenticationEnabled = 1;
+}
+
+message GetFederatedAuthenticationStatusResponse {
+    fedAuthState federatedAuthenticationState = 1;
 }
