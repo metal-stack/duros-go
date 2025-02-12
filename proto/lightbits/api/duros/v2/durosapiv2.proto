@@ -7,6 +7,7 @@ option go_package = "duros/v2;v2";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/api/httpbody.proto";
 import "grpc/gateway/protoc_gen_swagger/options/annotations.proto";
 import "lightbits/api/duros/v2/statisticsapiv2.proto";
@@ -24,6 +25,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Product Version.";
             description: "Get product version information.";
+            tags: "Cluster operations";
         };
     }
 
@@ -39,18 +41,18 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create volume.";
             description: "A volume has a user defined name, capacity and a string-based Access Control List (ACL).\nUser can also select to enable compression and define IP-ACL (IP address-based control list).";
-            tags: "create volume";
+            tags: "Volume operations";
             responses: {
                 key: "409";
                 value: {
-                    description: "Resource with the provided name already exists.";
+                    description: "A volume with the provided name already exists.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "400";
                 value: {
-                    description: "Provided invalid argument with one of the following reasons: \nmandatory argument is missing, \nname contains illegal characters, \nsize is not a positive integer, \nreplica count is outside of a valid range, \nACL or IP-ACL is invalid.";
+                    description: "An invalid argument was provided, due to one of the following reasons: \n a mandatory argument is missing, \n name contains illegal characters, \n size is not a positive integer, \n replica count is outside of a valid range, \n ACL or IP-ACL are invalid.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -87,19 +89,19 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete volume.";
-            description: "Deletes volume with provided UUID.\nDeletion of volume is a long operation. The status of deletion can be queried by GET operation on the volume. As long as the operation runs volume state is Deleting. When operation completed GET volume returns NotFound error response";
-            tags: "delete volume";
+            description: "Deletes a according to provided UUID or Name.\nDeletion of volume is a long operation. The status of deletion can be queried by GET operation on the volume. As long as the operation runs volume state is Deleting. Once the operation has completed GET volume will return NotFound error response.";
+            tags: "Volume operations";
             responses: {
                 key: "404";
                 value: {
-                    description: "Volume with provided UUID is not found.";
+                    description: "Volume with provided UUID or Name is not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "400";
                 value: {
-                    description: "Provided invalid UUID or a volume state does not allow deletion (Deleting/Failed).";
+                    description: "Provided invalid UUID, Name or a volume state does not allow deletion (Deleting/Failed).";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -113,7 +115,7 @@ service DurosAPI {
             responses: {
                 key: "503";
                 value: {
-                    description: "Volume is in a temporal state that does not allow deletion currently (Creating/Updating).";
+                    description: "Volume is in a temporary state that does not allow deletion currently (Creating/Updating).";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -158,7 +160,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List volumes.";
             description: "List can be filtered by failure domain. List can be partially returned by given offset UUID and size of the list. If offset is not provided, list is returned from the start. If offset UUID is provided, list starts from the next volume after the provided offset UUID. If limit is provided, length of the returned list is bounded by the limit. If limit is not provided, list is returned until the end. projectName is mandatory unless you are the admin. List can also be filtered by a specific source snapshot.";
-            tags: "list volume";
+            tags: "Volume operations";
             responses: {
                 key: "400";
                 value: {
@@ -198,9 +200,9 @@ service DurosAPI {
             }
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get all Lightbits events from cluster";
-            description:  "API to pull the events from the aggregated cluster event log";
-            tags: "list events";
+            summary: "Get all Lightbits events from cluster.";
+            description:  "API to pull the events from the aggregated cluster event log.";
+            tags: "Cluster operations";
             responses: {
                 key: "500";
                 value: {
@@ -232,7 +234,7 @@ service DurosAPI {
             responses: {
                 key: "501";
                 value: {
-                    description: "Unimplemented capability.";
+                    description: "Unimplemented capability. Specify only a single parameter to filter events: componentType, ProjectName or Severity.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -253,7 +255,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get connected host information.";
             description: "Get connected host information given by hostNQN.";
-            tags: "get connected host";
+            tags: "Host operations";
             responses: {
                 key: "500";
                 value: {
@@ -291,8 +293,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get list of connected hosts.";
-            description: "List can be filtered by volume UUID.";
-            tags: "get connected host";
+            description: "List all hosts connected to cluster or only connected hosts associated with a volume.";
+            tags: "Host operations";
             responses: {
                 key: "500";
                 value: {
@@ -339,9 +341,9 @@ service DurosAPI {
             }
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get volume information";
+            summary: "Get volume information.";
             description: "Get volume information by provided UUID";
-            tags: "get volume";
+            tags: "Volume operations";
             responses: {
                 key: "400";
                 value: {
@@ -386,8 +388,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get list of nodes.";
-            description: "A request to List Nodes is exposed via this API. An option to filter is done by the following parameters: 1. Name - e.g.  api/v2/nodes?Name=<Name> 2. UUID - e.g.  api/v2/nodes?UUID=<UUID> 3. FailureDomain - e.g.  api/v2/nodes?FailureDomain=<FailureDomain>";
-            tags: "list nodes";
+            description: "List Nodes. An option to filter is done by the following parameters: 1. Name - e.g.  api/v2/nodes?Name=<Name> 2. UUID - e.g.  api/v2/nodes?UUID=<UUID> 3. FailureDomain - e.g.  api/v2/nodes?FailureDomain=<FailureDomain>";
+            tags: "Node operations";
             responses: {
                 key: "400";
                 value: {
@@ -426,7 +428,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get node information.";
             description: "Get node information identified by UUID of the node";
-            tags: "node";
+            tags: "Node operations";
             responses: {
                 key: "404";
                 value: {
@@ -463,9 +465,9 @@ service DurosAPI {
             get: "/api/v2/nvmeDevices"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Retrieve list of NVMe devices with filtering option.";
-            description: "A request to list NVMe devices is exposed via this API. The list of NVMe devices can be filtered by the following parameters:  1. ServerUUID - e.g.  api/v2/nvmeDevices?ServerUUID=<UUID> 2. NodeUUID - e.g.  api/v2/nvmeDevices?NodeUUID=<UUID>";
-            tags: "node";
+            summary: "Retrieve list of NVMe devices, with optional filtering selections.";
+            description: "A request to list NVMe devices is exposed via this API. The list of NVMe devices can be filtered by the following parameters:  1. ServerUUID - e.g.  api/v2/nvmeDevices?ServerUUID=<UUID> 2. NodeUUID - e.g.  api/v2/nvmeDevices?NodeUUID=<UUID>.";
+            tags: "NVMe device operations";
             responses: {
                 key: "500";
                 value: {
@@ -495,9 +497,9 @@ service DurosAPI {
             get: "/api/v2/nvmeDevices/{Serial}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Retrieve a specific NVMe device with filtering option";
-            description: "Request NVMe device info by serial. Example usage: api/v2/nvmeDevices/15eb21c0-35ae-478d-b";
-            tags: "get nvme-device";
+            summary: "Retrieve a specific NVMe device with filtering option.";
+            description: "Request NVMe device info by serial. Example usage: api/v2/nvmeDevices/15eb21c0-35ae-478d-b.";
+            tags: "NVMe device operations";
             responses: {
                 key: "500";
                 value: {
@@ -536,7 +538,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Retrieve server logs and other information.";
             description: "Retrieve tarball file, generated by internal Lightbits script, that will contain server information and logs.";
-            tags: "fetch logs";
+            tags: "Cluster operations";
             responses: {
                 key: "500";
                 value: {
@@ -568,7 +570,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Retrieve cluster information.";
             description: "Cluster information, e.g. cluster UUID and SubsystemNQN is exposed via this API.";
-            tags: "get cluster";
+            tags: "Cluster operations";
             responses: {
                 key: "500";
                 value: {
@@ -600,7 +602,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Retrieve cluster information.";
             description: "Cluster information for tenants, e.g. cluster UUID and SubsystemNQN is exposed via this API.";
-            tags: "get cluster";
+            tags: "Cluster operations";
             responses: {
                 key: "500";
                 value: {
@@ -632,8 +634,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update NVMe device on a node.";
-            description: "Update NVMe device defined by serial number on a node defined by node UUID.";
-            tags: "node";
+            description: "Update NVMe device defined by serial number on a server defined by server UUID.";
+            tags: "NVMe device operations";
             responses: {
                 key: "500";
                 value: {
@@ -644,14 +646,14 @@ service DurosAPI {
             responses: {
                 key: "400";
                 value: {
-                    description: "Empty serial or empty node uuid is provided or device is already attached to another node or number of node's managed devices reached maximum or node is not listed as server's node for the server that device belongs to or node isn't active.";
+                    description: "Empty serial or empty server uuid is provided or device is already attached to another node or number of node's managed devices reached maximum or node is not listed as server's node for the server that device belongs to or node isn't active.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "404";
                 value: {
-                    description: "Serial or node uuid not found.";
+                    description: "Serial or server uuid not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -665,7 +667,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the device";
+                    description: "There is a user operation in progress on the device.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -694,7 +696,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Add NVMe device to a node.";
             description: "Add NVMe device defined by serial number to a node defined by node UUID. If NVMe device is already used by another node, or cannot be attached to the node, the command fails.";
-            tags: "node";
+            tags: "NVMe device operations";
             responses: {
                 key: "500";
                 value: {
@@ -757,9 +759,9 @@ service DurosAPI {
             }
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            description: "Update volume enable the change of the following attributes:\nACL list\nIP-ACL list.";
+            description: "Update volume enable the change of the following attributes:\n size\n compression\n ACL list\n IP-ACL list\n QoS\n labels.";
             summary: "Update volume.";
-            tags: "echo rpc";
+            tags: "Volume operations";
             responses: {
                 key: "404";
                 value: {
@@ -770,7 +772,7 @@ service DurosAPI {
             responses: {
                 key: "503";
                 value: {
-                    description: "Volume is in temporal state and cannot be updated now (Creating/Updating).";
+                    description: "Volume is in temporary state and cannot be updated now (Creating/Updating).";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -805,7 +807,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the volume";
+                    description: "There is a user operation in progress on the volume.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -831,9 +833,9 @@ service DurosAPI {
             get: "/api/v2/servers/{UUID}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Retrieve a specific server info based on UUID";
+            summary: "Retrieve a specific server info based on UUID.";
             description: "Request server info identified by UUID.";
-            tags: "server";
+            tags: "Server operations";
             responses: {
                 key: "404";
                 value: {
@@ -870,9 +872,9 @@ service DurosAPI {
             get: "/api/v2/servers"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            description: "Retrieve servers list with filtering option.";
-            summary: "A request to list servers is exposed via this API. The results can be filtered by supplying the following filters: 1. Name - e.g.  /api/v2/servers?Name=<Name> 2. UUID - e.g.  /api/v2/servers?UUID=<UUID>";
-            tags: "list servers";
+            summary: "Retrieve servers list with optional filtering parameters.";
+            description: "A request to list servers is exposed via this API. The results can be filtered by supplying the following filters: 1. Name - e.g.  /api/v2/servers?Name=<Name> 2. UUID - e.g.  /api/v2/servers?UUID=<UUID>.";
+            tags: "Server operations";
             responses: {
                 key: "500";
                 value: {
@@ -905,7 +907,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Upgrade server.";
             description: "Upgrades server given by UUID with a package pointed by URI. Since upgrade is a long operation, the status of the upgrade shall be fetched from server object";
-            tags: "upgrade";
+            tags: "Upgrade operations";
             responses: {
                 key: "404";
                 value: {
@@ -937,7 +939,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the server";
+                    description: "There is a user operation in progress on the server.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -965,12 +967,12 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Upgrade cluster.";
-            description: "Upgrades servers in the cluster one by one. Only servers that do not cause loss of service are upgraded. Since upgrade is a long operation, the status of the upgrade shall be fetched from server object";
-            tags: "upgrade";
+            description: "Upgrades servers in the cluster one by one. Only servers that do not cause loss of service are upgraded. Since upgrade is a long operation, the status of the upgrade shall be fetched from server object.";
+            tags: "Upgrade operations";
             responses: {
                 key: "404";
                 value: {
-                    description: "One of the provided UUIDs is not found";
+                    description: "One of the provided UUIDs is not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1011,9 +1013,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Enable Cluster level encryption";
+            summary: "Enable Cluster level encryption.";
             description: "Enables cluster-level encryption. Once enabled, each volume will be encrypted with a Data Encryption Key (DEK), which is in turn encrypted by a Key Encryption Key (KEK). In the body, users can select the KeyStore type tpm or file. Note: cluster-encryption cannot be disabled once enabled.";
-            tags: "encryption";
+            tags: "Encryption operations";
             responses: {
                 key: "500";
                 value: {
@@ -1059,8 +1061,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create Server.";
-            description: "A request to create a new server.  The requires parameters in the body are:  1. serverEndpoints - url list of the new server ip addresses as well as etcd ports for peer communication e.g: http://10.0.0.1:2380";
-            tags: "upgrade";
+            description: "A request to create a new server.  The requires parameters in the body are:  1. serverEndpoints - url list of the new server ip addresses as well as etcd ports for peer communication e.g: http://10.0.0.1:2380.";
+            tags: "Server operations";
             responses: {
                 key: "500";
                 value: {
@@ -1106,8 +1108,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Replace Node.";
-            description: "The request is identified by the UUID of the replaced node (referred as SrcNodeUUID).\nThe required parameters in the body are:\n1. TargetNodeUUID - the UUID of the target node that replaces the src Node. The command shall succeed only if srcNode is Inactive, and targetNode is Unattached. So user shall disable the server of the srcNode (that will make the node Inactive), and assure that targetNode is Unattached (possibly as a new node without assigned PGs or by replacing its PG to another node)";
-            tags: "replace node";
+            description: "The request is identified by the UUID of the replaced node (referred as SrcNodeUUID).\nThe required parameters in the body are:\n1. TargetNodeUUID - the UUID of the target node that replaces the src Node. The command shall succeed only if srcNode is Inactive, and targetNode is Unattached. So user shall disable the server of the srcNode (that will make the node Inactive), and assure that targetNode is Unattached (possibly as a new node without assigned PGs or by replacing its PG to another node).";
+            tags: "Node operations";
             responses: {
                 key: "400";
                 value: {
@@ -1139,7 +1141,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on one of the nodes";
+                    description: "There is a user operation in progress on one of the nodes.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1173,8 +1175,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete Server.";
-            description: "A request to delete a server. This operation makes the system to delete information of a server with given UUID. The required parameters in the body are:  1. UUID - UUID of the server to delete";
-            tags: "delete server";
+            description: "A request to delete a server. This operation makes the system to delete information of a server with given UUID. The required parameters in the body are:  1. UUID - UUID of the server to delete.";
+            tags: "Server operations";
             responses: {
                 key: "404";
                 value: {
@@ -1206,7 +1208,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the server";
+                    description: "There is a user operation in progress on the server.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1233,9 +1235,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Enable Server";
+            summary: "Enable Server.";
             description: "Enable a disabled server. Enabling a server causes the server nodes to synchronize with their peers and rebuild the replicas they hold.";
-            tags: "server";
+            tags: "Server operations";
             responses: {
                 key: "404";
                 value: {
@@ -1267,7 +1269,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the server";
+                    description: "There is a user operation in progress on the server.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1296,7 +1298,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Disable server.";
             description: "Server is disabled from the cluster. Server nodes become Inactive and do not participate in data protection. If the 'evict' parameter is True, all data on the server is evicted from the server before it is disabled. Once a server is disabled it can be enabled and added back to the cluster or removed from the cluster completely.";
-            tags: "echo rpc";
+            tags: "Server operations";
             responses: {
                 key: "404";
                 value: {
@@ -1321,7 +1323,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the server";
+                    description: "There is a user operation in progress on the server.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1351,7 +1353,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create project.";
             description: "A project has a name, a description, and a default qos rate limit policy.";
-            tags: "create project";
+            tags: "Project operations";
             responses: {
                 key: "409";
                 value: {
@@ -1398,7 +1400,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update Project Default Policy.";
             description: "Update project's default resource policy.";
-            tags: "update project default policy";
+            tags: "Project operations";
             responses: {
                 key: "400";
                 value: {
@@ -1437,7 +1439,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete project.";
             description: "Deletes project with provided name.";
-            tags: "delete project";
+            tags: "Project operations";
             responses: {
                 key: "404";
                 value: {
@@ -1489,8 +1491,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List projects.";
-            description: "list all projects";
-            tags: "list projects";
+            description: "list all projects.";
+            tags: "Project operations";
             responses: {
                 key: "400";
                 value: {
@@ -1527,9 +1529,9 @@ service DurosAPI {
             get: "/api/v2/projects/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get project";
+            summary: "Get project.";
             description: "Get project by name";
-            tags: "get project";
+            tags: "Project operations";
             responses: {
                 key: "400";
                 value: {
@@ -1576,7 +1578,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create credential.";
             description: "A credential has a name and description.";
-            tags: "create credential";
+            tags: "Access control operations";
             responses: {
                 key: "409";
                 value: {
@@ -1622,7 +1624,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete credential.";
             description: "Deletes credential with provided ID.";
-            tags: "delete credential";
+            tags: "Access control operations";
             responses: {
                 key: "404";
                 value: {
@@ -1674,8 +1676,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List credentials.";
-            description: "TODO";
-            tags: "list credentials";
+            description: "List credentials.";
+            tags: "Access control operations";
             responses: {
                 key: "400";
                 value: {
@@ -1712,9 +1714,9 @@ service DurosAPI {
             get: "/api/v2/projects/{projectName}/credentials/{ID}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get credential";
-            description: "Get credential by ID";
-            tags: "get credential";
+            summary: "Get credential.";
+            description: "Get credential by ID.";
+            tags: "Access control operations";
             responses: {
                 key: "400";
                 value: {
@@ -1758,9 +1760,9 @@ service DurosAPI {
 	     get: "/api/v2/projects/{projectName}/roles/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get role";
-            description: "Get role by name";
-            tags: "get role";
+            summary: "Get role.";
+            description: "Get role by name.";
+            tags: "Access control operations";
             responses: {
                 key: "400";
                 value: {
@@ -1805,8 +1807,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List all roles defined in a project.";
-            description: "TODO";
-            tags: "list roles";
+            description: "List roles";
+            tags: "Access control operations";
             responses: {
                 key: "400";
                 value: {
@@ -1844,20 +1846,20 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Create admin endpoint";
-            description: "Allow access to specified port for all specified IPs";
-            tags: "create admin endpoint";
+            summary: "Create admin endpoint.";
+            description: "Allow access to specified port for all specified IPs.";
+            tags: "Admin endpoint operations";
             responses: {
                 key: "409";
                 value: {
-                    description: "Port already exists";
+                    description: "Port already exists.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "400";
                 value: {
-                    description: "Port is invalid";
+                    description: "Port is invalid.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1890,20 +1892,20 @@ service DurosAPI {
             delete: "/api/v2/adminEndpoints/{port}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Delete admin endpoint";
-            description: "Delete endpoint corresponding to specified port";
-            tags: "delete admin endpoint";
+            summary: "Delete admin endpoint.";
+            description: "Delete endpoint corresponding to specified port.";
+            tags: "Admin endpoint operations";
             responses: {
                 key: "400";
                 value: {
-                    description: "Port is invalid";
+                    description: "Port is invalid.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "404";
                 value: {
-                    description: "Port does not have a corresponding endpoint";
+                    description: "Port does not have a corresponding endpoint.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1917,7 +1919,7 @@ service DurosAPI {
             responses: {
                 key: "503";
                 value: {
-                    description: "Temporal state that does not allow deletion currently (Creating/Updating).";
+                    description: "Temporary state that does not allow deletion currently (Creating/Updating).";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1931,7 +1933,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the port";
+                    description: "There is a user operation in progress on the port.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -1958,9 +1960,9 @@ service DurosAPI {
             get: "/api/v2/adminEndpoints"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "List admin endpoints";
-            description: "List can be filtered by port";
-            tags: "list admin endpoint";
+            summary: "List admin endpoints.";
+            description: "List can be filtered by port.";
+            tags: "Admin endpoint operations";
             responses: {
                 key: "400";
                 value: {
@@ -1999,27 +2001,27 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Update admin endpoint";
-            description: "Update list of ips that may access the specified port";
-            tags: "update admin endpoint";
+            summary: "Update admin endpoint.";
+            description: "Update list of ips that may access the specified port.";
+            tags: "Admin endpoint operations";
             responses: {
                 key: "400";
                 value: {
-                    description: "Port is invalid";
+                    description: "Port is invalid.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "404";
                 value: {
-                    description: "Port does not have a corresponding endpoint";
+                    description: "Port does not have a corresponding endpoint.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "503";
                 value: {
-                    description: "Temporal state and cannot be updated now (Creating/Updating).";
+                    description: "Temporary state and cannot be updated now (Creating/Updating).";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2040,7 +2042,7 @@ service DurosAPI {
             responses: {
                 key: "409";
                 value: {
-                    description: "There is a user operation in progress on the port";
+                    description: "There is a user operation in progress on the port.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2066,20 +2068,20 @@ service DurosAPI {
             get: "/api/v2/adminEndpoints/{port}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get admin endpoint";
-            description: "Get an endpoint corresponding to specified port";
-            tags: "get admin endpoint";
+            summary: "Get admin endpoint.";
+            description: "Get an endpoint corresponding to specified port.";
+            tags: "Admin endpoint operations";
             responses: {
                 key: "400";
                 value: {
-                    description: "Port is invalid";
+                    description: "Port is invalid.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
             responses: {
                 key: "404";
                 value: {
-                    description: "Port does not have a corresponding endpoint";
+                    description: "Port does not have a corresponding endpoint.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2114,8 +2116,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create a resource policy.";
-            description: "A resource policy";
-            tags: "create resource policy";
+            description: "A resource policy.";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2155,7 +2157,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create a policy.";
             description: "A policy is a set of user-defined rules that should be applied to one or more objects in the system.";
-            tags: "create policy";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2196,7 +2198,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update a policy.";
             description: "Updates user pre-defined policy by overriding the existing properties with the given arguments.";
-            tags: "update policy";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2229,7 +2231,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update a resource policy.";
             description: "update resource policy enable the change of the following attributes:\nretentionTime \nschedulePolicy \ndescription";
-            tags: "update resource policy";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2260,8 +2262,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get policy.";
-            description: "A request to get policy by either name or UUID";
-            tags: "get policy";
+            description: "A request to get policy by either name or UUID.";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2292,8 +2294,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List policies.";
-            description: "A request to list policies. The result can be filtered by either name or UUID";
-            tags: "list policies";
+            description: "A request to list policies. The result can be filtered by either name or UUID.";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2324,8 +2326,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List resource policies.";
-            description: "A request to list resource policies. The result can be filtered by either name or UUID";
-            tags: "list resource policies";
+            description: "A request to list resource policies. The result can be filtered by either name or UUID.";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2357,7 +2359,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get resource policy.";
             description: "Get resource policy information by provided UUID/name";
-            tags: "get resource policy";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2388,8 +2390,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete resource policy.";
-            description: "Delete resource policy information by provided UUID/name";
-            tags: "delete resource policy";
+            description: "Delete resource policy information by provided UUID/name.";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2420,8 +2422,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete policy.";
-            description: "Delete policy information by provided policy UUID";
-            tags: "delete policy";
+            description: "Delete policy information by provided policy UUID.";
+            tags: "Policy operations";
             responses: {
                 key: "400";
                 value: {
@@ -2453,8 +2455,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create snapshot.";
-            description: "A snapshot created from a volume";
-            tags: "create snapshot";
+            description: "Create a snapshot from a volume.";
+            tags: "Snapshot operations";
             responses: {
                 key: "400";
                 value: {
@@ -2514,7 +2516,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get snapshot.";
             description: "Get snapshot by UUID/Name.";
-            tags: "get snapshot";
+            tags: "Snapshot operations";
             responses: {
                 key: "400";
                 value: {
@@ -2560,7 +2562,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List snapshots.";
             description: "List can be filtered by UUID/Name.";
-            tags: "list snapshot";
+            tags: "Snapshot operations";
             responses: {
                 key: "400";
                 value: {
@@ -2598,8 +2600,8 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete snapshot.";
-            description: "Deletes snapshot with provided UUID.\nDeletion of a snapshot is a long operation. The status of deletion can be queried by GET operation on the snapshot. As long as the operation runs snapshot state is Deleting. When operation completed GET snapshot returns NotFound error response";
-            tags: "delete snapshot";
+            description: "Deletes snapshot with provided UUID.\nDeletion of a snapshot is a long operation. The status of deletion can be queried by GET operation on the snapshot. As long as the operation runs snapshot state is Deleting. When operation completed GET snapshot returns NotFound error response.";
+            tags: "Snapshot operations";
             responses: {
                 key: "404";
                 value: {
@@ -2624,7 +2626,7 @@ service DurosAPI {
             responses: {
                 key: "503";
                 value: {
-                    description: "Snapshot is in a temporal state that does not allow deletion currently (Creating/Updating and volume Updating).";
+                    description: "Snapshot is in a temporary state that does not allow deletion currently (Creating/Updating and volume Updating).";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -2650,9 +2652,9 @@ service DurosAPI {
             get: "/api/v2/featureFlags/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Get feature flag status";
-            description: "Get feature flag status enable / disable corresponding to given feature flag name";
-            tags: "feature flag";
+            summary: "Get feature flag status.";
+            description: "Get feature flag status enable / disable corresponding to given feature flag name.";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2690,9 +2692,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Enable feature flag";
-            description: "Enable feature flag status corresponding to given feature flag name";
-            tags: "feature flag";
+            summary: "Enable feature flag.";
+            description: "Enable feature flag status corresponding to given feature flag name.";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2730,9 +2732,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Disable feature flag";
-            description: "Disable feature flag status corresponding to given feature flag name";
-            tags: "feature flag";
+            summary: "Disable feature flag.";
+            description: "Disable feature flag status corresponding to given feature flag name.";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2776,9 +2778,9 @@ service DurosAPI {
             get: "/api/v2/featureFlags"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "List feature flags";
-            description: "List feature flags";
-            tags: "feature flag";
+            summary: "List feature flags.";
+            description: "List feature flags.";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2831,7 +2833,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get cluster configuration value according to a given parameter.";
             description: "Get cluster configuration value according to a given parameter.";
-            tags: "get cluster config";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2864,7 +2866,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update Cluster Config value.";
             description: "Update Cluster Config value.";
-            tags: "update cluster config";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2896,7 +2898,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List all cluster configuration parameters values.";
             description: "List all cluster configuration parameters values.";
-            tags: "list cluster config";
+            tags: "Cluster configuration/features operations";
             responses: {
                 key: "400";
                 value: {
@@ -2920,9 +2922,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Roll back a volume to a previous snapshot";
-            description: "Roll back a volume to a previous snapshot";
-            tags: "rollback volume";
+            summary: "Roll back a volume to a previous snapshot.";
+            description: "Roll back a volume to a previous snapshot.";
+            tags: "Volume operations";
             responses: {
                 key: "400";
                 value: {
@@ -2974,12 +2976,12 @@ service DurosAPI {
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List changed LBAs between a volume's snapshots.";
-            description: "List changed LBAs between a volume's snapshots (optionally list all snapshots LBAs)";
-            tags: "list changed blocks";
+            description: "List changed LBAs between a volume's snapshots (optionally list all snapshots LBAs).";
+            tags: "Snapshot operations";
             responses: {
                 key: "400";
                 value: {
-                    description: "Invalid arguments. Snapshot UUIDs are identical or they are no on same chain or offset-lba exceeds snapshot size";
+                    description: "Invalid arguments. Snapshot UUIDs are identical or they are no on same chain or offset-lba exceeds snapshot size.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3021,7 +3023,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Rotate cluster root encryption key (Mock).";
             description: "Rotate the Cluster Level Encryption Key (KEK). After the rotation all the DEK's will be encrypted with the new KEK and the new KEK will be stored securely in the Cluster. Note: This feature is not readily available and offers only limited support for evaluative purposes.";
-            tags: "encryption";
+            tags: "Encryption operations";
             responses: {
                 key: "401";
                 value: {
@@ -3047,7 +3049,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get cluster root encryption key.";
             description: "Securely export the Cluster-Level Encryption Key (KEK). As a security measure, the exported key in the response will be encrypted.";
-            tags: "encryption";
+            tags: "Encryption operations";
             responses: {
                 key: "401";
                 value: {
@@ -3065,6 +3067,7 @@ service DurosAPI {
         };
     }
 
+
     rpc CreateIdpConfiguration(CreateIDPConfigurationRequest) returns (IDPConfiguration) {
         option (google.api.http) = {
             post: "/api/v2/cluster/IdpConfiguration"
@@ -3073,7 +3076,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create an IdP configuration.";
             description: "Create a configuration for a remote Identity Provider (IdP) that may be used to authorize access to the Lighbits cluster. Currently only a single IdP configuration is supported.";
-            tags: "idp configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3105,7 +3108,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete an IdP configuration.";
             description: "Delete an IdP configuration.";
-            tags: "idp configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3145,7 +3148,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update an IdP configuration.";
             description: "Update an IdP configuration.";
-            tags: "idp configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3184,7 +3187,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Listing IdP configurations.";
             description: "Listing IdP configurations.";
-            tags: "idp configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3216,7 +3219,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get an IdP configuration.";
             description: "Get an IdP configuration.";
-            tags: "idp configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3256,7 +3259,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create an idp-client-configuration.";
             description: "Create an idp-client-configuration.";
-            tags: "idp client configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3288,7 +3291,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Delete an idp-client-configuration.";
             description: "Delete an idp-client-configuration.";
-            tags: "idp client configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3313,7 +3316,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "idp-client-configuration with the specidied name was not found.";
+                    description: "idp-client-configuration with the specified name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3328,7 +3331,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update an idp-client-configuration.";
             description: "Update an idp-client-configuration.";
-            tags: "idp client configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3353,7 +3356,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "idp-client-configuration with the specigied name was not found.";
+                    description: "idp-client-configuration with the specified name was not found.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3367,7 +3370,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Listing idp-client-configurations.";
             description: "Listing idp-client-configurations.";
-            tags: "idp client configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3399,7 +3402,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get an idp-client-configuration.";
             description: "Get an idp-client-configuration.";
-            tags: "idp client configuration";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3439,7 +3442,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create an authorization map entry.";
             description: "Create an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
-            tags: "Auth map entry";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3470,9 +3473,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "update an authorization map entry";
+            summary: "update an authorization map entry.";
             description: "Update an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
-            tags: "Auth map entry";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3509,9 +3512,9 @@ service DurosAPI {
             delete: "/api/v2/cluster/authMaps/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Delete an authorization map entry";
+            summary: "Delete an authorization map entry.";
             description: "Delete an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
-            tags: "Auth map entry.";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3550,7 +3553,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get an authorization map entry.";
             description: "Get an authorization map entry that maps a clientID/claim/group to an access right (scope and role).";
-            tags: "Auth map entry";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3589,7 +3592,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "List all authorization map entries.";
             description: "List all map entries between a clientID/claim/group and an access right (scope and role).";
-            tags: "Auth map entry";
+            tags: "Federated authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3620,9 +3623,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Enable In-Band cluster authentication (Beta)";
+            summary: "Enable In-Band cluster authentication (Beta).";
             description: "Enables NVMe-oF In Band Authentication, This allows Lightbits cluster to selectively restrict the set of NVMe hosts (clients) that are allowed to connect to the NVMe target (Lightbits cluster), and also (optionally), restrict the set NVMe targets that a given NVMe host will trust and connect to. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "encryption";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "401";
                 value: {
@@ -3646,9 +3649,9 @@ service DurosAPI {
             body: "*"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Disable In-Band cluster authentication (Beta)";
+            summary: "Disable In-Band cluster authentication (Beta).";
             description: "Disables NVMe-oF In Band Authentication, hosts may connect to Lightbits cluster without establishing trust (the default Lightbits cluster configuration). In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "encryption";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "401";
                 value: {
@@ -3674,7 +3677,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Create a trusted host resource.";
             description: "Create a trusted host resource with configuration parameters needed for authentication and NVMe connectivity, When In-Band Authentication is enabled, only trusted hosts may connect to Lightbits cluster. For each trusted host an associated Lightbits resource must be created using this command. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3711,9 +3714,9 @@ service DurosAPI {
             delete: "/api/v2/projects/{projectName}/trustedHosts/{name}"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-            summary: "Delete a host.";
+            summary: "Delete a trusted host.";
             description: "Delete a trusted host configuration. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3752,7 +3755,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get a host.";
             description: "Get a trusted host configuration. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3777,7 +3780,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Failed to find host name/ project .";
+                    description: "Failed to find host name/ project.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3794,7 +3797,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Return a list of trusted hosts configuration's.";
             description: "Return a list of trusted hosts configuration's. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3819,7 +3822,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Failed to find host name/ project .";
+                    description: "Failed to find host name/ project.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3834,7 +3837,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Update a host.";
             description: "Update a trusted host configuration, optionally modifying labels. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3859,7 +3862,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Failed to find host name/ project .";
+                    description: "Failed to find host name/ project.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3874,7 +3877,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Set the secrets for a host.";
             description: "Set hosts secrets for a trusted host to allow trusted connectivity between Lightbits Cluster and hosts as part of In-Band Authentication support. Specifying a host secret is mandatory for trusted connect of host to Lightbits cluster, Specifying a target secret, either explicitly or by using auto-gen mode, is optional, allowing only trusted Lightbits cluster to connect to host, if no target secret is specified the target secret type will be set to disable. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3892,7 +3895,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Failed to find host name/ project .";
+                    description: "Failed to find host name/ project.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3906,7 +3909,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Get secrets of a host.";
             description: "Get a trusted host secrets required for authentication and connection. In-Band authentication functionality and its APIs are under development, available for evaluative purposes only and should not be used in production clusters.";
-            tags: "authentication";
+            tags: "In-Band authentication operations";
             responses: {
                 key: "400";
                 value: {
@@ -3924,7 +3927,7 @@ service DurosAPI {
             responses: {
                 key: "404";
                 value: {
-                    description: "Failed to find host name/ project .";
+                    description: "Failed to find host name/ project.";
                     schema: { json_schema: { type: INTEGER;	} }
                 }
             }
@@ -3939,7 +3942,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Enable Federated Authentication.";
             description: "Enable Federated Authentication.";
-            tags: "authentication";
+            tags: "Federated authentication operations";
             responses: {
                 key: "401";
                 value: {
@@ -3972,7 +3975,7 @@ service DurosAPI {
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Disable Federated Authentication.";
             description: "Disable Federated Authentication.";
-            tags: "authentication";
+            tags: "Federated authentication operations";
             responses: {
                 key: "401";
                 value: {
@@ -4000,24 +4003,57 @@ service DurosAPI {
 
 
 message LogRequest {
-    // Optional SkipStatistics
+    // SkipStatistics
     //
     // Fetch log will download by default all the statistics from the relevant server
-    // By passing this parameter fetch logs will skip the statistics collect
+    // By passing this parameter fetch logs will skip the statistics collection.
     bool   SkipStatistics = 1;
+    // CaptureCpuAndTcpDump
+    //
+    // Capture CPU and tcpdump stats for 5 seconds to tcpdump.cap + sar.log in network/<interfaces>
     bool   CaptureCpuAndTcpDump = 2;
+    // NumOfDaysToCollectLogs
+    //
+    // Number of days back to collect the logs (default 2 days).
     uint32 NumOfDaysToCollectLogs = 3;
+    // CollectServicesLbcliEtcd
+    //
+    // Collect services info, lbcli and etcd dump only (default will also collect all relevant logs).
     bool   CollectServicesLbcliEtcd = 4;
+    // IntervalBetweenBEReadCycles
+    //
+    // Interval in seconds between FE/BE statistics captures (default 5sec).
     uint32 IntervalBetweenBEReadCycles = 5;
+    // DontCollectlogs
+    //
+    // Do not collect /var/log.
     bool   DontCollectlogs = 6;
+    // LogFilename
+    //
+    // Log filename prefix for convenience (do not use spaces).
     string LogFilename = 7;
+    // NumOfstatisticsToCapture
+    //
+    // Number of FE/BE statistics cycles to capture (default 1).
     uint32 NumOfstatisticsToCapture = 8;
+    // DontCompressOutput
+    //
+    // Do not compress the output tar file. Default is gzip but can switch to xz with -x flag.
     bool   DontCompressOutput = 9;
+    // IoNice
+    //
+    // Set nicest IO / CPU priority on most commands via 'ionice -c 2 -n 7 nice -n 19'. Default: 'ionice -c 2 -n 7'/
     bool   IoNice = 10;
+    // UseHighCompression
+    //
+    // If compressing, use stronger xz compression instead of gzip. File extension will be txz instead of tgz/
     bool   UseHighCompression = 11;
 }
 
 message AdminEndpoint {
+    // port
+    //
+    // Admin endpoint port.
     uint32 port = 1;
     repeated string ips = 2;
     // Etag
@@ -4028,6 +4064,14 @@ message AdminEndpoint {
 
 
 message GetAdminEndpointRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["port"]
+        }
+    };
+    // port
+    //
+    // Admin endpoint port.
     uint32 port = 1;
 }
 
@@ -4036,20 +4080,51 @@ message ListAdminEndpointsResponse {
 }
 
 message ListAdminEndpointsRequest {
+    // port
+    //
+    // Optionally filter by port.
     uint32 port = 1;
 }
 
 message CreateAdminEndpointRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["port", "ips"]
+        }
+    };
+    // port
+    //
+    // Admin endpoint port.
     uint32 port = 1;
+    // ips
+    // Admin endpoint IP addresses.
     repeated string ips = 2;
 }
 
 message UpdateAdminEndpointRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["port", "ips"]
+        }
+    };
+    // port
+    //
+    // Admin endpoint port.
     uint32 port = 1;
+    // ips
+    // Admin endpoint IP addresses.
     repeated string ips = 2;
 }
 
 message DeleteAdminEndpointRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["port"]
+        }
+    };
+    // port
+    //
+    // Delete endpoint corresponding to specified port.
     uint32 port = 1;
 }
 
@@ -4064,9 +4139,26 @@ enum CredsType {
 }
 
 message CreateCredentialRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName", "ID", "type", "payload"]
+        }
+    };
+    // projectName
+    //
+    // Project name.
     string projectName = 1;
+    // ID
+    //
+    // Credential ID.
     string ID = 2;
+    // type
+    //
+    // Type of the credentials, one of: pki rsa256pubkey cert-chain.
     CredsType type = 3;
+    // payload
+    //
+    // Payload of the credentials.
     bytes payload = 4;
 }
 
@@ -4102,7 +4194,18 @@ message Credential {
 }
 
 message DeleteCredentialRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["ID", "projectName"]
+        }
+    };
+    // ID
+    //
+    // Credential ID.
     string ID = 1;
+    // projectName
+    //
+    // Project name.
     string projectName = 2;
 }
 
@@ -4110,6 +4213,14 @@ message DeleteCredentialResponse {
 }
 
 message ListCredentialsRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // projectName
+    //
+    // Project name associated with credentials.
     string projectName = 1;
 }
 
@@ -4118,7 +4229,18 @@ message ListCredentialsResponse {
 }
 
 message GetCredentialRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["ID", "projectName"]
+        }
+    };
+    // ID
+    //
+    // Credential ID.
     string ID = 1;
+    // projectName
+    //
+    // Project name.
     string projectName = 2;
 }
 
@@ -4134,6 +4256,11 @@ message DefaultPolicy {
 }
 
 message CreateProjectRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
     // Project Name
     //
     // Project Name
@@ -4144,7 +4271,7 @@ message CreateProjectRequest {
     string description = 2;
     // Default policies
     //
-    // List of default polices. As of the 2.3.16 release the only default policy that may be specified for project is a QoS policy.
+    // List of default polices. Such as default QoS policy.
     repeated DefaultPolicy defaultPolicies = 3;
 }
 
@@ -4168,6 +4295,14 @@ message Project {
 }
 
 message DeleteProjectRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // project name
     string name = 1;
 }
 
@@ -4182,6 +4317,14 @@ message ListProjectsResponse {
 }
 
 message GetProjectRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // project name.
     string name = 1;
 }
 
@@ -4194,13 +4337,25 @@ message GetVersionRequest {
 }
 
 message CreateVolumeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "size", "acl", "replicaCount", "projectName"]
+        }
+    };
+
     enum SectorSizeEnum {
         sectorSize_Default = 0;
         sectorSize_512B = 512;
         sectorSize_4K = 4096;
     }
 
+    // name
+    //
+    // volume's immutable name
     string name = 1 [(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {pattern: "^[a-zA-Z0-9-_\\.]{1,253}$"}];
+    // size
+    //
+    // volume size
     string size = 2;
     // acl
     //
@@ -4208,12 +4363,12 @@ message CreateVolumeRequest {
     StringList acl = 3;
     // compression
     //
-    // valid values: true/enable/enabled or false/disable/disabled
+    // volume compression, valid values: true/enable/enabled/false/disable/disabled (default value is disable compression)
     string compression = 4;
     // replicaCount
     //
     // The number of replicas a volume may have. Valid values are 1, 2, and 3.
-    uint32 replicaCount = 5;
+    uint32 replicaCount = 5 ;
     // IPAcl
     //
     // Access control list of IP addresses. Valid values: list of valid IP addresses/ALLOW_ANY/ALLOW_NONE (optional, default: ALLOW_ANY)
@@ -4221,14 +4376,14 @@ message CreateVolumeRequest {
     // minReplicas
     //
     // not used
-    uint32 minReplicas = 7;
+    uint32 minReplicas = 7 ;
     // sectorSize
     //
     // volume sector size. Valid values: 4K (default), 512B
     SectorSizeEnum sectorSize = 8;
     // projectName
     //
-    // project name
+    // Name of project volume belongs to.
     string projectName = 9;
     // sourceSnapshotUUID
     //
@@ -4257,8 +4412,22 @@ message CreateVolumeRequest {
 }
 
 message DeleteVolumeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
+    //
+    // The volume's UUID for the delete volume request (optional, either UUID or Name must be provided to identify volume to delete).
     string UUID = 1;
+    // name
+    //
+    // The volume's name for the delete volume request (optional, either UUID or Name must be provided to identify volume to delete).
     string name = 2;
+    // projectName
+    //
+    // The project name of the volume to delete.
     string projectName = 3;
 }
 
@@ -4268,21 +4437,19 @@ message DeleteVolumeResponse {
 message EnableServerRequest {
     // UUID
     //
-    // The server's UUID for the enable server request.
+    // The server's UUID for the enable server request (Either server UUID or name must be specified).
     string UUID = 1;
-
     // name
     //
-    // The server's name for the enable server request.
+    // The server's name for the enable server request (Either server UUID or name must be specified).
     string name = 2;
 }
 
 message DisableServerRequest {
     // UUID
     //
-    // The server's UUID for the disable server request.
+    // The server's UUID for the disable server request (Either server UUID or name must be specified).
     string UUID = 1;
-
     // ForceDisable
     //
     // When set to True the disable operation bypasses upgradeability (loss of service) check when disabling
@@ -4290,12 +4457,10 @@ message DisableServerRequest {
     // replica volumes because they cannot be evicted to another server. Only set both "evict" and "ForceDisable"
     // to True if you are willing to lose your single-replica volumes.
     bool ForceDisable = 2;
-
     // name
     //
-    // The server's name for the disable server request.
+    // The server's name for the disable server request (Either server UUID or name must be specified).
     string name = 3;
-
     // evictData
     //
     // Setting this to True to cause all server data to be evicted from the server.
@@ -4306,7 +4471,6 @@ message DisableServerRequest {
     // If you want the data eviction process, even at the risk of potentially losing some data that couldn’t be evicted,
     // set both evictData and ForceDisable to True.
     bool evictData = 4;
-
     // permanentFailureTimeout
     //
     // Setting a value for this parameter will override the permanent failure timeout at the cluster level.
@@ -4321,12 +4485,11 @@ message DisableServerRequest {
 message DeleteServerRequest {
     // UUID
     //
-    // The server's UUID for the delete server request.
+    // The server's UUID for the delete server request (either server UUID or Name must be specified).
     string UUID = 1;
-
     // name
     //
-    // The server's name for the delete server request.
+    // The server's name for the delete server request (either server UUID or Name must be specified).
     string name = 2;
 
     // forceDelete
@@ -4350,20 +4513,42 @@ message DeleteServerRequest {
 }
 
 message ReplaceNodeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["SrcNodeUUID", "TargetNodeUUID"]
+        }
+    };
+    // SrcNodeUUID
+    //
+    // The source node's UUID for the replace node request.
     string SrcNodeUUID = 1;
+    // TargetNodeUUID
+    //
+    // The target node's UUID for the replace node request.
     string TargetNodeUUID = 2;
+    // ReplaceWhileActive
+    //
+    // Optional. When true, the replace node operation will be performed while the server is active. Default is False.
     bool   ReplaceWhileActive = 3;
 }
 
 message CreateServerRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["serverEndpoints", "serverUUID"]
+        }
+    };
     // serverEndpoints
     //
     // Etcd member endpoint. In current version, only a single point is allowed.
     repeated string serverEndpoints = 1;
+    // serverUUID
+    //
+    // The server's UUID for the create server request.
     string serverUUID = 2;
     // reuseIP
     //
-    // Optional. When true, bypasses validation if given endpoint is used by another server
+    // Optional. When true, bypasses validation if given endpoint is used by another server.
     bool reuseIP = 3;
     // extendCluster
     //
@@ -4372,6 +4557,14 @@ message CreateServerRequest {
 }
 
 message UpdateVolumeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
+    //
+    // Volume's UUID, Update volume identified by either name or UUID
     string UUID = 1;
     // acl
     //
@@ -4388,19 +4581,23 @@ message UpdateVolumeRequest {
     string compression = 5;
     // project name
     //
+    // Name of project volume belongs to.
     string projectName = 6;
-    // qos policy uuid
+    // qosPolicyID
     //
+    // QoS Policy, optionally specify QoS policy to be used by volume (either name or UUID).
     oneof qosPolicyID {
         string qosPolicyUUID = 7;
         string qosPolicyName = 8;
     }
     // Force
     //
-    // To intentionally shrink volume size, provide updated volume size and set force to true
+    // To intentionally shrink volume size, provide updated volume size and set force to true.
     bool Force = 9;
+    // name
+    //
+    // Volume's name, Update volume identified by either name or UUID.
     string name = 10;
-
     // labels
     //
     // User defined labels are optional for a volume. Labels are key-value pairs. A volume can have up to 16 labels, label-key and label-value length must be between 1 and 253 characters and may contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and dot (.). If labels are passed during volume update the existing volume's labels are replaced with the new ones. Otherwise, the labels are untouched.
@@ -4408,6 +4605,14 @@ message UpdateVolumeRequest {
 }
 
 message UpgradeServerRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["UUID", "InstallPkgUri"]
+        }
+    };
+    // UUID
+    //
+    // The server's UUID for the upgrade server request.
     string UUID = 1;
     // InstallPkgUri
     //
@@ -4424,6 +4629,11 @@ message UpgradeServerRequest {
 }
 
 message UpgradeClusterRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["InstallPkgUri"]
+        }
+    };
     // InstallPkgUri
     //
     // URI of Lightbits package to install
@@ -4453,23 +4663,62 @@ message GetClusterRequest {
 }
 
 message UpdateNvmeDeviceRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["serverUUID", "serialNumber", "ledPattern"]
+        }
+    };
+    // serverUUID
+    //
+    // Server UUID of the NVMe device to update.
     string serverUUID = 1;
+    // serialNumber
+    //
+    // NVMe device serial number.
     string serialNumber = 2;
+    // ledPattern
+    //
+    // NVMe device LED pattern. specify either "locate", "rebuild" or "locate-off"
     string ledPattern = 3;
 }
 
 message AddNvmeDeviceRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["serialNumber", "nodeUUID"]
+        }
+    };
+    // serialNumber
+    //
+    // NVMe device serial number.
     string serialNumber = 1;
+    // nodeUUID
+    //
+    // Node UUID to add NVMe device to.
     string nodeUUID = 2;
 }
 
 
 message GetHostRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["hostNQN"]
+        }
+    };
+    // hostNQN
+    //
+    // Host NQN to get.
     string hostNQN = 1;
 }
 
 message ListHostsRequest {
+    // hostNQN
+    //
+    // Not Supported (parameter is ignored and all connected hosts will be returned).
     string hostNQN = 1;
+    // hostNQN
+    //
+    // Optionally filter hosts associated with a specific volume (Default will return all hosts connected to cluster).
     string volumeUUID = 2;
 }
 
@@ -4478,12 +4727,24 @@ message ListHostsResponse {
 }
 
 message ListNodeRequest {
+    // Name
+    //
+    // Filter nodes by node name (either no filter or only name, UUID or failureDomain should be specified).
     string name = 1;
+    // Name
+    //
+    // Filter nodes by node name (either no filter or only name, UUID or failureDomain should be specified).
     string UUID = 2;
+    // failureDomain
+    //
+    // Filter nodes by a failure domain associated with nodes (either no filter or only name, UUID or failureDomain should be specified).
     string failureDomain = 3;
 }
 
 message ListEventsRequest {
+    // projectName
+    //
+    // List only events that are associated with specified project.
     string projectName = 1;
     // nextToken
     //
@@ -4517,45 +4778,92 @@ message ListEventsResponse {
 }
 
 message GetVolumeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
+    //
+    // optional, volume's UUID, either UUID or Name must be provided to identify volume to get.
     string UUID = 1;
+    // Name
+    //
+    // optional, volume's Name, either UUID or Name must be provided to identify volume to get.
     string name = 2;
+    // projectName
+    //
+    // Name of project volume belongs to.
     string projectName = 3;
 }
 
 message GetNodeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["UUID"]
+        }
+    };
+    // UUID
+    //
+    // ID of node to get.
     string UUID = 1;
 }
 
 message ListVolumeRequest {
+    // UUID
+    //
+    // List only volume with UUID.
     string UUID = 1;
+    // Name
+    //
+    // List only volumes with Name.
     string name = 2;
+    // failureDomain
+    //
+    // List volumes according to failureDomains volumes replicas are placed on.
     string failureDomain = 3;
     // offsetUUID
     //
-    // Optional. When provided, returned list starts with next to offsetUUID volume.
+    // When provided, returned list starts with next to offsetUUID volume.
     string offsetUUID = 4;
     // limit
     //
-    // Optional. Limits the number of volumes in the response.
+    // Limits the number of volumes in the response (default/Max value is 1000 volumes).
     int64 limit = 5;
+    // projectName
     //
+    // Optional. Return only volumes of the given project.
     string projectName = 6;
     // source snapshot UUID
     //
-    // Optional. Return only volumes created from this source snapshot.
+    // Return only volumes created from this source snapshot.
     string snapshotUUID = 7;
     // showAll
     //
-    // Optional. Show also volumes in Deleting state
+    // Optional. Show also volumes in Deleting state (default is false).
     bool showAll = 8;
 }
 
 message ListNvmeDevicesRequest {
+    // nodeUUID
+    //
+    // Optionally list all NVMe devices managed by specified node.
     string nodeUUID = 1;
+    // serverUUID
+    //
+    // Optionally list all NVMe devices attached to a server.
     string serverUUID = 2;
 }
 
 message GetNvmeDeviceRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["Serial"]
+        }
+    };
+    // Serial
+    //
+    // Serial number of the NVMe device to get.
     string Serial = 1;
 }
 
@@ -4722,12 +5030,29 @@ message DeleteServerResponse {}
 message DisableServerResponse {}
 
 message ListServersRequest {
+    // UUID
+    //
+    // List only server with UUID.
     string UUID = 1;
+    // Name
+    //
+    // List only servers with Name.
     string Name = 2;
+    // RiskOfServiceLoss
+    //
+    // List only servers in a RiskOfServiceLoss state matching the specified state.
     Server.RiskOfServiceLossEnum RiskOfServiceLoss = 3;
 }
 
 message GetServerRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["UUID"]
+        }
+    };
+    // UUID
+    //
+    // The server's UUID for the get server request.
     string UUID = 1;
 }
 
@@ -5198,16 +5523,34 @@ message Server {
     ServerEvictionStatus LastEviction = 14;
     // Server Health
     //
-    // Server health: OK- server healthy, Warning high utilisation or failed disk under rebuild, Error - Inactive nodes or nodes nearing/in Read-only.
+    // Server health: OK- server healthy, Warning high utilization or failed disk under rebuild, Error - Inactive nodes or nodes nearing/in Read-only.
     ClusterHealth.State health = 15;
     // Server Permanent failure configuration
     //
     // Permanent failure timeout at the server level. If set, overrides the cluster configuration. value of "0" sets it to infinite.
     google.protobuf.Duration ServerPermanenetFailureTimeout = 16;
+
+    // TPM 2.0 Support
+    //
+    // Trusted Platform Module 2.0 (TPM) support indication.
+    // Note: If information about a server's TPM2 support is unavailable,
+    // we consider it as not supported.
+    bool tpm2IsSupported = 17;
 }
 
 message GetRoleRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "projectName"]
+        }
+    };
+    // name
+    //
+    // The name of the role to get.
     string name = 1;
+    // projectName
+    //
+    // The name of the project this role belongs to.
     string projectName = 2;
 }
 
@@ -5226,6 +5569,14 @@ message Role {
 }
 
 message ListRolesRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // projectName
+    //
+    // The name of the project to list roles for.
     string projectName = 1;
 }
 
@@ -5270,12 +5621,31 @@ message Snapshot {
 }
 
 message DeleteSnapshotRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
+    //
+    // The UUID of the snapshot to delete (specify either UUID or Name).
     string UUID = 1;
+    // name
+    //
+    // The name of the snapshot to delete (specify either UUID or Name).
     string name = 2;
+    // projectName
+    //
+    // The name of the project this snapshot belongs to.
     string projectName = 3;
 }
 
 message CreateSnapshotRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "projectName"]
+        }
+    };
     // name
     //
     // The name of the snapshot
@@ -5307,8 +5677,22 @@ message CreateSnapshotRequest {
 }
 
 message ListSnapshotsRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
+    //
+    // Optionally filter a specific snapshot by UUID.
     string UUID = 1;
+    // Name
+    //
+    // Optionally filter a specific snapshot by name.
     string Name = 2;
+    // projectName
+    //
+    // The name of the project this snapshot belongs to.
     string projectName = 3;
     // offsetUUID
     //
@@ -5316,17 +5700,31 @@ message ListSnapshotsRequest {
     string offsetUUID = 4;
     // limit
     //
-    // Optional. Limits the number of snapshots in the response.
+    // Optional. Limits the number of snapshots in the response (default/max is 1000 snapshots in a response).
     int64 limit = 5;
     // showAll
     //
-    // Optional. Show also snapshots in Deleting state
+    // Optional. Show also snapshots in Deleting state (default is false).
     bool showAll = 6;
 }
 
 message GetSnapshotRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
+    //
+    //  The UUID of the snapshot to get (either UUID or Name must be specified).
     string UUID = 1;
+    // Name
+    //
+    // The name of the snapshot to get (either UUID or Name must be specified).
     string Name = 2;
+    // projectName
+    //
+    // The name of the project this snapshot belongs to.
     string projectName = 3;
 }
 
@@ -5342,14 +5740,38 @@ message FeatureFlagStatus {
 }
 
 message GetFeatureFlagRequest{
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // The name of the feature flag to get:  "event-log", "evict-data", "fail-in-place", "in-band-authentication", "proactive-rebalance".
     string name = 1;
 }
 
 message EnableFeatureFlagRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // The name of the feature flag to get:  "event-log", "evict-data", "fail-in-place", "in-band-authentication", "proactive-rebalance".
     string name = 1;
 }
 
 message DisableFeatureFlagRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // The name of the feature flag to get:  "event-log", "evict-data", "fail-in-place", "in-band-authentication", "proactive-rebalance".
     string name = 1;
 }
 
@@ -5362,9 +5784,14 @@ message ListFeatureFlagsResponse {
 }
 
 message CreateResourcePolicyRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "schedulePolicy"]
+        }
+    };
     // name
     //
-    // The name of the resource policy
+    // The name of the resource policy.
     string name = 1;
     // resourceUUID
     //
@@ -5391,6 +5818,11 @@ message CreateResourcePolicyRequest {
 }
 
 message CreatePolicyRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
     // Policy name
     //
     // Policy name
@@ -5409,6 +5841,7 @@ message CreatePolicyRequest {
 }
 
 message UpdatePolicyRequest {
+
     // UUID
     //
     // The UUID of the policy request to update. If both name and UUID are provided,
@@ -5473,6 +5906,11 @@ message Policy {
 }
 
 message UpdateResourcePolicyRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["UUID", "schedulePolicy"]
+        }
+    };
     // UUID
     //
     // The UUID of the resource policy request to update
@@ -5494,8 +5932,17 @@ message UpdateResourcePolicyRequest {
 message UpdateResourcePolicyResponse {}
 
 message ListPoliciesRequest {
+    // UUID
+    //
+    // Optionally filter specific policy by UUID.
     string UUID = 1;
+    // name
+    //
+    // Optionally filter specific policy by name.
     string name = 2;
+    // projectName
+    //
+    // Optionally filter policies by project name.
     string projectName = 3;
 }
 
@@ -5504,8 +5951,17 @@ message ListPoliciesResponse {
 }
 
 message ListResourcePoliciesRequest {
+    // UUID
+    //
+    // Optionally filter specific policy by UUID.
     string UUID = 1;
+    // projectName
+    //
+    // Optionally filter policies by project name.
     string projectName = 2;
+    // volumeUUID
+    //
+    // Optionally filter all policies of a specific volume.
     string volumeUUID  = 3;
 }
 
@@ -5515,43 +5971,87 @@ message ListResourcePoliciesResponse {
 }
 
 message GetPolicyRequest {
+    // UUID
+    //
+    // UUID of the policy to get (specify either UUID or name)
     string UUID = 1;
+    // name
+    //
+    // name of the policy to get (specify either UUID or name)
     string name = 2;
+    // projectName
+    //
+    // The name of the project this policy belongs to
     string projectName = 3;
 }
 
 message GetResourcePolicyRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["UUID"]
+        }
+    };
+    // UUID
+    //
+    // The UUID of the resource policy to get.
     string UUID = 1;
+    // projectName
+    //
+    // The name of the project this resource policy belongs to.
     string projectName = 2;
 }
 
 message DeleteResourcePolicyRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["UUID"]
+        }
+    };
+    // UUID
+    //
+    // The UUID of the resource policy to get.
     string UUID = 1;
+    // projectName
+    //
+    // The name of the project this resource policy belongs to.
     string projectName = 3;
 }
 
 message DeleteResourcePolicyResponse {}
 
 message DeletePolicyRequest {
+    // UUID
+    //
+    // UUID of the policy to delete (specify either UUID or name).
     string UUID = 1;
+    // name
+    //
+    // name of the policy to delete (specify either UUID or name).
     string name = 2;
 }
 
 message DeletePolicyResponse {}
 
 message GetClusterConfigParamRequest {
-    // ClusterConfigParam name
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
     //
     // specify name of parameter to get: ClusterName/ ClockDriftIntervalForRaisingEvent/ DeviceHealthIntervalForRaisingEvent/
-    // DurationToTurnIntoPermanentFailure/ VolumeDeletionFromNodeDelay/ DefaultQoSName
+    // DurationToTurnIntoPermanentFailure/ VolumeDeletionFromNodeDelay/ DefaultQoSName/ AllowedNumRevives/ DisableVolumeStatisticsExport
+    // EnableTrim/ EvcitionNoProgressTimeout/ RevivesWindowDuration
     string name = 1;
 }
 
 message ClusterConfigParam {
     // ClusterConfigParam name
     //
-    // specify name of parameter to update: ClusterName [string]/ ClockDriftIntervalForRaisingEvent [time]/ DeviceHealthIntervalForRaisingEvent [time]/
-    // DurationToTurnIntoPermanentFailure [time]/ VolumeDeletionFromNodeDelay [time]/ DefaultQoSName [valid QoS policy name]
+    // specify name of parameter to update: ClusterName [name]/ ClockDriftIntervalForRaisingEvent [time]/ DeviceHealthIntervalForRaisingEvent [time]/
+    // DurationToTurnIntoPermanentFailure [time]/ VolumeDeletionFromNodeDelay [time]/ DefaultQoSName [string]/ AllowedNumRevives [int]
+    // DisableVolumeStatisticsExport [bool]/ EnableTrim [bool]/ EvcitionNoProgressTimeout [time]/ RevivesWindowDuration [time]
     string name = 1;
     // ClusterConfigParam value
     //
@@ -5560,24 +6060,41 @@ message ClusterConfigParam {
 }
 
 message UpdateClusterConfigParamRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["configParam"]
+        }
+    };
+    // configParam
+    //
+    // Cluster config param name and value to update.
     ClusterConfigParam configParam = 1;
 }
 
 message RollbackVolumeRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
+    // UUID
     //
-    // volume UUID
+    // volume UUID to rollback (specify either volume UUID or volume name)
     string UUID = 1;
+    // srcSnapshotUUID
     //
-    // source snapshot UUID
+    // source snapshot UUID to rollback volume to (specify either snapshot UUID or volume name)
     string srcSnapshotUUID = 2;
     //
     // project name
     string projectName = 3;
+    // Name
     //
-    // volume name
+    // volume Name (specify either volume UUID or volume name)
     string Name = 4;
+    // srcSnapshotName
     //
-    // source snapshot name
+    //  // source snapshot name to rollback volume to (specify either snapshot UUID or volume name)
     string srcSnapshotName = 5;
 }
 
@@ -5674,6 +6191,11 @@ message LBARange {
 }
 
  message ListChangedBlocksRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName"]
+        }
+    };
     // snapshotUUID
     //
     // Target snapshot UUID for comparison. (specify either snapshotUUID or snapshotName)
@@ -5864,7 +6386,18 @@ message DefaultGlobalResourcePolicy {
 }
 
 message UpdateProjectRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["projectName", "defaultPolicies"]
+        }
+    };
+    // projectName
+    //
+    // The name of the project to update.
     string projectName = 1;
+    // defaultPolicies
+    //
+    // The updated default policies to apply to the project.
     repeated DefaultPolicy defaultPolicies = 2;
 }
 
@@ -5906,6 +6439,11 @@ message RotateClusterRootKeyRequest {}
 message RotateClusterRootKeyResponse {}
 
 message GetClusterRootKeyRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["userPublicKey"]
+        }
+    };
     // encryptingKeyGeneration
     //
     // The Generation key you want to export, if not specified the latest key will be exported.
@@ -5940,6 +6478,8 @@ enum IDPType {
 
 // IDPConfiguration represents the configuration for the Identity Provider (IdP) in LB cluster.
 message IDPConfiguration {
+
+
     enum IDPConfigurationState {
         // 0
         //
@@ -5964,7 +6504,7 @@ message IDPConfiguration {
     }
 
     //
-    // Unique name identyfing this IdP configuration.
+    // Unique name identifying this IdP configuration.
     string name = 1;
     //
     // The URL of the Identity Provider (IdP) issuer.
@@ -5984,32 +6524,50 @@ message IDPConfiguration {
 }
 
 message CreateIDPConfigurationRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "idpIssuerURL", "Type"]
+        }
+    };
+    // name
     //
     // The unique name to assign to this IdP configuration.
     string name = 1;
+    // idpIssuerURL
     //
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
+    // Type
     //
     // Type of an IdP (Identity Provider). currently only ADFS is supported.
     IDPType Type = 3;
+    // ProxyInfo
     //
     // Optional. Proxy server information for an IdP that is accessed via proxy.
     ProxyInfo ProxyInfo = 4;
 }
 
 message UpdateIDPConfigurationRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
     //
     // Specify name of the IdP configuration to update.
     string name = 1;
-    // 
+    // idpIssuerURL
+    //
     // The URL of the Identity Provider (IdP) issuer.
     string idpIssuerURL = 2;
-    // 
+    // Type
+    //
     // The type of an IdP (Identity Provider). currently only ADFS is supported
     IDPType Type = 3;
+    // ProxyInfo
     //
-    // Optional. Proxy server information for an IdP that is accessed via proxy.
+    // Proxy server information for an IdP that is accessed via proxy.
     ProxyInfo ProxyInfo = 4;
 
 }
@@ -6021,10 +6579,26 @@ message ListIDPConfigurationsResponse{
 }
 
 message GetIDPConfigurationRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // The name of the IdP configuration to get.
     string name = 1;
 }
 
 message DeleteIDPConfigurationRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
+    // The name of the IdP configuration to delete.
     string name = 1;
 }
 
@@ -6033,7 +6607,7 @@ message DeleteIDPConfigurationResponse {}
 // idp-client-configuration represents a configuration of an client specific IdP entry in LB cluster.
 // Lighbits cluster supports IdP client configurations with three types of authorization modes:
 // App, User, and Converge.
-// App authorization mode should be used when Lightbit should map a specific client to a scope and role.
+// App authorization mode should be used when Lightbits should map a specific client to a scope and role.
 // User authorization mode should be used when Lightbits should map according to both the client ID and a specific claim in the JWT.
 // Converge mode is used when Lightbits should map only according to the claim in the JWT. In this mode the client ID is ignored.
 // Only a single such entry may be created for each IdP configuration. Lightbits API service would first attempt to check for a
@@ -6067,13 +6641,19 @@ message DeleteIDPConfigurationResponse {}
     // authzMode
     //
     // The authorization mode will determine what info from access JWT
-    //  will be mapped to matching scope/role in Lightbits cluster.  
-    //  The autherization mode can be one of the following:
+    //  will be mapped to matching scope/role in Lightbits cluster.
+    //  The authorization mode can be one of the following:
     //  user, app, converge.
     AuthorizationMode authzMode = 6;
 }
 
 message CreateIdpClientConfRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "clientId", "idpConfName", "authzMode"]
+        }
+    };
+    // name
     //
     // A unique name of the idp-client-conf.
     string name = 1;
@@ -6085,10 +6665,12 @@ message CreateIdpClientConfRequest {
     //  When using converge authorization mode, this field must be configured to:
     //  NOT_APPLICABLE.
     string clientId = 2;
+    // idpConfName
     //
     // A reference to the IdP configuration that will use this client
     //  configuration.
     string idpConfName = 3;
+    // claimName
     //
     // When working in user authorization/converge mode, the claim name specifies
     //  the name of the field in JWT claim from which to extract the identifier
@@ -6097,31 +6679,49 @@ message CreateIdpClientConfRequest {
     string claimName = 4;
     //
     // The authorization mode will determine what info from access JWT
-    //  will be mapped to matching scope/role in Lightbits cluster.  
-    //  The autherization mode can be one of the following:
+    //  will be mapped to matching scope/role in Lightbits cluster.
+    //  The authorization mode can be one of the following:
     //  user, app, converge.
     AuthorizationMode authzMode = 5;
 }
 
 message UpdateIdpClientConfRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "claimName"]
+        }
+    };
+    // name
     //
     // The name of the idp-client-conf to update.
     string name = 1;
+    // claimName
     //
     // When working in user authorization/converge mode, the claim name specifies
     //  the name of the field in JWT claim from which to extract the identifier
     //  value from.
-    //  Note, this field is only required when authzMode is user or converge.
     string claimName = 2;
 }
 
 message GetIdpClientConfRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
     //
     // The name of the idp-client-conf to get.
     string name = 1;
 }
 
 message DeleteIdpClientConfRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
     //
     // The name of the idp-client-conf to delete.
     string name = 1;
@@ -6138,79 +6738,111 @@ message ListIdpClientConfsResponse{
 message AuthMapEntry {
     reserved "state";
     reserved 1;
-    // 
+    //
     // AuthMapEntry UUID
     string UUID = 2;
-    // 
+    //
     // Name of specific authorization mapping entry.
     string name = 3;
-    // 
+    //
     // Identifier to map application or clientID/claim/group to Lightbits scope/role.
     //  This should either have the clientID of the relevant application (app mode) or
-    //  an identifier of a specific claim/group exctracted from the field specified by claimName
+    //  an identifier of a specific claim/group extracted from the field specified by claimName
     //  (user or converge modes).
     string identifier = 4;
-    // 
-    // Represents the scope assgined to this client/claim/group  in Lightbits cluster.
+    //
+    // Represents the scope assigned to this client/claim/group  in Lightbits cluster.
     string scope = 5;
-    // 
-    // Represents the role assgined to this client/claim/group in Lightbits cluster.
+    //
+    // Represents the role assigned to this client/claim/group in Lightbits cluster.
     string role = 6;
-    // 
+    //
     // IdP configuration that is associated with this authorization map entry.
     string idpConfigurationName = 7;
 }
 
 message CreateAuthMapEntryRequest {
-    // 
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "identifier", "scope", "role", "idpConfigurationName"]
+        }
+    };
+    // name
+    //
     // Name of specific authorization mapping entry.
     string name = 1;
-    // 
+    // identifier
+    //
     // Identifier to map application or clientID/claim/group to Lightbits scope/role.
     //  This should either have the clientID of the relevant application (app mode) or
-    //  an identifier of a specific claim/group exctracted from the field specified by claimName
+    //  an identifier of a specific claim/group extracted from the field specified by claimName
     //  (user or converge modes).
     string identifier = 2;
-    // 
-    // Represents the scope assgined to this client/claim/group  in Lightbits cluster.
+    // scope
+    //
+    // Represents the scope assigned to this client/claim/group  in Lightbits cluster.
     string scope = 3;
-    // 
-    // Represents the role assgined to this client/claim/group in Lightbits cluster.
+    // Role
+    //
+    // Represents the role assigned to this client/claim/group in Lightbits cluster.
     string role = 4;
-    // 
+    // idpConfigurationName
+    //
     // Idp configuration that is associated with this authorization map entry.
     string idpConfigurationName = 5;
 }
 
 message UpdateAuthMapEntryRequest {
-    // 
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name", "identifier", "scope", "role", "idpConfigurationName"]
+        }
+    };
+    // name
+    //
     // Name of specific authorization mapping entry.
     string name = 1;
-    // 
-    // Represents the scope assgined to this client/claim/group  in Lightbits cluster.
+    // scope
+    //
+    // Represents the scope assigned to this client/claim/group  in Lightbits cluster.
     string scope = 2;
-    // 
-    // Represents the role assgined to this client/claim/group in Lightbits cluster.
+    // role
+    //
+    // Represents the role assigned to this client/claim/group in Lightbits cluster.
     string role = 3;
-    // 
+    // identifier
+    //
     // Identifier to map application or claim/group to Lightbits scope/role.
     //  This should either have the clientID of the relevant application (app mode) or
-    //  an identifier of a specific claim/group exctracted from the field specified by claimName
+    //  an identifier of a specific claim/group extracted from the field specified by claimName
     //  (user or converge modes).
     string identifier = 4;
-    // 
+    // idpConfigurationName
+    //
     // IdP configuration that is associated with this authorization map entry.
     string idpConfigurationName = 5;
 }
 
 message DeleteAuthMapEntryRequest {
-    // 
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
     // Name of specific authorization mapping entry.
     string name = 1;
 }
 
 message GetAuthMapEntryRequest {
-    // 
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+          required: ["name"]
+        }
+    };
+    // name
+    //
     // Name of specific authorization mapping entry.
     string name = 1;
 }
