@@ -5,7 +5,7 @@ package lightbits.api.duros.v2;
 option go_package = "duros/v2;v2";
 
 // label-key and label-value length must be between 1 and 253 characters and
-// may contain any of: alphanumeric characters (a-z, A-Z, 0-9), hyphen (-),
+// can contain any of: alphanumeric characters (a-z, A-Z, 0-9), hyphen (-),
 // underscore (_) and dot (.).
 message Label {
     string key = 1;
