@@ -35,4 +35,4 @@ protoc-ci: third-party
 .PHONY: mocks
 mocks:
 	rm -rf api/duros/v2/mocks/*
-	docker run --user $$(id -u):$$(id -g) --rm -w /work -v ${PWD}:/work vektra/mockery:v2.53.4 -r --all --keeptree --dir api/duros/v2 --output api/duros/v2/mocks 
+	docker run --user $$(id -u):$$(id -g) --rm -w /work -v ${PWD}:/work vektra/mockery:v2.53.5 -r --all --keeptree --dir api/duros/v2 --output api/duros/v2/mocks 

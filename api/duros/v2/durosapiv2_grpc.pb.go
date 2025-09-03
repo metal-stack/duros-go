@@ -115,6 +115,13 @@ const (
 	DurosAPI_GetTrustedHostSecret_FullMethodName           = "/lightbits.api.duros.v2.DurosAPI/GetTrustedHostSecret"
 	DurosAPI_EnableFederatedAuthentication_FullMethodName  = "/lightbits.api.duros.v2.DurosAPI/EnableFederatedAuthentication"
 	DurosAPI_DisableFederatedAuthentication_FullMethodName = "/lightbits.api.duros.v2.DurosAPI/DisableFederatedAuthentication"
+	DurosAPI_CFLogin_FullMethodName                        = "/lightbits.api.duros.v2.DurosAPI/CFLogin"
+	DurosAPI_ListClusters_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/ListClusters"
+	DurosAPI_DetachCluster_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/DetachCluster"
+	DurosAPI_AttachCluster_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/AttachCluster"
+	DurosAPI_GetCFServiceCredentials_FullMethodName        = "/lightbits.api.duros.v2.DurosAPI/GetCFServiceCredentials"
+	DurosAPI_ListWorkflows_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/ListWorkflows"
+	DurosAPI_GetWorkflow_FullMethodName                    = "/lightbits.api.duros.v2.DurosAPI/GetWorkflow"
 )
 
 // DurosAPIClient is the client API for DurosAPI service.
@@ -216,6 +223,31 @@ type DurosAPIClient interface {
 	GetTrustedHostSecret(ctx context.Context, in *GetTrustedHostSecretsRequest, opts ...grpc.CallOption) (*GetTrustedHostSecretsResponse, error)
 	EnableFederatedAuthentication(ctx context.Context, in *EnableFederatedAuthenticationRequest, opts ...grpc.CallOption) (*EnableFederatedAuthenticationResponse, error)
 	DisableFederatedAuthentication(ctx context.Context, in *DisableFederatedAuthenticationRequest, opts ...grpc.CallOption) (*DisableFederatedAuthenticationResponse, error)
+	// Login to the CF service
+	//
+	// If successful, the response will contain a token that should be used
+	// in the Authorization header for all subsequent requests.
+	CFLogin(ctx context.Context, in *CFLoginRequest, opts ...grpc.CallOption) (*CFLoginResponse, error)
+	// List Lightbits clusters
+	//
+	// List the Lightbits clusters connected to the CF service.
+	ListClusters(ctx context.Context, in *ListClustersRequest, opts ...grpc.CallOption) (*ListClustersResponse, error)
+	// Detach Lightbits cluster
+	//
+	// Detach a Lightbits cluster from the CF service.
+	DetachCluster(ctx context.Context, in *DetachClusterRequest, opts ...grpc.CallOption) (*DetachClusterResponse, error)
+	// Attach a Lightbits cluster to the CF service.
+	AttachCluster(ctx context.Context, in *AttachClusterRequest, opts ...grpc.CallOption) (*AttachClusterResponse, error)
+	// Get CF service credentials
+	GetCFServiceCredentials(ctx context.Context, in *GetCFServiceCredentialsRequest, opts ...grpc.CallOption) (*GetCFServiceCredentialsResponse, error)
+	// List workflows
+	//
+	// List the running and completed workflows.
+	ListWorkflows(ctx context.Context, in *ListWorkflowsRequest, opts ...grpc.CallOption) (*ListWorkflowsResponse, error)
+	// Get a specific workflow by its ID
+	//
+	// Get a specific workflow by its ID.
+	GetWorkflow(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*GetWorkflowResponse, error)
 }
 
 type durosAPIClient struct {
@@ -1185,6 +1217,76 @@ func (c *durosAPIClient) DisableFederatedAuthentication(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *durosAPIClient) CFLogin(ctx context.Context, in *CFLoginRequest, opts ...grpc.CallOption) (*CFLoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CFLoginResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_CFLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) ListClusters(ctx context.Context, in *ListClustersRequest, opts ...grpc.CallOption) (*ListClustersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListClustersResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_ListClusters_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) DetachCluster(ctx context.Context, in *DetachClusterRequest, opts ...grpc.CallOption) (*DetachClusterResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DetachClusterResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_DetachCluster_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) AttachCluster(ctx context.Context, in *AttachClusterRequest, opts ...grpc.CallOption) (*AttachClusterResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AttachClusterResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_AttachCluster_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) GetCFServiceCredentials(ctx context.Context, in *GetCFServiceCredentialsRequest, opts ...grpc.CallOption) (*GetCFServiceCredentialsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCFServiceCredentialsResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_GetCFServiceCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) ListWorkflows(ctx context.Context, in *ListWorkflowsRequest, opts ...grpc.CallOption) (*ListWorkflowsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListWorkflowsResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_ListWorkflows_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) GetWorkflow(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*GetWorkflowResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWorkflowResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_GetWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DurosAPIServer is the server API for DurosAPI service.
 // All implementations should embed UnimplementedDurosAPIServer
 // for forward compatibility.
@@ -1284,6 +1386,31 @@ type DurosAPIServer interface {
 	GetTrustedHostSecret(context.Context, *GetTrustedHostSecretsRequest) (*GetTrustedHostSecretsResponse, error)
 	EnableFederatedAuthentication(context.Context, *EnableFederatedAuthenticationRequest) (*EnableFederatedAuthenticationResponse, error)
 	DisableFederatedAuthentication(context.Context, *DisableFederatedAuthenticationRequest) (*DisableFederatedAuthenticationResponse, error)
+	// Login to the CF service
+	//
+	// If successful, the response will contain a token that should be used
+	// in the Authorization header for all subsequent requests.
+	CFLogin(context.Context, *CFLoginRequest) (*CFLoginResponse, error)
+	// List Lightbits clusters
+	//
+	// List the Lightbits clusters connected to the CF service.
+	ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error)
+	// Detach Lightbits cluster
+	//
+	// Detach a Lightbits cluster from the CF service.
+	DetachCluster(context.Context, *DetachClusterRequest) (*DetachClusterResponse, error)
+	// Attach a Lightbits cluster to the CF service.
+	AttachCluster(context.Context, *AttachClusterRequest) (*AttachClusterResponse, error)
+	// Get CF service credentials
+	GetCFServiceCredentials(context.Context, *GetCFServiceCredentialsRequest) (*GetCFServiceCredentialsResponse, error)
+	// List workflows
+	//
+	// List the running and completed workflows.
+	ListWorkflows(context.Context, *ListWorkflowsRequest) (*ListWorkflowsResponse, error)
+	// Get a specific workflow by its ID
+	//
+	// Get a specific workflow by its ID.
+	GetWorkflow(context.Context, *GetWorkflowRequest) (*GetWorkflowResponse, error)
 }
 
 // UnimplementedDurosAPIServer should be embedded to have
@@ -1577,6 +1704,27 @@ func (UnimplementedDurosAPIServer) EnableFederatedAuthentication(context.Context
 }
 func (UnimplementedDurosAPIServer) DisableFederatedAuthentication(context.Context, *DisableFederatedAuthenticationRequest) (*DisableFederatedAuthenticationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisableFederatedAuthentication not implemented")
+}
+func (UnimplementedDurosAPIServer) CFLogin(context.Context, *CFLoginRequest) (*CFLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CFLogin not implemented")
+}
+func (UnimplementedDurosAPIServer) ListClusters(context.Context, *ListClustersRequest) (*ListClustersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListClusters not implemented")
+}
+func (UnimplementedDurosAPIServer) DetachCluster(context.Context, *DetachClusterRequest) (*DetachClusterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DetachCluster not implemented")
+}
+func (UnimplementedDurosAPIServer) AttachCluster(context.Context, *AttachClusterRequest) (*AttachClusterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AttachCluster not implemented")
+}
+func (UnimplementedDurosAPIServer) GetCFServiceCredentials(context.Context, *GetCFServiceCredentialsRequest) (*GetCFServiceCredentialsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCFServiceCredentials not implemented")
+}
+func (UnimplementedDurosAPIServer) ListWorkflows(context.Context, *ListWorkflowsRequest) (*ListWorkflowsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListWorkflows not implemented")
+}
+func (UnimplementedDurosAPIServer) GetWorkflow(context.Context, *GetWorkflowRequest) (*GetWorkflowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflow not implemented")
 }
 func (UnimplementedDurosAPIServer) testEmbeddedByValue() {}
 
@@ -3301,6 +3449,132 @@ func _DurosAPI_DisableFederatedAuthentication_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DurosAPI_CFLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CFLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).CFLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_CFLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).CFLogin(ctx, req.(*CFLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_ListClusters_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListClustersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).ListClusters(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_ListClusters_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).ListClusters(ctx, req.(*ListClustersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_DetachCluster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetachClusterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).DetachCluster(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_DetachCluster_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).DetachCluster(ctx, req.(*DetachClusterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_AttachCluster_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AttachClusterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).AttachCluster(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_AttachCluster_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).AttachCluster(ctx, req.(*AttachClusterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_GetCFServiceCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCFServiceCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).GetCFServiceCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_GetCFServiceCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).GetCFServiceCredentials(ctx, req.(*GetCFServiceCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_ListWorkflows_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWorkflowsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).ListWorkflows(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_ListWorkflows_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).ListWorkflows(ctx, req.(*ListWorkflowsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_GetWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkflowRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).GetWorkflow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_GetWorkflow_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).GetWorkflow(ctx, req.(*GetWorkflowRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DurosAPI_ServiceDesc is the grpc.ServiceDesc for DurosAPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -3683,6 +3957,34 @@ var DurosAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DisableFederatedAuthentication",
 			Handler:    _DurosAPI_DisableFederatedAuthentication_Handler,
+		},
+		{
+			MethodName: "CFLogin",
+			Handler:    _DurosAPI_CFLogin_Handler,
+		},
+		{
+			MethodName: "ListClusters",
+			Handler:    _DurosAPI_ListClusters_Handler,
+		},
+		{
+			MethodName: "DetachCluster",
+			Handler:    _DurosAPI_DetachCluster_Handler,
+		},
+		{
+			MethodName: "AttachCluster",
+			Handler:    _DurosAPI_AttachCluster_Handler,
+		},
+		{
+			MethodName: "GetCFServiceCredentials",
+			Handler:    _DurosAPI_GetCFServiceCredentials_Handler,
+		},
+		{
+			MethodName: "ListWorkflows",
+			Handler:    _DurosAPI_ListWorkflows_Handler,
+		},
+		{
+			MethodName: "GetWorkflow",
+			Handler:    _DurosAPI_GetWorkflow_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
