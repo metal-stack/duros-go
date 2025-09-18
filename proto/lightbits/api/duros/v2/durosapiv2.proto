@@ -15,6 +15,8 @@ import "lightbits/api/duros/v2/security.proto";
 import "lightbits/api/duros/v2/labels.proto";
 import "lightbits/api/duros/v2/authz_mode.proto";
 import "lightbits/api/duros/v2/proxy_info.proto";
+import "lightbits/api/duros/v2/cf.proto";
+
 
 service DurosAPI {
     rpc GetVersion(GetVersionRequest) returns (Version) {
@@ -4034,6 +4036,227 @@ service DurosAPI {
             }
         };
     }
+
+    // Login to the CF service
+    //
+    // If successful, the response will contain a token that should be used
+    // in the Authorization header for all subsequent requests.
+    rpc CFLogin(CFLoginRequest) returns (CFLoginResponse) {
+        option (google.api.http) = {
+            post: "/cflogin"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Login to the cluster federation.";
+            description: "Login to the cluster federation service. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            security: {
+                security_requirement: {
+                  key: "BasicAuth";
+                  value: {};
+                }
+            },
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error in the cluster-federation service.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    // List Lightbits clusters
+    //
+    // List the Lightbits clusters connected to the CF service.
+    rpc ListClusters(ListClustersRequest) returns (ListClustersResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/clusters"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List clusters.";
+            description: "List clusters attached to the cluster-federation. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    // Detach Lightbits cluster
+    //
+    // Detach a Lightbits cluster from the CF service.
+    rpc DetachCluster(DetachClusterRequest) returns (DetachClusterResponse) {
+        option (google.api.http) = {
+            delete: "/api/v2/clusters/{cid}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Detach an existing cluster.";
+            description: "Detaches an existing cluster from the system. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error in the cluster-federation service.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    // Attach a Lightbits cluster to the CF service.
+    rpc AttachCluster(AttachClusterRequest) returns (AttachClusterResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/clusters"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Attach a new cluster.";
+            description: "Attaches a new cluster to the system. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error in the cluster-federation service.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    // Get CF service credentials
+    rpc GetCFServiceCredentials(GetCFServiceCredentialsRequest) returns (GetCFServiceCredentialsResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/cf-service-credentials"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get cluster-federation service credentials";
+            description: "Gets the cluster-federation service credentials. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    // List workflows
+    //
+    // List the running and completed workflows.
+    rpc ListWorkflows(ListWorkflowsRequest) returns (ListWorkflowsResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/workflows"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "List workflows";
+            description: "List the running and completed workflows. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error in the cluster-federation service.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
+
+    // Get a specific workflow by its ID
+    //
+    // Get a specific workflow by its ID.
+    rpc GetWorkflow(GetWorkflowRequest) returns (GetWorkflowResponse) {
+        option (google.api.http) = {
+            get: "/api/v2/workflows/{workflowId}"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Get a specific workflow";
+            description: "Gets a specific workflow by its ID. This API is currently unavailable. It is reserved for future support of cluster federation functionality.";
+            tags: "Cluster Federation";
+
+            responses: {
+                key: "401";
+                value: {
+                    description: "Authentication required / Authentication failed";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "400";
+                value: {
+                    description: "Invalid argument.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            },
+            responses: {
+                key: "500";
+                value: {
+                    description: "Internal error in the cluster-federation service.";
+                    schema: { json_schema: { type: INTEGER;	} }
+                }
+            }
+        };
+    }
 }
 
 
@@ -4386,7 +4609,7 @@ message CreateVolumeRequest {
 
     // name
     //
-    // Volume's immutable name.
+    // A volume's name is unique at the project level. Name length must be between 1 and 253 characters and can contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and period (.).
     string name = 1 [(grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {pattern: "^[a-zA-Z0-9-_\\.]{1,253}$"}];
     // size
     //
@@ -4599,7 +4822,7 @@ message UpdateVolumeRequest {
     };
     // UUID
     //
-    // Volume's UUID. Update volume identified by either name or UUID
+    // Optional identifier of the volume to update (command must use either name or UUID fields to identify volume).
     string UUID = 1;
     // acl
     //
@@ -4631,12 +4854,16 @@ message UpdateVolumeRequest {
     bool Force = 9;
     // name
     //
-    // Volume's name. Update volume identified by either name or UUID.
+    // Optional identifier of the volume to update (command must use either name or UUID fields to identify volume).
     string name = 10;
     // labels
     //
     // User-defined labels are optional for a volume. Labels are key-value pairs. A volume can have up to 16 labels. label-key and label-value length must be between 1 and 253 characters and can contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and period (.). If labels are passed during volume update, the existing volume's labels are replaced with the new ones. Otherwise, the labels are untouched.
     repeated Label labels = 11;
+    // new name
+    //
+    // Volume new name. A volume's name is unique on the project level. Name length must be between 1 and 253 characters and can contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and period (.).
+    string newName = 12;
 }
 
 message UpgradeServerRequest {
@@ -5233,6 +5460,10 @@ message ClusterInfo {
     //
     // Parameters of the last (or active) cluster upgrade process.
     ClusterLastUpgrade lastUpgrade = 14;
+    // inBandAuthMode
+    //
+    // Defines whether In-Band Authentication is enabled for the cluster(Enabled/Disabled).
+    // When enabled, authentication is required for hosts to connect to the Lightbits cluster.
     AuthenticationMode inBandAuthMode = 15;
     // encryptionStatus
     //
@@ -5385,7 +5616,7 @@ message Volume {
         ProtocolTCP = 0;
     }
 
-    //State
+    // State
     //
     // Indicates the current state of the volume in its creation/update/delete lifetime. It will reflect the state of execution of a user invoked API (CreateVolume, UpdateVolume..)
     // or an internal operation (Volume migration).
@@ -5416,8 +5647,17 @@ message Volume {
     // valid values: true/enable/enabled or false/disable/disabled
     string compression = 8;
     uint64 size = 9;
+    // name
+    //
+    // A volume's name is unique at the project level. Name length must be between 1 and 253 characters and can contain any of: alphanumeric characters (a-z, A-Z, 0-9) ,hyphen (-), underscore (_) and period (.).
     string name = 10;
+    // rebuildProgress
+    //
+    // Progress of the volume's replica rebuild operation in percent.
     string rebuildProgress = 11;
+    // statistics
+    //
+    // Volume statistics. Contains information about the physical used capacity, used memory, compression ratio, and more.
     VolumeStatisticsApi statistics = 12;
     // IPAcl
     //
@@ -5465,6 +5705,10 @@ message Volume {
     //
     // Optionally add labels to a volume.
     repeated Label labels = 25;
+    // clusterId
+    //
+    // The ID of the cluster where the volume is resides.
+    string clusterId = 26;
 }
 
 message ServerEvictionStatus {
@@ -6127,7 +6371,7 @@ message GetClusterConfigParamRequest {
     //
     // specify name of parameter to get: ClusterName/ ClockDriftIntervalForRaisingEvent/ DeviceHealthIntervalForRaisingEvent/
     // DurationToTurnIntoPermanentFailure/ VolumeDeletionFromNodeDelay/ DefaultQoSName/ AllowedNumRevives/ DisableVolumeStatisticsExport
-    // EnableTrim/ EvcitionNoProgressTimeout/ RevivesWindowDuration
+    // EnableTrim/ EvictionNoProgressTimeout/ RevivesWindowDuration
     string name = 1;
 }
 
@@ -6136,7 +6380,7 @@ message ClusterConfigParam {
     //
     // Specify the name of the parameter to update: ClusterName [name]/ ClockDriftIntervalForRaisingEvent [time]/ DeviceHealthIntervalForRaisingEvent [time]/
     // DurationToTurnIntoPermanentFailure [time]/ VolumeDeletionFromNodeDelay [time]/ DefaultQoSName [string]/ AllowedNumRevives [int]
-    // DisableVolumeStatisticsExport [bool]/ EnableTrim [bool]/ EvcitionNoProgressTimeout [time]/ RevivesWindowDuration [time].
+    // DisableVolumeStatisticsExport [bool]/ EnableTrim [bool]/ EvictionNoProgressTimeout [time]/ RevivesWindowDuration [time].
     string name = 1;
     // ClusterConfigParam value
     //
@@ -6500,7 +6744,7 @@ message ClusterEncryptionStatus {
     enum RotationState {
         NoRotation = 0; // No rotation is in progress
         DistributingKEK = 1; // Distributing KEK to all nodes
-        EncryptyingDEKs = 2;// Encrypting all DEKs with the new KEK
+        EncryptyingDEKs = 2; // Encrypting all DEKs with the new KEK
     }
 
     // encryptionState

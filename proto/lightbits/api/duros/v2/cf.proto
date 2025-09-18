@@ -1,0 +1,228 @@
+syntax = "proto3";
+
+package lightbits.api.duros.v2;
+
+option go_package = "duros/v2;v2";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
+import "grpc/gateway/protoc_gen_swagger/options/annotations.proto";
+
+// Login Request
+//
+// Request to login to the CF service.
+message CFLoginRequest {
+}
+
+// Login Response
+//
+// The response to the login to the CF service.
+message CFLoginResponse {
+    //
+    // The type of token.
+    string tokenType = 1;
+    //
+    // The time in seconds when the token will expire.
+    uint64 expiresIn = 2;
+    //
+    // The ID of the token.
+    string idToken = 3;
+}
+
+// Attach Cluster Request
+//
+// Request to attach a cluster to the CF service.
+message AttachClusterRequest {
+	//
+    // Management API endpoint of the cluster to connect to. Any one of the API endpoints can be used
+    // must be of the form `<host>:<port>`, e.g.: `10.0.0.1:443`, `foo.bar.com:443`.
+    string apiEndpoint = 1;
+}
+
+// Attach Cluster Response
+//
+// Response to attach a Lightbits cluster to the CF service.
+// ListWorkflows API and the returned workflow ID can be used to track the status of this operation.
+message AttachClusterResponse {
+    string workflowId = 1;
+}
+
+// Get Service Credentials Request
+//
+// Request to get the service credentials for the CF service.
+message GetCFServiceCredentialsRequest {}
+
+// Get Service Credentials Response
+//
+// The response to get the service credentials for the CF service.
+message GetCFServiceCredentialsResponse {
+    //
+    // The key ID to be used while importing the public key into the Lightbits cluster.
+    string pubKeyId = 1;
+    // The base64-encoded public key to be imported into the Lightbits cluster.
+    //
+    // After Base64 decoding, the contents should be saved as a file (e.g. into <FILE_PATH>) and
+    // passed as an argument to the following command to the corresponding Lightbits cluster, with
+    // <FILE_PATH> and <PUB_KEY_ID> substituted as appropriate.
+    //   lbcli create credential --project-name=system --id=<PUB_KEY_ID> --type=rsa256pubkey <FILE_PATH>
+    string pubKey = 2;
+}
+
+//
+// Request to detach a Lightbits cluster from the CF service.
+// After detaching the cluster, it is recommended to remove the CF credentials that were added to the Lightbits cluster,
+// by issuing the "lbcli delete credential command".
+message DetachClusterRequest {
+    // UUID of the cluster to detach from the CF service (must be a valid UUID).
+    string cid = 1;
+}
+
+//
+// Response to detach a Lightbits cluster from the CF service.
+message DetachClusterResponse {}
+
+//
+// Information about a Lightbits cluster connected to the CF service.
+message Cluster {
+    //
+    // The connection status of the cluster.
+    enum ClusterStatus {
+        Connected = 0;
+        Disconnected = 1;
+        Unauthorized = 2;
+    }
+    //
+    // The UUID of the cluster. Must be a valid UUID.
+    string id = 1;
+    //
+    // The name of the cluster.
+    string name = 2;
+    //
+    // The minimum version of the Lightbits release on the cluster.
+    string version = 3;
+    //
+    // The NQN of the subsystem of the cluster.
+    string subsystemNqn = 4;
+    //
+    // The list of API endpoints of the cluster.
+    repeated string apiEndpoints = 5;
+    //
+    // The list of discovery endpoints of the cluster.
+    repeated string discoveryEndpoints = 6;
+    //
+    // The connection status of the cluster.
+    message ClusterConnectionStatus {
+        ClusterStatus accessConnectionStatus = 1;
+    }
+
+    ClusterConnectionStatus clusterConnectionStatus = 9;
+}
+
+// List Clusters Request
+//
+// Request to list the Lightbits clusters connected to the CF service.
+message ListClustersRequest {}
+
+// List Clusters Response
+//
+// The response to list the Lightbits clusters connected to the CF service.
+message ListClustersResponse {
+    repeated Cluster clusters = 1;
+}
+
+
+
+// Progress information
+//
+// The progress information of a workflow.
+message Progress {
+    //
+    // The percentage of the workflow that has been completed.
+    int32 percent = 1;
+    //
+    // The current stage of the workflow.
+    string stage = 2;
+}
+
+
+//
+// Workflow information.
+message Workflow {
+    enum WorkflowState {
+        PENDING = 0;
+        RUNNING = 1;
+        COMPLETED = 2;
+        FAILED = 3;
+    }
+    //
+    // The UUID of the workflow.
+    string id = 1;
+    //
+    // The time the workflow was created.
+    google.protobuf.Timestamp createdAt = 2;
+    //
+    // The time the workflow started.
+    google.protobuf.Timestamp startedAt = 3;
+    //
+    // The time the workflow completed.
+    google.protobuf.Timestamp endedAt = 4;
+    //
+    // The type of workflow (e.g. attach cluster).
+    string type = 5;
+    //
+    // The state of the workflow.
+    string state = 6;
+    //
+    // A detailed message providing additional information on the workflow state. This is mainly used in case of failure.
+    string msg = 7;
+    //
+    // Progress information of the workflow.
+    Progress progress = 8;
+    oneof input {
+        AttachClusterRequest attachClusterRequest = 9; // Use a number not already used above
+    }
+}
+
+//
+// Request to get a workflow by its ID.
+message GetWorkflowRequest {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Workflow ID"
+            required: ["workflowId"]
+        }
+    };
+    //
+    // The ID of the workflow.
+    string workflowId = 1[
+        (grpc.gateway.protoc_gen_swagger.options.openapiv2_field) = {
+            description: "Workflow ID to get"
+            example: "\"2473253a-86e6-11ef-8751-2beef763dee3\""
+        }
+    ];
+}
+
+// Get Workflow Response
+//
+// The response to get a workflow by its ID.
+message GetWorkflowResponse {
+    //
+    // The workflow information.
+    Workflow workflow = 1;
+}
+
+// List Workflows Request
+message ListWorkflowsRequest {
+    google.protobuf.Int32Value pageSize = 1;
+    google.protobuf.BytesValue  nextPageToken = 2;
+}
+
+// List Workflows Response
+//
+// The response to list the workflows.
+// Note that the initial CF service will only return the last 100 workflows.
+message ListWorkflowsResponse {
+    repeated Workflow workflows = 1;
+    bytes nextPageToken = 2;
+}
