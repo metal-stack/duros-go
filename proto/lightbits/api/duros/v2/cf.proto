@@ -117,6 +117,14 @@ message Cluster {
     }
 
     ClusterConnectionStatus clusterConnectionStatus = 9;
+
+    //
+    // The Provisioned to Effective Storage Ratio is used for volume placement,
+    // aiming to allocate volumes to the cluster with the lowest ratio
+    // (least utilized). Provisioned storage refers to the sum of allocated
+    // capacity across all volumes, considering all their replicas. Effective
+    // storage represents the total available user data space on the cluster
+    string provisionedToEffectiveStorageRatio = 10;
 }
 
 // List Clusters Request
