@@ -48,6 +48,9 @@ const (
 	DurosAPI_DeleteServer_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/DeleteServer"
 	DurosAPI_EnableServer_FullMethodName                   = "/lightbits.api.duros.v2.DurosAPI/EnableServer"
 	DurosAPI_DisableServer_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/DisableServer"
+	DurosAPI_StartNodeInstance_FullMethodName              = "/lightbits.api.duros.v2.DurosAPI/StartNodeInstance"
+	DurosAPI_StopNodeInstance_FullMethodName               = "/lightbits.api.duros.v2.DurosAPI/StopNodeInstance"
+	DurosAPI_RestartNodeInstance_FullMethodName            = "/lightbits.api.duros.v2.DurosAPI/RestartNodeInstance"
 	DurosAPI_CreateProject_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/CreateProject"
 	DurosAPI_UpdateProject_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/UpdateProject"
 	DurosAPI_DeleteProject_FullMethodName                  = "/lightbits.api.duros.v2.DurosAPI/DeleteProject"
@@ -156,6 +159,12 @@ type DurosAPIClient interface {
 	DeleteServer(ctx context.Context, in *DeleteServerRequest, opts ...grpc.CallOption) (*DeleteServerResponse, error)
 	EnableServer(ctx context.Context, in *EnableServerRequest, opts ...grpc.CallOption) (*Server, error)
 	DisableServer(ctx context.Context, in *DisableServerRequest, opts ...grpc.CallOption) (*DisableServerResponse, error)
+	// Start a node instance
+	StartNodeInstance(ctx context.Context, in *StartNodeInstanceRequest, opts ...grpc.CallOption) (*StartNodeInstanceResponse, error)
+	// Stop a node instance
+	StopNodeInstance(ctx context.Context, in *StopNodeInstanceRequest, opts ...grpc.CallOption) (*StopNodeInstanceResponse, error)
+	// Restart a node instance
+	RestartNodeInstance(ctx context.Context, in *RestartNodeInstanceRequest, opts ...grpc.CallOption) (*RestartNodeInstanceResponse, error)
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*Project, error)
 	UpdateProject(ctx context.Context, in *UpdateProjectRequest, opts ...grpc.CallOption) (*UpdateProjectResponse, error)
 	DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*DeleteProjectResponse, error)
@@ -541,6 +550,36 @@ func (c *durosAPIClient) DisableServer(ctx context.Context, in *DisableServerReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DisableServerResponse)
 	err := c.cc.Invoke(ctx, DurosAPI_DisableServer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) StartNodeInstance(ctx context.Context, in *StartNodeInstanceRequest, opts ...grpc.CallOption) (*StartNodeInstanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartNodeInstanceResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_StartNodeInstance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) StopNodeInstance(ctx context.Context, in *StopNodeInstanceRequest, opts ...grpc.CallOption) (*StopNodeInstanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StopNodeInstanceResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_StopNodeInstance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *durosAPIClient) RestartNodeInstance(ctx context.Context, in *RestartNodeInstanceRequest, opts ...grpc.CallOption) (*RestartNodeInstanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RestartNodeInstanceResponse)
+	err := c.cc.Invoke(ctx, DurosAPI_RestartNodeInstance_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1319,6 +1358,12 @@ type DurosAPIServer interface {
 	DeleteServer(context.Context, *DeleteServerRequest) (*DeleteServerResponse, error)
 	EnableServer(context.Context, *EnableServerRequest) (*Server, error)
 	DisableServer(context.Context, *DisableServerRequest) (*DisableServerResponse, error)
+	// Start a node instance
+	StartNodeInstance(context.Context, *StartNodeInstanceRequest) (*StartNodeInstanceResponse, error)
+	// Stop a node instance
+	StopNodeInstance(context.Context, *StopNodeInstanceRequest) (*StopNodeInstanceResponse, error)
+	// Restart a node instance
+	RestartNodeInstance(context.Context, *RestartNodeInstanceRequest) (*RestartNodeInstanceResponse, error)
 	CreateProject(context.Context, *CreateProjectRequest) (*Project, error)
 	UpdateProject(context.Context, *UpdateProjectRequest) (*UpdateProjectResponse, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) (*DeleteProjectResponse, error)
@@ -1503,6 +1548,15 @@ func (UnimplementedDurosAPIServer) EnableServer(context.Context, *EnableServerRe
 }
 func (UnimplementedDurosAPIServer) DisableServer(context.Context, *DisableServerRequest) (*DisableServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisableServer not implemented")
+}
+func (UnimplementedDurosAPIServer) StartNodeInstance(context.Context, *StartNodeInstanceRequest) (*StartNodeInstanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartNodeInstance not implemented")
+}
+func (UnimplementedDurosAPIServer) StopNodeInstance(context.Context, *StopNodeInstanceRequest) (*StopNodeInstanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopNodeInstance not implemented")
+}
+func (UnimplementedDurosAPIServer) RestartNodeInstance(context.Context, *RestartNodeInstanceRequest) (*RestartNodeInstanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestartNodeInstance not implemented")
 }
 func (UnimplementedDurosAPIServer) CreateProject(context.Context, *CreateProjectRequest) (*Project, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
@@ -2239,6 +2293,60 @@ func _DurosAPI_DisableServer_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DurosAPIServer).DisableServer(ctx, req.(*DisableServerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_StartNodeInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartNodeInstanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).StartNodeInstance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_StartNodeInstance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).StartNodeInstance(ctx, req.(*StartNodeInstanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_StopNodeInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopNodeInstanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).StopNodeInstance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_StopNodeInstance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).StopNodeInstance(ctx, req.(*StopNodeInstanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DurosAPI_RestartNodeInstance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RestartNodeInstanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DurosAPIServer).RestartNodeInstance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DurosAPI_RestartNodeInstance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DurosAPIServer).RestartNodeInstance(ctx, req.(*RestartNodeInstanceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3689,6 +3797,18 @@ var DurosAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DisableServer",
 			Handler:    _DurosAPI_DisableServer_Handler,
+		},
+		{
+			MethodName: "StartNodeInstance",
+			Handler:    _DurosAPI_StartNodeInstance_Handler,
+		},
+		{
+			MethodName: "StopNodeInstance",
+			Handler:    _DurosAPI_StopNodeInstance_Handler,
+		},
+		{
+			MethodName: "RestartNodeInstance",
+			Handler:    _DurosAPI_RestartNodeInstance_Handler,
 		},
 		{
 			MethodName: "CreateProject",

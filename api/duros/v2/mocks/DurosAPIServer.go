@@ -2587,6 +2587,36 @@ func (_m *DurosAPIServer) ReplaceNode(_a0 context.Context, _a1 *v2.ReplaceNodeRe
 	return r0, r1
 }
 
+// RestartNodeInstance provides a mock function with given fields: _a0, _a1
+func (_m *DurosAPIServer) RestartNodeInstance(_a0 context.Context, _a1 *v2.RestartNodeInstanceRequest) (*v2.RestartNodeInstanceResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RestartNodeInstance")
+	}
+
+	var r0 *v2.RestartNodeInstanceResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.RestartNodeInstanceRequest) (*v2.RestartNodeInstanceResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.RestartNodeInstanceRequest) *v2.RestartNodeInstanceResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.RestartNodeInstanceResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.RestartNodeInstanceRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // RollbackVolume provides a mock function with given fields: _a0, _a1
 func (_m *DurosAPIServer) RollbackVolume(_a0 context.Context, _a1 *v2.RollbackVolumeRequest) (*v2.RollbackVolumeResponse, error) {
 	ret := _m.Called(_a0, _a1)
@@ -2669,6 +2699,66 @@ func (_m *DurosAPIServer) SetTrustedHostSecret(_a0 context.Context, _a1 *v2.SetT
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.SetTrustedHostSecretsRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// StartNodeInstance provides a mock function with given fields: _a0, _a1
+func (_m *DurosAPIServer) StartNodeInstance(_a0 context.Context, _a1 *v2.StartNodeInstanceRequest) (*v2.StartNodeInstanceResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StartNodeInstance")
+	}
+
+	var r0 *v2.StartNodeInstanceResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StartNodeInstanceRequest) (*v2.StartNodeInstanceResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StartNodeInstanceRequest) *v2.StartNodeInstanceResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.StartNodeInstanceResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.StartNodeInstanceRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// StopNodeInstance provides a mock function with given fields: _a0, _a1
+func (_m *DurosAPIServer) StopNodeInstance(_a0 context.Context, _a1 *v2.StopNodeInstanceRequest) (*v2.StopNodeInstanceResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StopNodeInstance")
+	}
+
+	var r0 *v2.StopNodeInstanceResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StopNodeInstanceRequest) (*v2.StopNodeInstanceResponse, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StopNodeInstanceRequest) *v2.StopNodeInstanceResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.StopNodeInstanceResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.StopNodeInstanceRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

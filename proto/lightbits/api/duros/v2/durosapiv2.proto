@@ -1359,6 +1359,64 @@ service DurosAPI {
         };
     }
 
+    // Start a node instance
+    rpc StartNodeInstance(StartNodeInstanceRequest) returns (StartNodeInstanceResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/nodes/{nodeUUID}/start"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Start a stopped node instance";
+            description: "This operation starts a specific node instance.\n"
+                         "Starting all of the node's Lightbits services, including duroslight and the backend instance.\n"
+                         "This is useful for dual-node servers where you want to start a single node instance without affecting the other node.\n"
+                         "Only system administrators can execute this command.\n"
+                         "Note that node maintenance operations (stop/start/restart) are a tech preview, for evaluative purposes only. "
+                         "They should not be used in production clusters.";
+            tags: "Node operations";
+        };
+    }
+
+    // Stop a node instance
+    rpc StopNodeInstance(StopNodeInstanceRequest) returns (StopNodeInstanceResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/nodes/{nodeUUID}/stop"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Stop a running node instance";
+            description: "This operation stops a specific node instance.\n"
+                         "Stopping all of the node's Lightbits services, including duroslight and the backend instance.\n"
+                         "This is useful for dual-node servers where you want to stop a single node instance without affecting the other node.\n"
+                         "This operation is blocked if it could cause data unavailability. Use --force to override this check.\n"
+                         "Please note that this is a potentially disruptive operation that should be used with care. "
+                         "Only system administrators can execute this command.\n"
+                         "Note that node maintenance operations (stop/start/restart) are a tech preview, for evaluative purposes only. "
+                         "They should not be used in production clusters.";
+            tags: "Node operations";
+        };
+    }
+
+    // Restart a node instance
+    rpc RestartNodeInstance(RestartNodeInstanceRequest) returns (RestartNodeInstanceResponse) {
+        option (google.api.http) = {
+            post: "/api/v2/nodes/{nodeUUID}/restart"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+            summary: "Restart a running node instance";
+            description: "This operation restarts the node instance for a specific node by restarting only its own services.\n"
+                         "This includes duroslight and the gftl backend instances (unless --consider-backend=false is specified).\n"
+                         "This is useful for dual-node servers where you want to restart a single node instance without affecting the other node.\n"
+                         "This operation will be blocked if it could cause data unavailability. Use --force to override this check.\n"
+                         "Please note that this is a potentially disruptive operation that should be used with care. "
+                         "Only system administrators can execute this command.\n"
+                         "Note that node maintenance operations (stop/start/restart) are a tech preview, for evaluative purposes only. "
+                         "They should not be used in production clusters.";
+            tags: "Node operations";
+        };
+    }
+
 
     rpc CreateProject(CreateProjectRequest) returns (Project) {
         option (google.api.http) = {
@@ -3693,7 +3751,7 @@ service DurosAPI {
             }
         };
     }
-     
+
     rpc DisableClusterInBandAuth(DisableClusterInBandAuthRequest) returns (DisableClusterInBandAuthResponse) {
         option (google.api.http) = {
             post: "/api/v2/cluster/inBandAuth/disable"
@@ -4043,7 +4101,7 @@ service DurosAPI {
     // in the Authorization header for all subsequent requests.
     rpc CFLogin(CFLoginRequest) returns (CFLoginResponse) {
         option (google.api.http) = {
-            post: "/cflogin"
+            post: "/api/v2/cflogin"
         };
         option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
             summary: "Login to the cluster federation.";
@@ -5115,6 +5173,10 @@ message ListNvmeDevicesRequest {
     //
     // Optionally, list all NVMe devices attached to a specified server.
     string serverUUID = 2;
+    // deviceUsage
+    //
+    // Optionally, filter NVMe devices by their usage
+    repeated UserNvmeDevicesResponse.DeviceUsageEnum deviceUsages = 3;
 }
 
 message GetNvmeDeviceRequest {
@@ -5160,6 +5222,13 @@ message UserNvmeDevicesResponse {
         Rebuilding = 3;
         Failed = 4;
     }
+    enum DeviceUsageEnum {
+        Unknown = 0;
+        Data = 1;
+        Journal = 2;
+        OS = 3;
+        UnManaged = 4;
+    }
     // size
     //
     // Total capacity of the device in bytes.
@@ -5186,10 +5255,12 @@ message UserNvmeDevicesResponse {
     StateEnum state = 6;
     // device time of failure
     //
+    // Relevant only for NVMe devices with deviceUsage set to Data.
     // Timestamp that will be updated in case the device has failed.
     google.protobuf.Timestamp failureTime = 7;
     // device rebuild completion time
     //
+    // Relevant only for NVMe devices with deviceUsage set to Data.
     // Timestamp that will be updated once GFTL has completed
     // to rebuild all the data that the device had, and we are safe
     // for second failure.
@@ -5208,8 +5279,13 @@ message UserNvmeDevicesResponse {
     string ETag = 13;
     // Statistics
     //
+    // Relevant only for NVMe devices with deviceUsage set to Data.
     // Various nvme-device related statistics.
     NvmeDeviceStatisticsApi statistics = 14;
+    // DeviceUsage
+    //
+    // Specifies the assignment of the NVMe device for example data, journal, etc..
+    DeviceUsageEnum deviceUsage =15;
 }
 
 message DurosNodeInfo {
@@ -5275,6 +5351,29 @@ message DurosNodeInfo {
     bool readOnly = 18;
     uint32 powerupProgress = 19;
     bool permanentFailure = 20;
+    oneof JournalDeviceInfo {
+        string journalDeviceNotFound = 21;
+        JournalNvmeDevice journalNvmeDevice = 22;
+        JournalRaidDevice journalRaidDevice = 23;
+    }
+}
+
+message JournalRaidDevice {
+    // deviceUUID
+    //
+    // The UUID of the RAID device.
+    string deviceUUID = 1;
+    // memberDeviceSerials
+    //
+    // Serial numbers of the devices participating in the RAID array.
+    repeated string memberDeviceSerials = 2;
+}
+
+message JournalNvmeDevice {
+    // deviceSerial
+    //
+    // The serial number of the NVMe device.
+    string deviceSerial = 1;
 }
 
 message ListNodesResponse {
@@ -5302,6 +5401,54 @@ message ReplaceNodeResponse {}
 message DeleteServerResponse {}
 
 message DisableServerResponse {}
+
+message StartNodeInstanceRequest {
+    // nodeUUID
+    //
+    // The UUID of the node to start.
+    string nodeUUID = 1;
+}
+
+message StartNodeInstanceResponse {}
+
+message StopNodeInstanceRequest {
+    // nodeUUID
+    //
+    // The UUID of the node to stop.
+    string nodeUUID = 1;
+    // force
+    //
+    // When set to true, bypasses the safety check that prevents stopping a node
+    // if it would cause volumes to become unavailable or read-only.
+    // WARNING: Using force=true may cause data unavailability.
+    // Default: false
+    bool force = 2;
+}
+
+message StopNodeInstanceResponse {}
+
+message RestartNodeInstanceRequest {
+    // nodeUUID
+    //
+    // The UUID of the node to restart.
+    string nodeUUID = 1;
+    // considerBackend
+    //
+    // Whether to include the backend (gftl) when restarting the node.
+    // When true, both duroslight and gftl backend will be restarted.
+    // When false (default), only duroslight and control plane components will be restarted.
+    // Default: false
+    bool considerBackend = 2;
+    // force
+    //
+    // When set to true, bypasses the safety check that prevents restarting a node
+    // if it would cause volumes to become unavailable or read-only.
+    // WARNING: Using force=true may cause temporary data unavailability.
+    // Default: false
+    bool force = 3;
+}
+
+message RestartNodeInstanceResponse {}
 
 message ListServersRequest {
     // UUID
@@ -5531,6 +5678,10 @@ message ClusterInfoV2 {
     //
     // Information about the state of Cluster Level Encryption
     ClusterEncryptionStatus encryptionStatus = 16;
+
+    // Defines whether In-Band Authentication is enabled for the cluster(Enabled/Disabled).
+    // When enabled, authentication is required for hosts to connect to the Lightbits cluster.
+    ClusterInfo.AuthenticationMode inBandAuthMode = 17;
 }
 
 message ClusterHealth {
@@ -5707,8 +5858,12 @@ message Volume {
     repeated Label labels = 25;
     // clusterId
     //
-    // The ID of the cluster where the volume is resides.
+    // The ID of the cluster where the volume resides.
     string clusterId = 26;
+    // PG UUID
+    //
+    // The Protection Group this volume is placed in.
+    string pgUUID = 27;
 }
 
 message ServerEvictionStatus {
@@ -5947,6 +6102,14 @@ message Snapshot {
     //
     // Once a snapshot is taken, the volume's labels are copied to the snapshot. Once a clone is created, if the user does not pass new labels on clone creation, the cloned volume labels are copied from the source snapshot labels.
     repeated Label labels = 22;
+    // clusterId
+    //
+    // The ID of the cluster where the snapshot resides.
+    string clusterId = 23;
+    // PG UUID
+    //
+    // The Protection Group this snapshot is placed in.
+    string pgUUID = 24;
 }
 
 message DeleteSnapshotRequest {
@@ -6025,7 +6188,7 @@ message ListSnapshotsRequest {
     string projectName = 3;
     // offsetUUID
     //
-    // Optional. When provided, returned list starts with next to offsetUUID volume.
+    // Optional. When provided, returned list starts with next to offsetUUID snapshot.
     string offsetUUID = 4;
     // limit
     //
@@ -6443,6 +6606,7 @@ message LabelValueKeyPair {
         Unknown = 0;
         FD = 1;
         PrimaryFD = 2;
+        ClusterID = 3;
     };
 
     Key key = 1;
@@ -6460,7 +6624,10 @@ message LabelMatchExpression {
     Operator operator = 1;
     // Volume affinity operation Key/Value pairs
     //
-    // Volume affinity KeyPairs. Key currently must be fd (failure domain). Value should specify the failure domains we want to match.
+    // Volume affinity KeyPairs. Key currently must be one of:
+    // fd (failure domain). Value should specify the failure domains we want to match.
+    // PrimaryFd (primary failure domain). Value should specify the primary failure domain we want to match.
+    // ClusterId (cluster ID - cluster federation only). Value should specify the cluster ID we want to match.
     repeated LabelValueKeyPair labelValueKeyPairs = 2;
 }
 
@@ -6737,14 +6904,19 @@ message ClusterEncryptionStatus {
     enum State {
         Disabled = 0; // Encryption is disabled
         Enabling = 1; // Enabling cluster encryption
-        Enabled = 2;  // Cluster encryption is enabled
-        Unknown = 3;  // Unknown state
+        Enabled = 2; // Cluster encryption is enabled
+        Unknown = 3; // Unknown state
     }
 
     enum RotationState {
+        option allow_alias = true;
         NoRotation = 0; // No rotation is in progress
         DistributingKEK = 1; // Distributing KEK to all nodes
-        EncryptyingDEKs = 2; // Encrypting all DEKs with the new KEK
+        EncryptingDEKs = 2; // Encrypting all DEKs with the new KEK
+        // Deprecated: Typo in 'EncryptyingDEKs'. Use 'EncryptingDEKs' instead.
+        // TODO: Remove the deprecated 'EncryptyingDEKs' field in version 3.20+.
+        // (The correct field 'EncryptingDEKs' was added in 3.18; removal is scheduled 2 versions later.)
+        EncryptyingDEKs = 2;
     }
 
     // encryptionState

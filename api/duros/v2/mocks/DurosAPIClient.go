@@ -3201,6 +3201,43 @@ func (_m *DurosAPIClient) ReplaceNode(ctx context.Context, in *v2.ReplaceNodeReq
 	return r0, r1
 }
 
+// RestartNodeInstance provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) RestartNodeInstance(ctx context.Context, in *v2.RestartNodeInstanceRequest, opts ...grpc.CallOption) (*v2.RestartNodeInstanceResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RestartNodeInstance")
+	}
+
+	var r0 *v2.RestartNodeInstanceResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.RestartNodeInstanceRequest, ...grpc.CallOption) (*v2.RestartNodeInstanceResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.RestartNodeInstanceRequest, ...grpc.CallOption) *v2.RestartNodeInstanceResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.RestartNodeInstanceResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.RestartNodeInstanceRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // RollbackVolume provides a mock function with given fields: ctx, in, opts
 func (_m *DurosAPIClient) RollbackVolume(ctx context.Context, in *v2.RollbackVolumeRequest, opts ...grpc.CallOption) (*v2.RollbackVolumeResponse, error) {
 	_va := make([]interface{}, len(opts))
@@ -3304,6 +3341,80 @@ func (_m *DurosAPIClient) SetTrustedHostSecret(ctx context.Context, in *v2.SetTr
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *v2.SetTrustedHostSecretsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// StartNodeInstance provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) StartNodeInstance(ctx context.Context, in *v2.StartNodeInstanceRequest, opts ...grpc.CallOption) (*v2.StartNodeInstanceResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StartNodeInstance")
+	}
+
+	var r0 *v2.StartNodeInstanceResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StartNodeInstanceRequest, ...grpc.CallOption) (*v2.StartNodeInstanceResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StartNodeInstanceRequest, ...grpc.CallOption) *v2.StartNodeInstanceResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.StartNodeInstanceResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.StartNodeInstanceRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// StopNodeInstance provides a mock function with given fields: ctx, in, opts
+func (_m *DurosAPIClient) StopNodeInstance(ctx context.Context, in *v2.StopNodeInstanceRequest, opts ...grpc.CallOption) (*v2.StopNodeInstanceResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StopNodeInstance")
+	}
+
+	var r0 *v2.StopNodeInstanceResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StopNodeInstanceRequest, ...grpc.CallOption) (*v2.StopNodeInstanceResponse, error)); ok {
+		return rf(ctx, in, opts...)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *v2.StopNodeInstanceRequest, ...grpc.CallOption) *v2.StopNodeInstanceResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v2.StopNodeInstanceResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *v2.StopNodeInstanceRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

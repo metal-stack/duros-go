@@ -235,10 +235,6 @@ message GetTrustedHostSecretsResponse {
     //
     // A target secret to allow a trusted connection from a NVMe target (Lightbits cluster) to a host.
     string targetSecret = 3;
-    // targetSecretType
-    //
-    // Type of target secret to set Disabled (default)/ Enabled/ AutoGenSecret.
-    TargetSecretType targetSecretType = 4;
 }
 
 message EnableClusterInBandAuthRequest {
